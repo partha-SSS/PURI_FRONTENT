@@ -1,0 +1,60 @@
+.color_icon {
+    color: #044800; /* Change 'red' to your desired color */
+  }
+  .menu_item_style {
+    color: #044800;
+     /* Change 'red' to your desired color */
+  }
+  button span{
+    user-select: none;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    line-height: 48px;
+    height: 48px;
+    text-align: left;
+    text-decoration: none;
+    max-width: 100%;
+    position: relative;
+  }
+  .mat-menu-item:hover{
+    background-color: rgb(148 229 121 / 60%)!important;
+}
+
+.mat-mdc-menu-item {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  padding: 0;
+  padding-left: 10px!important;
+  padding-right: 10px!important;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  box-sizing: border-box;
+  color: inherit;
+  font-size: inherit;
+  background: none;
+  text-decoration: none;
+  margin: 0;
+  min-height: 48px;
+}
+.mat-mdc-focus-indicator {
+  position: relative;
+}
+.mat-mdc-menu-item.mat-mdc-menu-item-submenu-trigger {
+  margin-right: 34px!important;
+  padding-right: 0px!important;
+}

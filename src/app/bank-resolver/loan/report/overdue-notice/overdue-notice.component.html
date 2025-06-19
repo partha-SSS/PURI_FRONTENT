@@ -1,0 +1,496 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+  
+          <div class="form-row">
+            <div class="col-12">
+              <small for="acc_type_cd">Loan Type</small>
+             <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_cd">
+               <option *ngIf="AcctTypes" disabled>Choose</option>
+               <option  *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                 {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+               </option>
+             </select>
+            </div>
+            <div class="col-12">
+              <small for="block">Block</small>
+             <select id="block" class="form-control form-control-sm" formControlName="block">
+               <option *ngIf="blocks" disabled>Choose</option>
+               <option  *ngFor="let block of blocks" [value]="block.block_cd">
+                 {{block.block_name}}
+               </option>
+             </select>
+            </div>
+            <div class="col-12">
+              <small for="activity_cd">Activity</small>
+                <select id="activity_cd" class="form-control form-control-sm" formControlName="activity_cd">
+                  <option *ngIf="activityList" disabled>Choose</option>
+                  <option *ngFor="let acti of activityList" [value]="acti.activity_desc">
+                    {{acti.activity_desc}}
+                  </option>
+                </select>
+             </div>
+            <!-- <div class="col-4">
+              <small for="block">Block</small>
+             <input type="text" id="block" class="form-control form-control-sm" formControlName="block" disabled>
+            </div>
+            <div class="col-12 example-form">
+              <mat-form-field class="example-full-width">
+                <small> Select Village</small>
+                <input type="text"
+                       aria-label="Number"
+                       matInput
+                       formControlName="vill_cd"
+                       [matAutocomplete]="auto"
+                       (keypress)="filterVill()">
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                  <mat-option *ngFor="let option of filteredOptions | async; let i=index" [value]="option.vill_name" (click)="setVill()" >
+                    {{option.vill_name}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+             -->
+            <div class="col-6">
+              <small for="fromDate">From Date</small>
+              <div class="input-group">
+                <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                  formControlName="fromDate"
+                  [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+                <div class="input-group-append">
+                  <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <small for="toDate">To Date</small>
+              <div class="input-group">
+                <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                  formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                  [isOpen]="isOpenToDp">
+                <div class="input-group-append">
+                  <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+        </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+    
+    <div class="row d-flex justify-content-center align-items-center pt-4"style="background-color: #78c2ad21; min-height: 20vh;">
+      <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+        <div>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" printSectionId="mattable"
+            ngxPrint>Print</button>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+    
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+        <mat-form-field appearance="outline" >
+          <mat-label>Search....</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Abc/123" #input>
+        </mat-form-field>
+        <div class="mat-elevation-z8" id="mattable">
+          
+          <table mat-table [dataSource]="dataSource" matSort *ngIf="ardbcd!='2'">
+            
+          
+            <!-- Fruit Column -->
+            <ng-container matColumnDef="acc_cd" *ngIf="ardbcd!='26'">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                <td mat-cell *matCellDef="let data let i=index"> 
+                  <div class="justify-content-center"style="text-align:center;padding-top: 40px;" *ngIf="data">
+                    <div *ngIf="ardbcd=='4'">
+                      <h5> <b>{{getArdb}} {{translatedData?.heading}} </b> </h5>
+                      <h5>Branch : Ghatal / Khirpai / Sonakhali</h5>
+                    </div>
+                    <div *ngIf="ardbcd=='20'">
+                      <h4> <b>{{getArdb}} {{translatedData?.heading}} </b> </h4>
+                      <h4><b>Branch : Suri(H.O) / Bolpur</b></h4>
+                    </div>
+                    
+                    <br>
+                    <div class="row">
+                        <div class="col-12" style="font-weight:700;font-size: large; text-align:center">{{translatedData?.name}} - {{data?.cust_name }}</div> <br>
+                        <div class="col-12" style="font-weight:700;font-size: large; text-align:center">{{overdueData?.purpose}} - {{data?.activity_name }}</div> 
+                        
+                    </div><br>
+                    <div class="row" style="font-size: larger;">
+                      <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:10px">
+                           <b>{{translatedData?.address}} - C/o:{{data?.block_name}},<br>{{data?.ardb_cd}}</b>
+                       </div> 
+                      <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:10px"> 
+                          <div class="row">
+                          <b><div class="col-12 pull-left"> {{translatedData?.member_code}} - {{data?.brn_cd}}</div></b>
+                          </div><br>
+                          <div class="row">
+                              <b><div class="col-12 pull-left"> {{translatedData?.loan_id}} -{{data?.loan_id}} </div></b>
+                          </div><br>
+                          <div class="row">
+                              <b><div class="col-12 pull-left">{{translatedData?.ledger_no}} - {{data?.loan_case_no}} </div></b>
+                          </div>
+                        </div>
+                   </div>
+                   <br><br><br><br><br>
+                   <h3><b style="font-size: large;"> {{overdueData?.notice_flag}} </b> </h3>  
+                  </div><br><br><br>
+                  <div style="padding-left:5px;padding-right:5px;font-size: larger;">
+                    {{translatedData?.salutation}}, <br> {{translatedData?.salutation_sub}}, <br> {{overdueData?.body_pre}} 
+                    <br><br><br><br><br><br><br><br><br><br><br> {{overdueData?.body_mid}} {{converDttoDt}} {{overdueData?.body_post}} <br><br><br>
+                  <table style="border-style:dotted;width: 40%;padding-left: 10%;">
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.curr_prn}}</td>
+                      <td style="text-align: right;">{{data?.curr_prn| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.prn}}</td>
+                      <td style="text-align: right;">{{data?.ovd_prn| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.intt}}</td>
+                      <td style="text-align: right;">{{data?.ovd_intt| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.curr_intt}}</td>
+                      <td style="text-align: right;">{{data?.curr_intt| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.penal_amt}}</td>
+                      <td style="text-align: right;">{{data?.penal_intt| currency:"INR"}}</td>
+                    </tr>
+                       <tr><td colspan="2">..............................................................................................................................................</td></tr>
+                       <tr ><td colspan="2" style="text-align: right;"><b>{{overdueData?.total}} : {{data?.curr_intt + data?.curr_prn + data?.ovd_prn + data?.ovd_intt + data?.penal_intt| currency:'INR'}}</b></td></tr>
+                       
+                    </table><br><br><br><br><br><br><br><br><br>
+                 <div class="pull-right bt-5">
+                    {{overdueData?.regards_pre}} <br><br><br><br><br><br>
+                    ------------------------------------------ <br> 
+                    {{overdueData?.regards_post}}
+                 </div><br><br><br><br><br><br><br><br><br>
+                 <!-- <br>   {{translatedData?.foot_pre}}  <br><br><br><br><h1>&nbsp;</h1> -->
+                </div>
+                </td>
+              </ng-container>
+            
+              <ng-container matColumnDef="acc_cd" *ngIf="ardbcd=='26'">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                <td mat-cell *matCellDef="let data let i=index"> 
+                  <div class="justify-content-center"style="text-align:center;padding-top: 40px;" *ngIf="data">
+                   
+                     <div>
+                          <h2> <b>{{overdueData?.bmHead}} </b> </h2>
+                          <h4> <b>{{overdueData?.bmAdd1}} </b> </h4>
+                          <h4> <b>{{overdueData?.bmAdd2}} </b> </h4>
+                          <h4> <b>{{overdueData?.bm_website}} </b> </h4>
+                    </div>
+                    <br>
+                    <div class="row" style="font-size:medium;">
+                      <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:10px">
+                            <div class="row">
+                              <b><div class="col-12 pull-left">{{translatedData?.name}} - {{data?.cust_name }}</div></b>
+                           </div>
+                           <div class="row">
+                              <b><div class="col-12 pull-left">{{translatedData?.guardian_name}} - {{data?.block_name }}</div></b>
+                           </div>
+                           <div class="row">
+                            <!-- C/o:{{data?.block_name}},  -->
+                              <b><div class="col-12 pull-left">{{translatedData?.address}} - {{data?.ardb_cd}}</div></b>
+                           </div> 
+                           <div class="row">
+                              <b><div class="col-12 pull-left">{{translatedData?.join_holder}} - {{data.cust_address.toString().length>2?data?.cust_address:'N/A'}}</div></b>
+                            </div>
+                          </div> 
+                      <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:10px"> 
+                          <div class="row">
+                          <b><div class="col-12 pull-left"> {{translatedData?.member_code}} - {{data?.brn_cd}}</div></b>
+                          </div>
+                          <div class="row">
+                              <b><div class="col-12 pull-left"> {{translatedData?.loan_id}} -{{data?.loan_id}} </div></b>
+                          </div>
+                          <div class="row">
+                              <b><div class="col-12 pull-left">{{translatedData?.ledger_no}} - {{data?.loan_case_no}} </div></b>
+                          </div>
+                          <div class="row">
+                              <b><div class="col-12 pull-left">{{overdueData?.purpose}} - {{data?.activity_name }} </div></b>
+                          </div>
+                        </div>
+                   </div>
+                   <br><br>
+                   <h2><b style="font-size: x-large;"> নোটিশ </b> </h2>  
+                  </div><br><br><br>
+                  <div style="padding-left:5px;padding-right:5px;font-size: larger;">
+                    {{translatedData?.salutation}}, <br> {{translatedData?.salutation_sub}}, <br> {{overdueData?.bm_body1}}  {{converDttoDt}} {{overdueData?.bm_body2}} 
+                     <br><br><br>
+                  <table style="border-style:dotted;width: 30%;padding-left: 10%;">
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.curr_prn}}</td>
+                      <td style="text-align: right;">{{data?.curr_prn| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.prn}}</td>
+                      <td style="text-align: right;">{{data?.ovd_prn| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.intt}}</td>
+                      <td style="text-align: right;">{{data?.ovd_intt| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.curr_intt}}</td>
+                      <td style="text-align: right;">{{data?.curr_intt| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.penal_amt}}</td>
+                      <td style="text-align: right;">{{data?.penal_intt| currency:"INR"}}</td>
+                    </tr>
+                       <tr><td colspan="2">..............................................................................................................................................</td></tr>
+                       <tr ><td colspan="2" style="text-align: right;"><b>{{overdueData?.total}} : {{data?.curr_intt + data?.curr_prn + data?.ovd_prn + data?.ovd_intt + data?.penal_intt| currency:'INR'}}</b></td></tr>
+                       
+                    </table><br>
+                    <div>
+                      <img src="./assets/images/qr.jpeg" width="600" height="310"  />
+                    </div>
+                 <div class="pull-right bt-5">
+                    {{overdueData?.regards_pre}} <br><br><br><br>
+                    ------------------------------------------ <br> 
+                    {{overdueData?.regards_post}}
+                 </div><br><br><br><br><br><br><br>
+                 <!-- <br>   {{translatedData?.foot_pre}}  <br><br><br><br><h1>&nbsp;</h1> -->
+                </div>
+                
+                </td>
+              </ng-container>
+             
+             
+            
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="custom-row"></tr>
+            
+            <!-- Row shown when there is no matching data. -->
+            
+          </table>
+          <table mat-table [dataSource]="dataSource" matSort *ngIf="ardbcd=='2'">
+            
+          
+            <!-- Fruit Column -->
+            <ng-container matColumnDef="acc_cd" >
+                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                <td mat-cell *matCellDef="let data let i=index"> 
+                  <div class="justify-content-center"style="text-align:center;padding-top: 40px;" *ngIf="data">
+                    <div>
+                      <h2>Regd. With A/D</h2><br>
+                      <h4>কন্টাই কো অপারেটিভ্ এগ্রিকালচার অ্যান্ড রুরাল ডেভেলপমেন্ট ব্যাঙ্ক লিমিটেড</h4>
+                      <h4> পো:- কাঁথি :: জেলা:- পূর্ব মেদিনীপুর </h4>
+                      <h5>Branch: {{branchName}}</h5>
+                      <h4>|| নোটিশ ||</h4>
+                      <h4>{{overdueData?.con_head}}</h4>
+                    </div>
+                    <br>
+                    <div class="row" style="font-size: larger;">
+                      <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:10px">
+                        <div class="row">
+                          <b><div class="col-12 pull-left"> মেমো নং - </div></b>
+                          </div>
+                        <div class="row">
+                          <b><div class="col-12 pull-left"> {{translatedData?.name}} - {{data?.cust_name }}</div></b>
+                          </div>
+                          <div class="row">
+                            <b><div class="col-12 pull-left"> {{translatedData?.guardian_name}} - C/o:{{data?.block_name}}</div></b>
+                            </div>
+                            <div class="row">
+                              <b><div class="col-12 pull-left"> {{overdueData?.address}} - {{data?.cust_address}}</div></b>
+                              </div>
+                              <div class="row">
+                                <b><div class="col-12 pull-left"> {{overdueData?.purpose}} - {{data?.activity_name }}</div></b>
+                                </div>
+                       </div> 
+                      <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:10px"> 
+                        <div class="row">
+                          <b><div class="col-12 pull-left"> তারিখ - </div></b>
+                          </div>
+                          <div class="row">
+                              <b><div class="col-12 pull-left"> {{translatedData?.loan_id}} -{{data?.loan_id}} </div></b>
+                          </div>
+                          <div class="row">
+                              <b><div class="col-12 pull-left">{{translatedData?.ledger_no}} - {{data?.ledger_no}} </div></b>
+                          </div>
+                          <div class="row">
+                                <b><div class="col-12 pull-left"> {{translatedData?.party_code}} - {{data?.member_id}}</div></b>
+                          </div>
+                          <div class="row">
+                            <b><div class="col-12 pull-left"> {{translatedData?.member_code}} - {{data?.loan_case_no}}</div></b>
+                            </div>
+                            <div class="row">
+                              <b><div class="col-12 pull-left"> {{translatedData?.phone}} - {{data?.brn_cd}}</div></b>
+                              </div>
+                              
+                        </div>
+                   </div>
+                   <br><br><br><br><br> 
+                  </div>
+                  <div style="padding-left:5px;padding-right:5px;font-size: larger;">
+                    
+                      {{overdueData?.con_body1}} {{data?.disb_dt?.substr(0,10)}} {{overdueData?.con_body2}} {{data?.disb_amt>0?data.disb_amt:0}}
+                    {{overdueData?.con_body3}} {{this.LastYearDay}} {{overdueData?.con_body4}} {{data.ovd_prn?data.ovd_prn:0}} {{overdueData?.con_body5}} 
+                    {{(+data.penal_intt?data.penal_intt:0) + (+data.ovd_intt?data.ovd_intt:0)}} {{overdueData?.con_body6}} {{(+data.ovd_prn?data.ovd_prn:0)+((+data.penal_intt?data.penal_intt:0) + (+data.ovd_intt?data.ovd_intt:0))}} {{overdueData?.con_body8}}
+                    {{converDttoDt}}{{overdueData?.con_body9}} <br>
+                     <br><br>
+                  <table style="border-style:dotted;width: 40%;padding-left: 10%;">
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.curr_prn}}</td>
+                      <td style="text-align: right;">{{data?.curr_prn| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.prn}}</td>
+                      <td style="text-align: right;">{{data?.ovd_prn| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.intt}}</td>
+                      <td style="text-align: right;">{{data?.ovd_intt| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.curr_intt}}</td>
+                      <td style="text-align: right;">{{data?.curr_intt| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">{{overdueData?.penal_amt}}</td>
+                      <td style="text-align: right;">{{data?.penal_intt| currency:"INR"}}</td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left;">খরচ</td>
+                      <td style="text-align: right;">{{200| currency:"INR"}}</td>
+                    </tr>
+                       <tr><td colspan="2">..............................................................................................................................................</td></tr>
+                       <tr ><td colspan="2" style="text-align: right;"><b>{{overdueData?.total}} : {{data?.curr_intt + data?.curr_prn + data?.ovd_prn + data?.ovd_intt + data?.penal_intt + 200| currency:'INR'}}</b></td></tr>
+                       
+                    </table><br><br><br><br><br><br><br><br><br>
+                 <div class="pull-right bt-5">
+                    {{overdueData?.regards_pre}} <br><br><br><br><br><br>
+                    -----------------------------------<br> 
+                    {{translatedData?.regards_post}}
+                 </div><br><br><br><br><br><br><br><br><br>
+                 <!-- <br>   {{translatedData?.foot_pre}}  <br><br><br><br><h1>&nbsp;</h1> -->
+                </div>
+                </td>
+              </ng-container>
+            
+              
+             
+             
+            
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="custom-row"></tr>
+            
+            <!-- Row shown when there is no matching data. -->
+            
+          </table>
+        </div>
+        <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100, this.reportData?.length]" aria-label="Select page of users"></mat-paginator> -->
+       
+        <!-- <div id="mattable" >
+        <div *ngFor="let data of reportData" style="padding-top:18px;padding-bottom:30px;">
+          <div class="justify-content-center" style="text-align:center" *ngIf="data">
+            <div *ngIf="ardbcd=='4'">
+              <h4> <b>{{getArdb}} {{translatedData?.heading}} </b> </h4>
+              <h5>Branch : Ghatal / Khirpai / Sonakhali</h5>
+            </div>
+            <h4> <u> তারিখ - {{converDtfrmDt}} থেকে 
+                {{converDttoDt}}
+              </u>
+            </h4>
+            <div class="row">
+                <div class="col-4"></div>
+                <div class="col-4" style="font-weight:800; text-align:center">{{translatedData?.name}} - {{data?.cust_name }}</div> 
+                <div class="col-4"></div>
+            </div>
+            <div class="row" >
+              <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:20px">
+                   <b>{{translatedData?.address}} - {{data?.cust_address}}</b>
+               </div> 
+              <div class="col-6" style="border:1px solid rgb(182, 181, 181); padding:20px"> 
+                  <div class="row">
+                  <b><div class="col-12 pull-left"> {{translatedData?.member_code}} - {{data?.brn_cd}}</div></b>
+                  </div>
+                  <div class="row">
+                      <b><div class="col-12 pull-left"> {{translatedData?.loan_id}} -{{data?.loan_id}} </div></b>
+                  </div>
+                  <div class="row">
+                      <b><div class="col-12 pull-left">{{translatedData?.ledger_no}} - {{data?.loan_case_no}} </div></b>
+                  </div>
+                </div>
+           </div>
+           <br>
+           <h4><b> {{translatedData?.notice_flag}} </b> </h4>
+                 
+          </div>
+          <div style="padding-left:5px;padding-right:5px">
+            {{translatedData?.salutation}}, <br> {{translatedData?.salutation_sub}}, <br> {{translatedData?.body_pre}} <br><br> {{translatedData?.body_mid}} {{converDttoDt}} {{translatedData?.body_post}} <br>
+          <table style="border-style:dotted">
+               <tr>
+                    <td>{{translatedData?.curr_prn}}</td>
+                     <td>{{data?.curr_prn| currency:"INR"}}</td>   
+                     <td>{{translatedData?.prn}}</td>
+                      <td>{{data?.ovd_prn| currency:"INR"}}</td>
+                      <td>{{translatedData?.curr_intt}} </td>
+                      <td>{{data?.curr_intt| currency:"INR"}}</td>
+                      <td>{{translatedData?.intt}}</td>
+                      <td>{{data?.ovd_intt| currency:"INR"}}</td>
+                      <td>{{translatedData?.penal_amt}}</td>
+                      <td>{{data?.penal_intt| currency:"INR"}}</td>
+                </tr>
+                <tr><th >{{translatedData?.total}}:   </th>
+                    <th > {{data?.curr_intt + data?.curr_prn + data?.ovd_prn + data?.ovd_intt + data?.penal_intt| currency:"INR"}}</th> 
+                </tr>
+    
+            </table>
+            <br>
+         <div class="pull-right bt-5">
+            {{translatedData?.regards_pre}} <br><br>
+            ------------------------------------- <br> 
+            {{translatedData?.regards_post}}
+         </div>
+         <br>   {{translatedData?.foot_pre}}  <br><br>
+        </div>
+        </div> 
+        
+        </div> -->
+  
+  
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+        <div>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" printSectionId="mattable"
+            ngxPrint>Print</button>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+    
+        </div>
+      </div>
+    </div>
+    <loading *ngIf="isLoading"></loading>
+  

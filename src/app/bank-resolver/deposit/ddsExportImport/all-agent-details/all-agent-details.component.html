@@ -1,0 +1,148 @@
+
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button  type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="form-group col-12">
+            <label for="acc_type">Acc Type<span class="text-danger">*</span></label>
+            <select id="acc_type" class="form-control form-control-sm"  formControlName="acc_type">
+                <option value='0'>Select a type</option>
+                <option  value="1">Liability</option>
+                <option  value="2">Asset</option>
+                <option  value="3">Revenue</option>
+                <option  value="4">Expanse</option>
+            </select>
+            </div>
+        </div>
+  
+  
+      </form>
+  
+     
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-outline-dark" data-dismiss="modal">Submit</button> -->
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportPDFTitle()">Download PDF</button> -->
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as CSV</button> -->
+      <button mat-raised-button type="button" 
+      class="btn btn-rounded btn-primary m-1" 
+      [useExistingCss]="true"
+      printSectionId="trial111" 
+      ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+   <mat-form-field appearance="outline" >
+    <mat-label>Search Cash Account</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+  </mat-form-field>
+  
+  <div class="mat-elevation-z8" id="trial111">
+    
+    <table mat-table [dataSource]="dataSource" matSort >
+      <ng-container matColumnDef="SLNO">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Srl No.
+        </th>
+      <td mat-cell *matCellDef="let row; let i=index;"> {{i+1}} </td>
+      </ng-container>
+      <ng-container matColumnDef="agent_cd" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Agent Code </th>
+        <td mat-cell *matCellDef="let row"> 
+          {{row.agent_cd}} </td>
+      </ng-container>
+     <!-- ID Column -->
+      <ng-container matColumnDef="agent_name" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Agent Name </th>
+        <td mat-cell *matCellDef="let row">{{row.agent_name}} </td>
+      </ng-container>
+      <ng-container matColumnDef="cust_cd" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Customer Code </th>
+        <td mat-cell *matCellDef="let row"> 
+          {{row.Cust_cd}} </td>
+      </ng-container>
+      <!-- Fruit Column -->
+      <ng-container matColumnDef="sb_acc_no" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Saving Number </th>
+        <td mat-cell *matCellDef="let row"> 
+          {{row.sb_acc_no}} </td>
+      </ng-container>
+      <ng-container matColumnDef="close_dt" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Contract End Date</th>
+        <td mat-cell *matCellDef="let row"> 
+          {{row.close_dt.substr(0,10)}} </td>
+      </ng-container>
+      <!-- Fruit Column -->
+      
+      <!-- ID Column -->
+     
+  
+      <!-- Header column -->
+      <ng-container matColumnDef="Header">
+        <th mat-header-cell *matHeaderCellDef colspan="6">
+          <div class="justify-content-center" style="text-align:center">
+            <br><h4>{{ardbName}} ({{branchName}})</h4>
+            
+            <h4>Run Date & Time : {{today}} </h4>
+            <h4> <b> All Agent Detail List</b></h4>
+         </div>
+        </th>
+      </ng-container>
+     
+      
+      
+        
+      <tr mat-header-row *matHeaderRowDef="['Header']"
+       class="example-second-header-row">
+      </tr>
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <!-- <tr mat-footer-row *matFooterRowDef="['Total','disclaimer1', 'disclaimer2']" class="example-second-footer-row"></tr> -->
+      
+      <!-- Row shown when there is no matching data. -->
+          </table>
+    <footer>
+      <small>
+        This report is generated through CFS-2022
+       </small> 
+       <!-- <ng-container matColumnDef="disclaimer">
+        <td mat-footer-cell *matFooterCellDef colspan="2">
+          This report is generated through CFS-2022
+      
+        </td>
+       </ng-container> -->
+      </footer>
+  </div>
+  <!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[10, 25, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+    
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

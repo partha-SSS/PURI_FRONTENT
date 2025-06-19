@@ -1,0 +1,52 @@
+.divc1{
+  background-color: rgb(245, 245, 184);
+  margin: 15px;
+  width: 1150px;
+  border-radius: 15px;
+
+}
+
+
+.divc2{
+  background-color: #1076eb;
+  /* background-color: white; */
+  width: 1200px;
+  border-radius: 10px;
+}
+
+.divc3{
+  background-color: rgb(245, 245, 184);
+  width: 1200px;
+  border-radius: 15px;
+}
+
+.divc4{
+  width: 1200px;
+  height: 5px;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.divc5{
+  background-color: #1076eb;
+  /* background-color: white; */
+  width: 8000px;
+  border-radius: 10px;
+}
+
+.divc6{
+  background-color: rgb(245, 245, 184);
+  width: 1000px;
+  border-radius: 15px;
+}
+
+
+.sec1{
+  background-color: #1076eb;
+  margin: 6px 8px 6px 8px;
+  /* height: 40px; */
+}
+
+.text{
+  color : white
+}

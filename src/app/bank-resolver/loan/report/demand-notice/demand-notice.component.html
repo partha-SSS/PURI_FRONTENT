@@ -1,0 +1,219 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <form [formGroup]="reportcriteria">
+      <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+
+        <div class="form-row">
+          <div class="col-8">
+            <small for="acc_type_cd">Loan Type</small>
+           <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_cd">
+             <option *ngIf="AcctTypes" disabled>Choose</option>
+             <option  *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+               {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+             </option>
+           </select>
+          </div>
+          <div class="col-4">
+            <small for="block">Block</small>
+           <input type="text" id="block" class="form-control form-control-sm" formControlName="block" disabled>
+          </div>
+          <div class="col-12 example-form">
+            <mat-form-field class="example-full-width">
+              <small> Select Village</small>
+              <input type="text"
+                     aria-label="Number"
+                     matInput
+                     formControlName="vill_cd"
+                     [matAutocomplete]="auto"
+                     (keypress)="filterVill()">
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option *ngFor="let option of filteredOptions | async; let i=index" [value]="option.vill_name" (click)="setVill()" >
+                  {{option.vill_name}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+      </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" printSectionId="mattable"
+          ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+      <div id="mattable">
+        <table mat-table [dataSource]="dataSource" matSort >
+            
+          
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="acc_cd" >
+              <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+              <td mat-cell *matCellDef="let data let i=index"> 
+                <div class="justify-content-center" style="text-align:center;padding-top: 40px;" *ngIf="data">
+                  
+                  <div  *ngIf="ardbcd!='26'&&ardbcd!='20'&&ardbcd!='4'">
+                    <h4>{{ardbName}} ({{branchName}})</h4>
+                    <h4>Run Date & Time : {{today}} </h4> 
+                  </div>
+                  <div *ngIf="ardbcd=='26'">
+                    <h4> <b>{{getArdb}} {{translatedData?.heading}} </b> </h4>
+                  <h5> <b>{{translatedData?.bmaddr?.bm_branch}} </b> </h5> 
+                  <h5> <b>{{translatedData?.bmaddr?.bm_cont}} </b> </h5> 
+                  <h5> <b>{{translatedData?.bmaddr?.bm_addr}} </b> </h5> 
+                  <!-- <h5> <b>{{translatedData?.bmaddr?.bm_website}} </b> </h5> -->
+                  </div>
+                  <div *ngIf="ardbcd=='20'">
+                    <h4> <b>{{getArdb}} {{translatedData?.heading}} </b> </h4>
+                  <h5> <b>{{translatedData?.biraddr?.bir_branch}} </b> </h5> 
+                  <!-- <h5> <b>{{translatedData?.bmaddr.burdwan_cont}} </b> </h5> 
+                  <h5> <b>{{translatedData?.bmaddr.burdwan_addr}} </b> </h5> 
+                  <h5> <b>{{translatedData?.bmaddr.burdwan_website}} </b> </h5> <br> -->
+                  </div>
+                  <div *ngIf="ardbcd=='4'">
+                    <h4> <b>{{getArdb}} {{translatedData?.heading}} </b> </h4>
+                  <h4> <b>{{translatedData?.gmaddr?.gm_branch}} </b> </h4> 
+                  <h4> <b>{{translatedData?.gmaddr?.gm_addr}} </b> </h4> 
+                  <!-- <h5> <b>{{translatedData?.bmaddr.burdwan_addr}} </b> </h5> 
+                  <h5> <b>{{translatedData?.bmaddr.burdwan_website}} </b> </h5> <br> -->
+                  </div>
+                  <table style="width: 100%;">
+                  <tr>
+                    <td colspan="6" >{{translatedData?.name}} - {{data?.cust_name }}</td> 
+                    <td colspan="6" style="text-align: right;">{{translatedData.member_code}} - {{data.brn_cd}}</td> 
+
+                  </tr>
+                  <tr>
+                    <td colspan="6">{{translatedData?.block}} - {{this.blocks1[0].block_name}} </td>  
+                      <td colspan="6" style="text-align: right;">{{translatedData.loan_id}} -{{data?.loan_id}} </td>   
+                  </tr>
+                 
+                  <tr>  
+                      <td colspan="6" >{{translatedData?.address}} - {{data?.cust_address}}</td> 
+
+                      <td colspan="6" style="text-align: right;"> {{translatedData.ledger_no}} - {{data?.loan_case_no}}</td>   
+                  </tr>
+                   
+              </table>
+             <b> {{translatedData?.notice_flag}} </b> 
+              
+              <!-- style="border:1px solid black;margin-left:10%" -->
+              
+              </div>
+              <table>
+                <tr>
+                    <td colspan="6">{{translatedData?.intt_rt}} -<b>{{data?.curr_intt_rate}}%</b> </td>  
+                    <td colspan="6" style="text-align:center">{{translatedData?.current_loan_amt}} - <b>{{data?.disb_amt}} </b></td>
+                </tr>
+            </table>
+              <div style="padding:10px;">
+                {{translatedData?.salutation}}, <br> {{translatedData?.salutation_sub}}, <br> {{translatedData?.body_pre}} {{reportData?data?.activity_name:''}} {{translatedData?.body_mid}} {{converDttoDt}} {{translatedData?.body_post}} <br>
+              <br>  <table style="border-style:dotted; width: 100%; ">
+                    
+                    <tr>
+                      <th>{{translatedData?.installment_amt}}</th>
+                        <td>
+                            <b>{{translatedData?.prn}}: {{reportData?data?.ovd_prn:0}}</b>
+                        </td>
+                        <td><b>{{translatedData?.curr_prn}}: {{reportData?data?.curr_prn:0}}</b></td>
+                    
+                        <td><b>{{translatedData?.intt}}: {{reportData?data?.ovd_intt:0}}</b></td>
+                        <td> <b>{{translatedData?.curr_intt}}: {{reportData?data?.curr_intt:0}}</b>
+                        </td>
+                   
+                        <td><b>{{translatedData?.penal_amt}}: {{reportData?data?.penal_intt:0}}</b></td>
+                    
+                        <th >{{translatedData?.total}}:   </th>
+                        <th style="text-align:center"> {{data?.curr_intt + data?.curr_prn + data?.ovd_prn + data?.ovd_intt + data?.penal_intt}}</th> 
+                    </tr>
+        
+                </table>
+             <br>   {{translatedData?.foot_pre}} <br> {{translatedData?.foot_mid}} <br> {{translatedData?.foot_post}} 
+        
+             <div class="pull-right bt-5" style="padding-bottom: 25px;">
+                <p style="text-align: center;">{{translatedData?.regards_pre}}</p><br><br>
+                ------------------------------------------------------------------ <br> 
+                {{translatedData?.regards_post}}
+             </div>
+            </div>
+              </td>
+            </ng-container>
+          
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="custom-row"></tr>
+          
+          <!-- Row shown when there is no matching data. -->
+          
+        </table>
+        
+        <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100, this.reportData?.length]" aria-label="Select page of users"></mat-paginator> -->
+     </div>
+
+
+      
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" printSectionId="mattable"
+          ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+      </div>
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

@@ -1,0 +1,328 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+        <div class="form-row">
+          <div class="col-12">
+            <!-- <small for="acct_num">Search by Loan ID / Customer Name / Phone number
+            </small> -->
+  
+            <!-- <div class="input-group">
+              <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                placeholder="Enter Loan ID / Customer Name / Phone number" (input)="cancelOnNull()" name="x-field-1"
+                autocomplete="new-field-1">
+  
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div> -->
+  
+            <!-- <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.loan_id}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div> -->
+            <!-- <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+              *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+              <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any
+                customer</strong>
+            </div> -->
+          </div>
+          <!-- <div class="col-12" *ngIf="showWait">
+            Please wait...
+          </div> -->
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button"
+        [useExistingCss]="true" 
+        class="btn btn-rounded btn-primary m-1" 
+        
+          printSectionId="mattable" ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+      </div>
+    </div>
+    
+      <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+        <!-- <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+          <h4>{{ardbName}} {{branchName}}</h4>
+          <h4>Run Date & Time : {{today}} </h4> <br>
+          <h4> <u> Overdue Transfer List from {{reportcriteria.controls.fromDate.value | date: 'dd/MM/yyyy'}} to
+              {{reportcriteria.controls.toDate.value | date: 'dd/MM/yyyy'}}</u></h4>
+        
+        </div> -->
+        <mat-form-field appearance="outline">
+          <mat-label>Search Overdue Transfer List</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Ex. abc / 123">
+        </mat-form-field>
+        <div class="mat-elevation-z8" id="mattable">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+        <ng-container matColumnDef="header0" >
+          <td mat-header-cell *matHeaderCellDef colspan="6" style="text-align:right;font-weight: 800;">
+           &nbsp; <span style="height:20px; border-right:1px solid rgb(172, 170, 170)"></span>
+          </td>
+          
+          <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+          <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+        </ng-container>
+        <ng-container matColumnDef="header1" >
+          <td mat-header-cell *matHeaderCellDef colspan="5" style="text-align:center">
+            Balance
+          </td>
+          
+          <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+          <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+        </ng-container>
+        <ng-container matColumnDef="trans_dt">
+        
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Transfer Date
+          
+          </th>
+         
+          
+          <td mat-cell *matCellDef="let element"> {{element.trans_dt.substr(0,10)}} </td>
+        </ng-container>
+      
+        <!-- Name Column -->
+        <ng-container matColumnDef="cust_name">
+       
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Name
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:left"> {{element.cust_name}} </td>
+        </ng-container>
+        <ng-container matColumnDef="block">
+       
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Block
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:left"> {{element.block_name}} </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="loan_id">
+        
+           <th mat-header-cell *matHeaderCellDef mat-sort-header>Loan ID
+           
+           </th>
+         
+           
+           <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.loan_id}} </td>
+         </ng-container>
+       
+        
+         <ng-container matColumnDef="prn_trf">
+         
+           <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:right"> Principal Transfer
+           </th>
+        
+           <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.prn_trf | currency:'INR'}} </td>
+         </ng-container>
+         <ng-container matColumnDef="intt_trf">
+         
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:right"> Interest Transfer
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.intt_trf  | currency:'INR'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="curr_prn">
+         
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:right"> Current Principal
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.curr_prn | currency:'INR'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="ovd_prn">
+         
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:right"> Overdue Principal
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.ovd_prn | currency:'INR'}} </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="curr_intt">
+         
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:right"> Current Interest
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.curr_intt | currency:'INR'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="ovd_intt">
+         
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:right"> Overdue Interest
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.ovd_intt | currency:'INR'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="penal_intt">
+         
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:right"> Penal Interest
+          </th>
+       
+          <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.penal_intt | currency:'INR'}} </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="mainHeader" >
+          <td mat-header-cell *matHeaderCellDef colspan="11" style="text-align:center">
+            <h4>{{ardbName}} {{branchName}}</h4>
+              <h4>Run Date & Time : {{today}} </h4> <br>
+              <h4> <u> Overdue Transfer List from {{reportcriteria.controls.fromDate.value | date: 'dd/MM/yyyy'}} to
+                  {{reportcriteria.controls.toDate.value | date: 'dd/MM/yyyy'}}</u></h4>
+              <p>
+              </p>
+          </td>
+    
+        </ng-container>
+        <!-- <ng-container matColumnDef="header1" >
+          <td mat-header-cell *matHeaderCellDef colspan="5" style="text-align:center">
+            Principal Recovery
+          </td>
+          
+    
+        </ng-container> -->
+  
+       
+        <tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+      <tr mat-header-row *matHeaderRowDef="['header0','header1']"></tr>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <table>
+      <tr>
+        <td style="text-align: right;" colspan="8"><b>Overall Total</b></td>
+        <td style="width:100px;" ></td>
+        <td style="text-align:right" ><b>Principal Transfer: {{prntrfSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>Interest Transfer: {{intttrfSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>Current Principal: {{currPrnSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>Overdue Principal: {{ovdPrnSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>Current Interest: {{currInttSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>Overdue Interest: {{ovdInttSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>Penal Interest: {{penalInttSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+       
+      </tr>
+    </table>
+    <!-- <table>
+      <tr>
+        <td style="text-align: right;" colspan="8"><b>Total</b></td>
+        <td style="width:100px;" ></td>
+        <td style="text-align:right"  ><b style="margin-left:490px;">{{prntrfSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>{{intttrfSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>{{currPrnSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>{{ovdPrnSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>{{currInttSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>{{ovdInttSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+        <td style="text-align:right"><b>{{penalInttSum | currency:"INR"}}</b></td>
+        <td style="width:20px;" ></td>
+       
+      </tr>
+    </table> -->
+      <footer>
+        <small>
+          This report is generated through CFS-2022
+         </small>
+       </footer>
+      </div>
+      <!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+       
+      </div>
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button"
+        [useExistingCss]="true" 
+        class="btn btn-rounded btn-primary m-1" 
+        
+          printSectionId="mattable" ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+      </div>
+    </div>
+  
+  <loading *ngIf="isLoading"></loading>

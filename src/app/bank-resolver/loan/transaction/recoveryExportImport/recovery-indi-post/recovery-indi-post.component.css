@@ -1,0 +1,11 @@
+.btn-primary-spacing
+{
+margin-right: 10px !important;
+}
+
+.transDet{
+    width: auto;
+    height: 300px;
+    overflow: auto;
+  }
+  

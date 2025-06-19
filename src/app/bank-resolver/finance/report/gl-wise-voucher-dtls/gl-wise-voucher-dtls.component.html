@@ -1,0 +1,196 @@
+<loading *ngIf="isLoading"></loading>
+
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close" aria-label="Close" data-dismiss="modal" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+      <form [formGroup]="reportcriteria">
+        <div>
+          <label for="fromDate">From Date</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" [readonly]="true" bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+        <div >
+            <label for="toDate">To Date</label>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="todate" [readonly]="true" bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-outline-dark" data-dismiss="modal">Submit</button> -->
+    </div>
+  </ng-template>
+  <ng-template #contentSearch let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Search voucher</h4>
+      <button type="button" class="close" aria-label="Close" data-dismiss="modal" (click)="closeAlert()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+      <form [formGroup]="searchcriteria">
+        <div>
+          <label for="fromDate">Voucher ID</label>
+          <input type="text" id="srcText"  class="form-control" formControlName="searchText">
+        </div>
+        <div>
+          <label for="fromDate">Date</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="todate"disabled bsDatepicker
+            formControlName="searchDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="submitSearch()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRefSearch.hide()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-outline-dark" data-dismiss="modal">Submit</button> -->
+    </div>
+  </ng-template>
+
+<loading *ngIf="isLoading"></loading>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<ng-template #buttonDiv>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="downloadPDF()">Download PDF</button>
+      <button mat-raised-button type="button" 
+      class="ml-2 btn btn-rounded btn-primary btn-primary-spacing btn-sm" 
+      [useExistingCss]="true"
+      printSectionId="_voucher" 
+      ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="ml-2 btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="retrieve()">Retrieve</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm"> Print</button> -->
+      <button mat-raised-button type="button" class="ml-2 btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="onLoadSearch(contentSearch)">Search voucher</button>
+     
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()"
+        style="position: absolute;right: 10px;">Close</button>
+        <mat-radio-group aria-label="Select an option"  [value]="selectedFilter" (change)="onFilterChange($event)">
+          <mat-radio-button value="C">
+            <label style="margin-top: 10px;">Cash</label>
+          </mat-radio-button>
+          <mat-radio-button value="T"> 
+            <label style="margin-top: 10px;">Transfer</label>
+          </mat-radio-button>
+          <mat-radio-button value="B"> 
+            <label style="margin-top: 10px;">Both</label>
+          </mat-radio-button>
+        </mat-radio-group>
+
+    </div>
+  </div>
+</ng-template>
+<ng-container *ngTemplateOutlet="buttonDiv">
+
+</ng-container>
+
+<button class="scroll-to-top" (click)="scrollToTop()" > <mat-icon>north</mat-icon></button>
+<button class="scroll-to-bottom" (click)="scrollToBotom()" > <mat-icon>south</mat-icon></button>
+  
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3">
+  <div id="reportcontent" #reportcontent>
+    <mat-form-field appearance="outline" >
+         <mat-label>Search with Acc CD</mat-label>
+         <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+       </mat-form-field>
+<table style="width: 100% " id="_voucher">  
+  <br>
+ <div class="justify-content-center" style="text-align:center">
+  <br><h4>{{ardbName}} ({{branchName}})</h4>
+  <h4>Run Date & Time : {{today}} </h4>
+</div>
+ <br><br>    
+<tr *ngFor="let item of tvn; let i = index;">
+  <!-- <p *ngIf="tvn[i].vd.length> 2" style="page-break-after: always;">&nbsp;</p> -->
+  <!-- {{item.redFlag}} -->
+  <table [ngStyle]="{'color':item.redFlag?'rgb(235 3 3)':'rgb(0 0 0)'}" style="width: 100%;">
+  <tr> <label style="padding-left: 20px;">Voucher Id : {{item.voucher_id}}</label></tr>
+  <tr> <label style="padding-left: 20px;">Transaction Cd : {{item.vd[0]?.instrument_no}}</label></tr>
+  <tr><label style="padding-left: 20px;">Voucher Date : {{item.voucher_dt | date}}</label> </tr>
+  <tr><label style="padding-left: 20px;">Voucher Type : {{item.voucher_typ==='C' ?'CASH':'TRANSFER'}}</label> </tr>
+  <tr><label style="padding-left: 20px;">Approval Status : {{item.voucher_status==='A'?'Approved':'Un Approved'}}</label> </tr>
+  <tr>
+    <table style="width: 95%;">
+      <tr>
+        <td style="width: 15%"> <label style="padding-left: 20px;"><b>Dr/Cr</b></label></td>
+        <td style="width: 15%"> <label><b>Account Cd</b></label> </td>
+        <td style="width: 40%"> <label><b>Account Name</b></label> </td>
+        <td style="width: 15%;text-align:right;"> <label><b>Debit Amt</b></label> </td>
+        <td style="width: 15%;text-align:right;"> <label><b>Credit Amt</b></label> </td>
+      </tr>
+      <tr *ngFor="let vitem of tvn[i].vd">
+        <td style="width: 15%"> <label style="padding-left: 20px;"> {{vitem.debit_credit_flag==='D'?'Debit':'Credit'}} </label></td>
+        <td style="width: 15%"> <label>{{vitem.acc_cd}}</label> </td>
+        <td style="width: 40%"> <label>{{vitem.acc_name}}</label> </td>
+        <td style="width: 15%;text-align:right;"> <label>{{FormatNumber(vitem.dr_amount) }}</label> </td>
+        <td style="width: 15%;text-align:right;"> <label>{{FormatNumber(vitem.cr_amount) }}</label> </td>
+      </tr>
+      
+      <tr>
+        <td colspan="3"></td>
+        <td style="border-top: 1px solid gray;text-align:right;"><b>Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {{FormatNumber(tvn[i].vd[0]?.ardb_cd) }}</b></td>
+        <td style="border-top: 1px solid gray;text-align:right;"><b>{{FormatNumber(tvn[i].vd[0]?.brn_cd) }}</b></td>
+      </tr>
+    </table>  
+</tr>
+<tr><td><label style="padding-left: 20px;">{{item.narration}}</label></td></tr>
+
+  </table>
+  <hr>
+</tr>
+   </table>
+  </div>
+</div>
+<ng-container *ngTemplateOutlet="buttonDiv">
+
+</ng-container>
+
+  </div>
+  
+ 

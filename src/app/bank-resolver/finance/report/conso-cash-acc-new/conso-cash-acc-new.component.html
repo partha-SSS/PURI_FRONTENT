@@ -1,0 +1,209 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate" >From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate"  bsDatepicker
+              formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate" >To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate"  bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="form-row">
+          <div class="col-12">
+           <div >
+            <small for="acc_type_cd">Loan Type</small>
+              <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd">
+                <option *ngIf="AcctTypes" disabled>Choose</option>
+                <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                  {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                </option>
+              </select>
+           </div>
+          </div>
+        </div> -->
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="mattable" 
+     ngxPrint>Print</button>
+ <button mat-raised-button type="button" [hidden]="LandingCall" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+    </div>
+    </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+<!--    
+   <mat-form-field appearance="outline">
+    <mat-label>Search Loan Statement</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. abc / 123">
+  </mat-form-field> -->
+  <div class="mat-elevation-z8" id="mattable">
+<table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+ 
+  <ng-container matColumnDef="mainHeader">
+    <th mat-header-cell colspan="3" *matHeaderCellDef>
+      <div class="justify-content-center" style="text-align:center"><br>
+        <h4>{{ardbName}} {{branchName}}</h4>
+        <h4>Run Date & Time : {{today}} </h4>
+        <h4> <u> Consolidated Cash Account Between {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+      </div>
+   </th>
+  </ng-container>
+  <ng-container matColumnDef="acc_cd">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Account Code</th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.acccashaccount.acc_cd}}
+      </td>
+   </ng-container>
+   <ng-container matColumnDef="acc_name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header style="padding-left: 5%;"> Account Name</th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+     {{row.acccashaccount.acc_name}}
+      </td>
+   </ng-container>
+   <ng-container matColumnDef="acc_cd2">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Branch Wise Details</th>
+    <td mat-cell *matCellDef="let row" style="font-size:20px;" >
+      <table  class="t1"> 
+        <ng-container style="padding-bottom:30px;">
+                <tr mat-cell>
+                    <th mat-header-cell style="text-align: center;">Branch</th> 
+                    <th mat-header-cell style="text-align: right;padding-right: 5px;">Receipt</th>
+                    <th mat-header-cell style="text-align: right;">Payment</th>
+                  </tr>
+                  <tbody>
+                    <tr *ngFor="let acc of row.cashaccount">
+                       
+                       <td mat-cell style="text-align: center;">{{acc.cr_particulars}} </td>
+                       <td mat-cell style="text-align: right;">{{acc.dr_amt|currency:"INR"}} </td>
+                       <td mat-cell style="text-align: right;">{{acc.cr_amt |currency:"INR"}} </td>
+                    </tr>
+                    
+                </tbody>
+                <tr mat-cell >
+                    <td mat-cell ><b>Total for {{row.acccashaccount.acc_name}}</b></td>
+                    <td mat-cell style="text-align: right;"><b>{{row.acccashaccount.tot_dr_amt|currency:"INR"}}</b></td>
+                     <td mat-cell style="text-align: right;"><b>{{row.acccashaccount.tot_cr_amt|currency:"INR"}}</b></td>
+                  </tr>
+                
+        </ng-container>
+   </table>
+      </td>
+      
+   </ng-container>
+   
+   
+  
+  <tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+</table>
+<table style="margin-bottom:20px;margin-right: 120px; margin-left: 50px;">
+  <tr >
+    <td  style="width: 35%; text-align: center;"><b>Grand Total</b></td>
+    <td style="width:15%;" ></td>
+    <td ><b>Total Receipt: {{totdrSum|currency:"INR"}}</b></td>
+    <td style="width:3%;" ></td>
+    <td ><b>Total Payment: {{totcrSum|currency:"INR"}}</b></td>
+    <td style="width:3%;" ></td>
+  </tr>
+</table>
+   <!-- <table style="margin-bottom:20px;margin-right: 120px; margin-left: 50px;">
+    <tr>
+      <td style="width:30px;" ></td>
+      <td><b>Grand Total recov:-</b></td>
+      <td style="width:160px;" ></td>
+      <td><b>{{totadvPrnSum|currency:"INR"}}</b></td>
+      <td style="width:5px;" ></td>
+      <td><b>{{totcurrPrnSum|currency:"INR"}}</b></td>
+      <td style="width:5px;" ></td>
+      <td><b>{{totovdPrnSum|currency:"INR"}}</b></td>
+      <td style="width:5px;" ></td>
+      <td><b>{{totcurrInttSum|currency:"INR"}}</b></td>
+      <td style="width:5px;" ></td>
+      <td><b>{{totovdInttSum|currency:"INR"}}</b></td>
+      <td style="width:5px;" ></td>
+      <td><b>{{totpenalInttSum|currency:"INR"}}</b></td>
+      <td style="width:5px;" ></td>
+      <td><b> {{totPrn|currency:"INR"}}</b></td>
+      <td style="width:160px;" ></td>
+    </tr>
+  </table> -->
+<footer>
+  <small>
+    This report is generated through Synergic Banking
+   </small> 
+   
+ </footer>
+</div>
+<!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+ 
+
+   
+  
+  <!-- <br><br><br><br>
+  <small>This report is generated through Synergic Banking</small> -->
+   </div>
+  </div>
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+ <button mat-raised-button type="button" [hidden]="LandingCall" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

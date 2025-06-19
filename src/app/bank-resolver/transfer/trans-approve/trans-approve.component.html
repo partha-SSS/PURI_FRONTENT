@@ -1,0 +1,284 @@
+<ng-template #MakerChecker >
+  <div class="modal-body text-center" >
+    <p>a transaction created by a user cannot be approved by that user.</p>
+   <button mat-raised-button type="button" class=" btn btn-primary" (click)="this.modalRef.hide()" >Close</button>
+    
+  </div>
+</ng-template>
+<ng-template #contentbatch let-modal bd-example-modal-lg>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Unapprove Transaction List</h4>
+  
+    </div>
+    <div class="modal-body">
+  
+      <table class="table table-sm table-hover">
+        <tr>
+          <td>Trans Code</td>
+          <td>Trf Cd</td>
+          <td >Created By</td>
+          <td style="text-align:right;">Operation</td>
+        </tr>
+        <tr *ngFor="let item of unApprovedTransactionLst; let i = index;" title="Click to Select"  style="cursor: pointer;">
+          <td>{{item.trans_cd}}</td>
+          <td>{{item.trf_cd}}</td>
+          <td>{{item.created_by}}</td>
+          <td><button mat-raised-button class="btn btn-primary float-right" (click)="Submit(item)">View/Edit</button></td>
+          </tr>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-default" (click)="modalRef.hide()">Cancel</button>
+    </div>
+  </ng-template>
+  <loading *ngIf="isLoading"></loading>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <div>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieve()">Retrieve</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="GetUnapproveTransfer()">RetrieveBatch</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="Approve()">Approve</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="clear()">Clear</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+   </div>
+  </div>
+   <div  class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+       
+       <div class="row">
+        <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 bg-white ">
+          <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+           'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+            <strong>{{showMsg.Message}}</strong>
+            <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div> 
+        <div class="col-12">
+          <form [formGroup]="tmtransfer">
+            <div class="form-row">
+              <div class="form-group col-2">
+                <small for="trans_date">Trans Date<span class="text-danger">*</span></small>
+                  <div class="input-group">
+                  <input type="text" style="height:30px;" [readonly]="true" placeholder="dd/mm/yyyy" class="form-control" 
+                  formControlName="trf_dt"  bsDatepicker
+                  [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                  [isOpen]="isOpenFromDp">
+                  <!-- <div class="input-group-append">
+                    <button mat-raised-button class="btn btn-outline-secondary" style="height:30px;"  type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                      <i class="fa fa-calendar" aria-hidden="true"></i>
+                    </button>
+                  </div> -->
+                </div>
+              </div>
+              <div class="form-group col-1">
+                <small for="trans_cd">Trans Cd</small>
+                <input type="text" formControlName="trans_cd"  (focusout)="PopulateTransfer()"
+                    class="form-control form-control-sm text-capitalize" id="trans_cd">
+              </div>
+              <div class="form-group col-2">
+                <small for="approval_status">Status</small>
+                <input type="text" formControlName="approval_status1" [readonly]="true"
+                    class="form-control form-control-sm text-capitalize" id="approval_status">
+              </div>
+              <div class="form-group col-7">
+                <small for="particulars">Particulars</small>
+                <input type="text" formControlName="particulars" [readonly]="true"
+                    class="form-control form-control-sm text-capitalize" id="particulars">
+              </div>
+              
+            </div>          
+          </form>
+         </div>
+              <div class="col-6 border-right">
+                  <h4 class="customHeader">Debit Transfer Details</h4>
+                  <section *ngFor="let l of td_deftranstrfList; let i=index">
+                    <div class="form-row">
+                      <div class="form-group col-2">
+                        <small for="debit_ac">Account Type</small>
+                        <input type="text" [(ngModel)]="l.cust_acc_type" [readonly]="true"
+                          [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code?.length > 0"
+                          (focusout)="checkAndSetDebitAccType('cust_acc', l)"
+                          class="form-control form-control-sm text-capitalize" id="debit_ac">
+                      </div>
+    
+                      <div class="form-group col-2">
+                        <small for="debit_ac_dsc">Account Desc</small>
+                        <input type="text" [(ngModel)]="l.cust_acc_desc"  [readonly]="true"
+                          class="form-control form-control-sm text-capitalize" id="debit_ac_dsc">
+                      </div>
+    
+                      <div class="form-group col-3">
+                        <small for="debit_ac_no">Account Number</small>
+                        <input type="text" [(ngModel)]="l.cust_acc_number" [readonly]="true"
+                          (focusout)="setDebitAccDtls( l)" [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code?.length > 0"
+                          class="form-control form-control-sm text-capitalize" id="debit_ac_no">
+                      </div>
+    
+                      <div class="form-group col-3">
+                        <small for="debit_ac_name">Acc Holder Name</small>
+                        <input type="text" [readonly]="true" [(ngModel)]="l.cust_name" [readonly]="true"
+                          [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code?.length > 0"
+                          class="form-control form-control-sm text-capitalize" id="debit_ac_name">
+                      </div>
+    
+                      <div class="form-group col-2">
+                        <small for="debit_amount">Amount</small>
+                        <input type="text" [(ngModel)]="l.amount" [readonly]="true"
+                          (focusout)="checkDebitBalance(l)"
+                          class="form-control form-control-sm text-capitalize"
+                          [disabled]="!(undefined !== l.cust_acc_type && l.cust_acc_type?.length > 0)
+                            && !(undefined !== l.gl_acc_code && l.gl_acc_code.length > 0)"
+                          id="debit_amount">
+                      </div>
+    
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-2">
+                        <small for="debit_gl_ac">GL Code</small>
+                        <input [disabled]="undefined !== l.cust_acc_type && l.cust_acc_type?.length > 0" type="text"
+                        (focusout)="checkAndSetDebitAccType('gl_acc', l)" [readonly]="true"
+                          [(ngModel)]="l.gl_acc_code"
+                          class="form-control form-control-sm text-capitalize" id="debit_gl_ac">
+                      </div>
+    
+                      <div class="form-group col-4">
+                        <small for="debit_gl_head">GL Head</small>
+                        <input type="text" [readonly]="true" [(ngModel)]="l.gl_acc_desc"
+                          class="form-control form-control-sm text-capitalize" id="debit_gl_head">
+                      </div>
+    
+                      <div class="form-group col-3">
+                        <small for="Inst_num">Instrument Num</small>
+                        <input type="text"  class="form-control form-control-sm text-capitalize" [readonly]="true"
+                          id="Inst_num" >
+                      </div>
+                      <button *ngIf="td_deftranstrfList.length > 1 && (undefined !== l.cust_acc_type || undefined !== l.gl_acc_code  )"
+                        type="button" style="height:22px; padding-top: 0px;" class="btn btn-danger btn-sm mt-4" [readonly]="true"
+                      (click)="removeTransfer(l)">
+                      <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <hr/>
+                  </section>
+                  <div class="text-right mb-3">
+                    <div class="form-group">
+                      <small for="trf_total_amt">Total</small>
+                      <input type="text" [readonly]="true" [(ngModel)]="TrfTotAmt"
+                        class="form-control form-control-sm text-capitalize" id="trf_total_amt">
+                        <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm mr-1" [readonly]="true"
+                        (click)="addTransfer()" title="Add transfer"> 
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </button>
+                      </div>
+    
+                  </div>
+              </div>
+  
+  
+  
+  
+  
+              <div class="col-6 border-left">
+                  <h4 class="customHeader">Credit Transfer Details</h4>
+                  <section *ngFor="let l of cr_td_deftranstrfList; let i=index">
+                    <div class="form-row">
+                      <div class="form-group col-2">
+                        <small for="credit_ac">Account Type</small>
+                        <input type="text" [(ngModel)]="l.cust_acc_type" [readonly]="true"
+                          [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                          (focusout)="checkAndSetCreditAccType('cust_acc', l)"
+                          class="form-control form-control-sm text-capitalize" id="credit_ac">
+                      </div>
+    
+                      <div class="form-group col-2">
+                        <small for="credit_ac_dsc">Account Desc</small>
+                        <input type="text" [(ngModel)]="l.cust_acc_desc"  [readonly]="true"
+                          class="form-control form-control-sm text-capitalize" id="credit_ac_dsc">
+                      </div>
+    
+                      <div class="form-group col-3">
+                        <small for="credit_ac_no">Account Number</small>
+                        <input type="text" [(ngModel)]="l.cust_acc_number" [readonly]="true"
+                          (focusout)="setCreditAccDtls( l)" [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                          class="form-control form-control-sm text-capitalize" id="credit_ac_no">
+                      </div>
+    
+                      <div class="form-group col-3">
+                        <small for="credit_ac_name">Acc Holder Name</small>
+                        <input type="text" [readonly]="true" [(ngModel)]="l.cust_name" [readonly]="true"
+                          [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                          class="form-control form-control-sm text-capitalize" id="credit_ac_name">
+                      </div>
+    
+                      <div class="form-group col-2">
+                        <small for="credit_amount">Amount</small>
+                        <input type="text" [(ngModel)]="l.amount" [readonly]="true"
+                          (focusout)="checkCreditBalance(l)"
+                          class="form-control form-control-sm text-capitalize"
+                          [disabled]="!(undefined !== l.cust_acc_type && l.cust_acc_type.length > 0)
+                            && !(undefined !== l.gl_acc_code && l.gl_acc_code.length > 0)"
+                          id="credit_amount">
+                      </div>
+    
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-2">
+                        <small for="credit_gl_ac">GL Code</small>
+                        <input [disabled]="undefined !== l.cust_acc_type && l.cust_acc_type.length > 0" type="text"
+                        (focusout)="checkAndSetCreditAccType('gl_acc', l)" [readonly]="true"
+                          [(ngModel)]="l.gl_acc_code"
+                          class="form-control form-control-sm text-capitalize" id="credit_gl_ac">
+                      </div>
+    
+                      <div class="form-group col-4">
+                        <small for="credit_gl_head">GL Head</small>
+                        <input type="text" [readonly]="true" [(ngModel)]="l.gl_acc_desc"
+                          class="form-control form-control-sm text-capitalize" id="credit_gl_head">
+                      </div>
+    
+                      <div class="form-group col-3">
+                        <small for="Cr_Inst_num">Instrument Num</small>
+                        <input type="text"  class="form-control form-control-sm text-capitalize" [readonly]="true"
+                          id="Cr_Inst_num" >
+                      </div>
+                      <button *ngIf="cr_td_deftranstrfList.length > 1 && (undefined !== l.cust_acc_type || undefined !== l.gl_acc_code  )"
+                        type="button" style="height:22px; padding-top: 0px;" class="btn btn-danger btn-sm mt-4" [readonly]="true"
+                      (click)="CrremoveTransfer(l)"> 
+                      <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <hr/>
+                  </section>
+                  <div class="text-right mb-3">
+                    <div class="form-group">
+                      <small for="cr_trf_total_amt">Total</small>
+                      <input type="text" [readonly]="true" [(ngModel)]="CrTrfTotAmt"
+                        class="form-control form-control-sm text-capitalize" id="cr_trf_total_amt">
+                        <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm mr-1" [readonly]="true"
+                        (click)="CraddTransfer()" title="Add transfer">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </button>
+                      </div>
+    
+                  </div>
+              </div>
+  
+  
+  
+          </div>
+  </div>
+  
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <div>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieve()">Retrieve</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="GetUnapproveTransfer()">RetrieveBatch</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="Approve()">Approve</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="clear()">Clear</button>
+      <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+   </div>
+  </div>
+    </div>
+    
+   

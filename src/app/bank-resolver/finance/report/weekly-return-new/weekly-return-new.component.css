@@ -1,0 +1,17 @@
+.table {
+    margin-bottom: 0;
+  }
+  
+  h3 {
+    margin-bottom: 15px;
+  }
+  
+  .mt-4 {
+    margin-top: 1.5rem;
+  }
+  @media print{footer{
+    margin-top: 25px !important; 
+    margin-left: 25px !important; 
+    position:fixed!important; 
+    bottom: 0px !important;
+  } }

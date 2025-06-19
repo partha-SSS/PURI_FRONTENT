@@ -1,0 +1,32 @@
+<div>
+  <div class="col-12 scroll-when-long">
+    <h6 style="background-color:lightskyblue" *ngIf="!(interestDetails.length > 0)">No Installamanet data Available</h6>
+    <div class="table-responsive" *ngIf="interestDetails.length > 0">
+      <!-- <h6 style="background-color:lightskyblue">View Installment Details</h6> -->
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Paid Sts Number</th>
+            <th scope="col">Paid Sts</th>
+            <th scope="col">Calc Date</th>
+            <th scope="col">Intt Amt</th>
+            <th scope="col">Paid date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let interestDetail of interestDetails; let i = index" >
+            <td>{{++i}}</td>
+            <td [ngClass]="{'text-danger': interestDetail.paid_status === 'U', 'text-success': interestDetail.paid_status === 'P'}" >
+              {{interestDetail.paid_status === 'P' ? 'Paid' :
+              (interestDetail.paid_status === 'B' ? 'Payable' : 'Un Paid')}}
+            </td>
+            <td>{{interestDetail.calc_dt | slice:0:10}}</td>
+            <td>{{interestDetail.intt_amt | INRCurrency}}</td>
+            <td *ngIf="interestDetail.paid_dt != '01/01/0001 00:00'">{{ interestDetail.paid_dt | slice:0:10}}</td>
+            <!-- <td>{{ interestDetail.paid_dt != '01/01/0001 00:00'? null: interestDetail.paid_dt | slice:0:10}}</td> -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

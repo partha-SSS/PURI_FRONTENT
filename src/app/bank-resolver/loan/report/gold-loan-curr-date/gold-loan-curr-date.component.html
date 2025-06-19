@@ -1,0 +1,307 @@
+
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on Date</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+      
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+<button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+  </div>
+  </div>
+<!-- {{ReportUrl}} -->
+
+<div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+  <mat-form-field appearance="outline" >
+    <mat-label>Search....</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Abc/123" #input>
+  </mat-form-field>
+  <!-- <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+    <h6>{{ardbName}} {{branchName}}</h6>
+
+    <h6>Run Date & Time : {{today}} </h6> <br>
+    <h6> <u> Detail List as on  {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h6>
+    <p>
+      <b>
+        Loan Type : {{loanNm}}</b>
+    </p>
+
+ </div> -->
+ <br>
+
+<div class="mat-elevation-z8" id="mattable">
+<table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort >
+<!-- Position Column -->
+<ng-container matColumnDef="mainHeader">
+  <th mat-header-cell colspan="12" *matHeaderCellDef>
+    <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+      <h4>{{ardbName}} ({{branchName}})</h4>
+  
+      <h4>Run Date & Time : {{today}} </h4> <br>
+      <h4> <u> Gold Loans as on  {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+      
+  
+   </div>
+ </th>
+</ng-container>
+<ng-container matColumnDef="SL_NO">
+  <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:center!important;max-width:15px;">Sl No</th>
+ <td mat-cell *matCellDef="let element let i=index"> {{i+1}} </td>
+</ng-container>
+<ng-container matColumnDef="member_name">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Member Name
+  
+  </th>
+ 
+  
+  <td mat-cell *matCellDef="let element"> {{element.member_name}} </td>
+</ng-container>
+<ng-container matColumnDef="loan_id" >
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Loan Id
+  
+  </th>
+ <td mat-cell *matCellDef="let element"> {{element.loan_id}} </td>
+</ng-container>
+
+<ng-container matColumnDef="intt_rt">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header >Intt Rate
+  
+  </th>
+ 
+  
+  <td mat-cell *matCellDef="let element" > {{element.intt_rt}} </td>
+</ng-container>
+
+<!-- Name Column -->
+<ng-container matColumnDef="gross_we">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header> Gross Weight of Gold(Grms.)
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align: center;"> {{element.gross_we}} </td>
+</ng-container>
+<ng-container matColumnDef="net_we">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header> Net Weight of Gold(Grms.)
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align: center;"> {{element.net_we}} </td>
+</ng-container> 
+<ng-container matColumnDef="gold_value">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Value of Gold
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align: right;"> {{element.gold_value| currency:'INR'}} </td>
+</ng-container>
+<!-- Weight Column -->
+<ng-container matColumnDef="disb_amt">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Disb. Amt.
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align: right;"> {{element.disb_amt| currency:'INR'}} </td>
+</ng-container>
+<ng-container matColumnDef="tot_prn">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Prn.
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align: right;"> {{element.tot_prn| currency:'INR'}} </td>
+</ng-container>
+<ng-container matColumnDef="curr_intt">
+
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Curr Intt.
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align: right;"> {{element.curr_intt| currency:'INR'}} </td>
+</ng-container>
+<!-- Symbol Column -->
+<ng-container matColumnDef="last_intt_calc_dt">
+
+   <th mat-header-cell *matHeaderCellDef mat-sort-header>Interest Upto
+   
+   </th>
+ 
+   
+   <td mat-cell *matCellDef="let element" > {{element.last_intt_calc_dt.substr(0,10)}} </td>
+ </ng-container>
+ <!-- .substr(0,10) -->
+ <!-- Name Column -->
+ <!-- <ng-container matColumnDef="curr_intt_rate">
+ 
+   <th mat-header-cell *matHeaderCellDef mat-sort-header > Curr Intt Rt
+   </th>
+
+   <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_intt_rate | number : '1.2-2'}}% </td>
+ </ng-container>
+ <ng-container matColumnDef="ovd_intt_rate">
+ 
+  <th mat-header-cell *matHeaderCellDef mat-sort-header > Ovd Intt Rt
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt_rate | number : '1.2-2'}}% </td>
+</ng-container> -->
+<ng-container matColumnDef="v_page">
+ 
+  <th mat-header-cell *matHeaderCellDef mat-sort-header >Volume Page
+  </th>
+
+  <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.v_page}} </td>
+</ng-container>
+
+
+
+
+
+  
+  <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+  <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+
+<ng-container matColumnDef="disclaimer1">
+  <td mat-footer-cell *matFooterCellDef colspan="4" 
+  style="font-size: small;
+    text-align: center;
+    font-weight: 450;">
+  Total (Count-{{resultLength}})
+  </td>
+
+</ng-container>
+<ng-container matColumnDef="disclaimer2" >
+  <td mat-footer-cell *matFooterCellDef  
+  style="font-size: small;
+    text-align: center;
+    font-weight: 450;">
+    {{tot_gross_we  | number : '1.2-3'}}gm
+  </td>
+  
+</ng-container>
+<ng-container matColumnDef="disclaimer3">
+  <td mat-footer-cell *matFooterCellDef 
+  style="font-size: small;
+    text-align: center;
+    font-weight: 450;">
+    {{tot_net_we| number : '1.2-3'}}gm
+  </td>
+  
+</ng-container>
+<ng-container matColumnDef="disclaimer4">
+  <td mat-footer-cell *matFooterCellDef 
+  style="font-size: small;
+    text-align: right;
+    font-weight: 450;">
+    {{tot_gold_value | number : '1.2-2'}}
+  </td>
+  
+</ng-container>
+<ng-container matColumnDef="disclaimer5">
+  <td mat-footer-cell *matFooterCellDef 
+  style="font-size: small;
+    text-align: right;
+    font-weight: 450;">
+    {{tot_disb_amt | number : '1.2-2'}}
+  </td>
+  
+</ng-container>
+<ng-container matColumnDef="disclaimer6">
+  <td mat-footer-cell *matFooterCellDef 
+  style="font-size: small;
+    text-align: right;
+    font-weight: 450;">
+    {{tot_tot_prn | number : '1.2-2'}}
+  </td>
+  
+</ng-container>
+<ng-container matColumnDef="disclaimer7">
+  <td mat-footer-cell *matFooterCellDef 
+  style="font-size: small;
+    text-align: right;
+    font-weight: 450;">
+    {{tot_curr_intt | number : '1.2-2'}}
+  </td>
+  
+</ng-container>
+
+
+
+
+<tr mat-footer-row *matFooterRowDef="['disclaimer1','disclaimer2','disclaimer3','disclaimer4','disclaimer5','disclaimer6','disclaimer7']" class="example-second-footer-row"></tr>
+<!-- <tr mat-header-row *matHeaderRowDef="['header0','header1','header2','header3','header4','header5','header6','header7','header8']"></tr> -->
+<tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+
+<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+<tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+ </table>
+<footer>
+<small>
+  This Report Is Generated Through cfs-2022
+ </small>
+</footer>
+</div>
+<mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[100,500,resultLength]" MatPaginator></mat-paginator>
+
+
+</div>
+
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+ <button mat-raised-button type="button" 
+ class="btn btn-rounded btn-primary m-1" 
+ [useExistingCss]="true"
+ printSectionId="mattable" 
+ ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+<button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+</div>
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

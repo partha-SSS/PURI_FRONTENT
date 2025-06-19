@@ -1,0 +1,158 @@
+.mg1
+{
+  margin: 5px;
+  text-align: center;
+}
+
+.btn2{
+  background-color: #dfdfdf;
+  color: rgb(58, 18, 18);
+  font-weight:bold;
+  margin: 6px 8px 6px 8px;
+  min-width: 100px;
+  border-radius: 5px;
+
+  padding: 0 6px 0 6px;
+  margin: 6px 8px 6px 8px;
+  min-width: 88px;
+  border-radius: 3px;
+  font-size: 14px;
+  outline: black;
+  border: rgb(58, 18, 18);
+
+
+}
+
+.md-button {
+  padding: 0 6px 0 6px;
+  margin: 6px 8px 6px 8px;
+  min-width: 88px;
+  border-radius: 3px;
+  font-size: 14px;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration:none;
+  border: blue;
+
+}
+
+.inp1{
+  margin: 5px;
+  width: 100px;
+  background-color: whitesmoke;
+  border-radius: 6px;
+  color: rgb(3, 3, 58);
+  border-color:  rgb(3, 3, 58);
+}
+
+.inp2{
+  margin: 5px;
+  width: 100px;
+  background-color:#dce5e7;
+  border-radius: 6px;
+  color: rgb(3, 3, 58);
+  border-color:  rgb(3, 3, 58);
+}
+
+.inp3{
+  margin: 5px;
+  width: 130px;
+  background-color: whitesmoke;
+  border-radius: 6px;
+  color: rgb(3, 3, 58);
+  border-color:  rgb(3, 3, 58);
+}
+
+
+.inp4{
+  margin: 5px;
+  width: 130px;
+  background-color:#dce5e7;
+  border-radius: 6px;
+  color: rgb(3, 3, 58);
+  border-color:  rgb(3, 3, 58);
+}
+
+.inp5{
+  margin: 5px;
+  width: 140px;
+  background-color: whitesmoke;
+  border-radius: 6px;
+  color: rgb(3, 3, 58);
+  border-color:  rgb(3, 3, 58);
+}
+
+.inp6{
+  margin: 5px;
+  width: 120px;
+  background-color:#dce5e7;
+  border-radius: 6px;
+  color: rgb(3, 3, 58);
+  border-color:  rgb(3, 3, 58);
+}
+
+.divch{
+  background-color: rgb(245, 245, 184);
+  width: 1250px;
+  border-radius: 10px;
+  margin-left: 9px;
+}
+
+.chk
+{
+  margin: 6px 8px 6px 8px;
+}
+
+
+.divc0{
+  background-color: rgb(245, 245, 184);
+  width: 150px;
+  border-radius: 10px;
+}
+
+.divc1{
+  background-color: rgb(245, 245, 184);
+  width: 180px;
+  border-radius: 10px;
+}
+
+.divc2{
+  background-color: rgb(245, 245, 184);
+  width: 385px;
+  border-radius: 10px;
+}
+
+
+.divc3{
+  background-color: rgb(245, 245, 184);
+  width: 350px;
+  border-radius: 10px;
+}
+
+
+.divc4{
+  /* margin: 15px; */
+  width: 1200px;
+  border-radius: 10px;
+}
+
+
+.divc5{
+  margin-left: 5px;
+  width: 1350px;
+  height: 2px;
+  background-color: rgb(245, 245, 184);
+}
+
+
+.divc6{
+  background-color: rgb(245, 245, 184);
+  width: 1200px;
+  border-radius: 10px;
+}
+
+.divc7{
+  background-color: rgb(245, 245, 184);
+  width: 1800px;
+
+}

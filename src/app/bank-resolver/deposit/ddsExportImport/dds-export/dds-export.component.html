@@ -1,0 +1,118 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Enter Agent ID</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <form [formGroup]="exportEntryForm">
+      <div>
+        <div class="form-group col-12" style="margin-bottom: 0%;">
+          <small for="agent_cd">Search Agent.. </small>
+          <input type="text" class="form-control form-control-sm"
+          formControlName="agent_id"   (keyup)="onshow($event)" placeholder="Search by agent name or code..">
+          
+        </div>
+        <ng-container>
+          <div class="suggestions border p-2 " style="width: 91%; top: 92%; left: 6%;"
+          *ngIf="showHideAgent">
+               
+            <table id="customers1">
+              <tr>
+                <th> Agent Code</th>
+                <th>Agent Name</th>
+              </tr>
+              <tbody *ngFor="let agent of agentData" >
+                <tr  (click)="selectAgent(agent.agent_cd)">
+                  <td>
+                    {{agent.agent_cd}}
+                  </td>
+                  <td>
+                    {{agent.agent_name}}
+                  </td>
+                </tr>
+               
+              </tbody>
+              
+            </table>
+            </div>
+        </ng-container>
+        <!-- <select name="agent_id" id="agent_id" formControlName="agent_id" class="form-control">
+          <option value="" selected="selectTitle">Choose...</option>
+          <option *ngFor="let agent of agentData" [value]="agent.agent_cd">{{agent.agent_cd}}-{{agent.agent_name}}</option>
+        </select> -->
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SubmitReport();modalRef.hide()"
+      [disabled]="exportEntryForm.invalid">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3">
+    <table>
+      <tr *ngIf="getExportData">
+        <th>Branch CD</th>
+        <th>Loan ID / A/C No</th>
+        <th>Member Name</th>
+        <th>Trf Dt</th>
+        <th>Principal / Current Bal Amount</th>
+        <th>Interest</th>
+        <th>EMI Outstanding / Balance</th>
+      </tr>
+      <tr *ngIf="getExportData">
+        <td><input type="text" class="inputBld" name="agent_nm" id="agent_lbl" [readonly]="true" value="DCA / AGENT Name"></td>
+        <td><input type="text" class="inputBld" name="agent_nm" id="agent_nm" [readonly]="true" value="{{agentName}}"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let i of getExportData; let ag = index">
+        <ng-container>
+          <td class="mkColBlk"> <b>{{i.acc_num.substr(0,3)}} </b> </td>
+          <td class="mkColBlk"> <b> {{i.acc_num.substr(3)}} </b> </td>
+          <td class="mkColBlk" id="custNm" style="font-size:small;"><b> {{i.cust_name}} </b> </td>
+          <td>{{i.opening_dt}}</td>
+          <td>{{i.balance_amt}}</td>
+          <td style="text-align: center;">{{i.interest}}</td>
+          <td class="mkColBlk" style="text-align: center;"> <b> {{i.balance_amt}} </b> </td>
+        </ng-container>
+      </tr>
+    </table>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button> -->
+      <button mat-raised-button [disabled]="isType" type="button" class="btn btn-rounded btn-primary m-1"
+        (click)="exportAsTxt()">Export</button> &nbsp;
+      <div style="display:inline-block" *ngIf="getExportData">
+        <input type="radio" (change)="exportFormat($event)" id="N" name="exportAs" value="N">
+        <label for="Normal" class="pl-1">6-Digit</label> &nbsp;&nbsp;
+        <input type="radio" (change)="exportFormat($event)" id="C" name="exportAs" value="C">
+        <label for="Cochin" class="pl-1">9-Digit</label><br>
+      </div>
+    </div>
+  </div>
+  
+<button class="scroll-to-top" (click)="scrollToTop()" > <mat-icon>north</mat-icon></button>
+<button class="scroll-to-bottom" (click)="scrollToBotom()" > <mat-icon>south</mat-icon></button>
+</div>
+<loading *ngIf="isLoading"></loading>

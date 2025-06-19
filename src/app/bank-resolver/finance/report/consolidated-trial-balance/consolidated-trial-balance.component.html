@@ -1,0 +1,187 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">Trial Date</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+       
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as CSV</button> -->
+      <button mat-raised-button type="button"
+      class="btn btn-rounded btn-primary m-1"
+      [useExistingCss]="true"
+      printSectionId="mattable"
+      ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+    </div>
+  </div>
+
+  <!-- <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3"> -->
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 ">
+
+    <!-- <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+      <div style="display:inline-block">
+        <h6>{{ardbName}} {{branchName}}</h6>
+      </div>
+      <h6>Run Date & Time : {{today}} </h6> <br>
+      <h6> <u> Trial Balance as on {{this.reportcriteria.controls.fromDate.value.toDateString()| date: 'dd/MM/yyyy'}}</u></h6>
+    </div> -->
+
+    <div class="mat-elevation-z8" id="mattable">
+      <div class="justify-content-center" style="text-align:center">
+        <br><h4>{{ardbName}}<br> ({{branchName}})</h4>
+
+        <h4>Run Date & Time : {{today}} </h4> <br>
+        <h4> <u>Consolidated Trial Balance as on {{this.reportcriteria.controls.fromDate.value.toDateString()| date: 'dd/MM/yyyy'}}</u></h4>
+
+      </div>
+      <!-- <div *ngFor="let accDesc of getKeys(groupedData)">
+        <h4 style="text-align: center;"><b>Account Type: {{ accDesc }}</b></h4>
+        <div *ngFor="let schedule of getKeys(groupedData[accDesc])">
+          <h5 style="padding-left: 40px;"><b>Schedule: </b>{{ schedule }}</h5>
+          <table border="1" style="width: 90%; margin-left: 40px; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="width: 10% !important;">Account Code</th>
+                <th style="width: 40% !important;">Account Name</th>
+                <th style="width: 20% !important;text-align: right;">Debit</th>
+                <th style="width: 20% !important;text-align: right;">Credit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of groupedData[accDesc][schedule].items">
+                
+                <td style="width: 10% !important;">{{ item.acc_cd }}</td>
+                <td style="width: 40% !important;">{{ item.acc_name }}</td>
+                <td style="width: 20% !important;text-align: right;">{{ item.dr | number: '1.2-2' }}</td>
+                <td style="width: 20% !important;text-align: right;">{{ item.cr | number: '1.2-2' }}</td>
+              </tr>
+              <tr style="font-weight: bold;">
+                <td style="text-align: center;" colspan="2">Total</td>
+                <td style="text-align: right;">{{ groupedData[accDesc][schedule].totalDr | number: '1.2-2' }}</td>
+                <td style="text-align: right;">{{ groupedData[accDesc][schedule].totalCr | number: '1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> -->
+      <div *ngFor="let accDesc of getKeys(groupedData)">
+        <h4 style="text-align: center;"><b>Account Type: {{ accDesc }}</b></h4>
+      
+        <div *ngFor="let schedule of getKeys(groupedData[accDesc])" >
+          <ng-container *ngIf="schedule !== '_grandTotal'">
+            <h5 style="padding-left: 40px;"><b>SCHEDULE: {{ schedule }}</b></h5>
+            <table border="1" style="width: 90%; margin-left: 40px; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="width: 10%;">Account Code</th>
+                  <th style="width: 40%;">Account Name</th>
+                  <th style="width: 20%; text-align: right;">Debit</th>
+                  <th style="width: 20%; text-align: right;">Credit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of groupedData[accDesc][schedule].items">
+                  <td>{{ item.acc_cd }}</td>
+                  <td>{{ item.acc_name }}</td>
+                  <td style="text-align: right;">{{ item.dr | number: '1.2-2' }}</td>
+                  <td style="text-align: right;">{{ item.cr | number: '1.2-2' }}</td>
+                </tr>
+                <tr style="font-weight: bold;">
+                  <td colspan="2" style="text-align: center;">Total</td>
+                  <td style="text-align: right;">{{ groupedData[accDesc][schedule].totalDr | number: '1.2-2' }}</td>
+                  <td style="text-align: right;">{{ groupedData[accDesc][schedule].totalCr | number: '1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+        </div>
+      
+        <!-- Grand Total Row -->
+        <table border="1" style="width: 90%; margin-left: 40px; border-collapse: collapse;">
+          <tr style="font-weight: bold; background-color: #f0f0f0;">
+            <td colspan="2" style="text-align: center; width: 56%;">  Total {{ accDesc }}</td>
+            <td style="text-align: right; width: 22%;">
+              {{ groupedData[accDesc]._grandTotal.totalDr | number: '1.2-2' }}
+            </td>
+            <td style="text-align: right; width: 22%;">
+              {{ groupedData[accDesc]._grandTotal.totalCr | number: '1.2-2' }}
+            </td>
+          </tr>
+        </table>
+        
+      </div>
+      <div>
+        <table border="1" style="width: 90%; margin-left: 40px; border-collapse: collapse;">
+          <tr style="font-weight: bold; background-color: #dcdcdc;">
+            <td colspan="2" style="text-align: center; width: 56%;">Overall Grand Total (All Account Types)</td>
+            <td style="text-align: right;  width: 22%;">{{ tot_dr | number: '1.2-2' }}</td>
+            <td style="text-align: right;  width: 22%;" >{{ tot_cr | number: '1.2-2' }}</td>
+          </tr>
+        </table>
+      </div>
+      
+      
+  <footer>
+    <small>
+      This report is generated through Synergic Banking
+     </small>
+   </footer>
+  </div>
+  <!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[1,2,3,resultLength]" MatPaginator></mat-paginator> -->
+
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as CSV</button> -->
+      <button mat-raised-button type="button"
+      class="btn btn-rounded btn-primary m-1"
+      [useExistingCss]="true"
+      printSectionId="mattable"
+      ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+    </div>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>

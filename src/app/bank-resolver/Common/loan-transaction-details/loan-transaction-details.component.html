@@ -1,0 +1,190 @@
+<div *ngIf="show">
+  <loading *ngIf="isLoading"></loading>
+  <form [formGroup]="transactionDtlsFrm">
+    <h6 style="background-color:lightskyblue">Transaction Details</h6>
+    <div class="form-row">
+      <div class="form-group col-8">
+        <small for="party">Party </small>
+        <input type="text" class="form-control form-control-sm" formControlName="party" id="party" disabled>
+      </div>
+      <div class="form-group col-4">
+        <small for="approval_status">Approval Status</small>
+        <input type="text" class="form-control form-control-sm" formControlName="approval_status" id="approval_status"
+          disabled>
+      </div>
+      <div class="form-group col-3">
+        <small for="trans_dt">Transaction Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="trans_dt" id="trans_dt" disabled>
+      </div>
+      <div class="form-group col-3">
+        <small for="trans_cd">Transaction Code</small>
+        <input type="text" class="form-control form-control-sm" formControlName="trans_cd" id="trans_cd" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="acc_type_cd">Account Type</small>
+        <input type="text" class="form-control form-control-sm" formControlName="acc_type_cd"
+        id="acc_type_cd" disabled>
+      </div>
+      <div class="col-6">
+        <div class="row">
+          <div class="form-group col-6">
+            <small for="curr_prn">Current Prn </small>
+            <input type="text" class="form-control form-control-sm" formControlName="curr_prn" id="curr_prn" disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="ovd_prn">Ovd Prn </small>
+            <input type="text" class="form-control form-control-sm" formControlName="ovd_prn" id="ovd_prn" disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="curr_intt">Current Intt</small>
+            <input type="text" class="form-control form-control-sm" formControlName="curr_intt" id="curr_intt" disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="ovd_intt">Ovd Intt </small>
+            <input type="text" class="form-control form-control-sm" formControlName="ovd_intt" id="ovd_intt" disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="loan_id">loan Id</small>
+            <input type="text" class="form-control form-control-sm text-danger" formControlName="loan_id" id="loan_id"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="trans_type">Transaction Type</small>
+            <input type="text" class="form-control form-control-sm" formControlName="trans_type" id="trans_type" disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="curr_prn_recov">Curr Prn Recov</small>
+            <input type="text" class="form-control form-control-sm" formControlName="curr_prn_recov" id="curr_prn_recov"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="ovd_prn_recov">Ovd Prn Recov</small>
+            <input type="text" class="form-control form-control-sm" formControlName="ovd_prn_recov" id="ovd_prn_recov"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="curr_intt_recov">Curr Intt Recov</small>
+            <input type="text" class="form-control form-control-sm" formControlName="curr_intt_recov" id="curr_intt_recov"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="ovd_intt_recov">Ovd Intt Recov</small>
+            <input type="text" class="form-control form-control-sm" formControlName="ovd_intt_recov" id="ovd_intt_recov"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="mis_advance_recov">Saleble Form</small>
+            <input type="text" class="form-control form-control-sm" formControlName="mis_advance_recov"
+              id="mis_advance_recov " disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="share_amt">Legal Charge</small>
+            <input type="text" class="form-control form-control-sm" formControlName="share_amt" id="share_amt " disabled>
+          </div>
+          <!-- <div class="form-group col-6">
+            <small for="trans_type">Transfer Type</small>
+            <input type="text" class="form-control form-control-sm" formControlName="trans_type" id="trans_type "
+              disabled>
+          </div> -->
+        </div>
+
+      </div>
+      <div class="col-6">
+        <div class="row">
+          <div class="form-group col-6 bg-warning mt-1">
+            <small for="tot_Prn">Total Prn</small>
+            <input type="text" class="form-control form-control-sm" formControlName="tot_Prn" id="tot_Prn " disabled>
+          </div>
+          <div class="form-group col-6 bg-warning mt-1">
+            <small for="share_holding">Share Holding</small>
+            <input type="text" class="form-control form-control-sm" formControlName="share_holding" id="share_holding "
+              disabled>
+          </div>
+          <div class="form-group col-6 bg-warning">
+            <small for="audit_fees">Audit Fees</small>
+            <input type="text" class="form-control form-control-sm" formControlName="audit_fees" id="audit_fees "
+              disabled>
+          </div>
+          <div class="form-group col-6 bg-warning">
+            <small for="mis_adv">MIS advance</small>
+            <input type="text" class="form-control form-control-sm" formControlName="mis_adv" id="mis_adv " disabled>
+          </div>
+
+          <div class="form-group col-6">
+            <small for="amount">Amount </small>
+            <input type="text" class="form-control form-control-sm" formControlName="amount" id="amount" disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="intt_till_dt">Intt till date </small>
+            <input type="text" class="form-control form-control-sm" formControlName="intt_till_dt" id="intt_till_dt"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="particulars">Particulars </small>
+            <input type="text" class="form-control form-control-sm text-danger" formControlName="particulars" id="particulars"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="activity_cd">Activity Code </small>
+            <input type="text" class="form-control form-control-sm" formControlName="activity_cd" id="activity_cd"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="instrument_no">Instrument Number</small>
+            <input type="text" class="form-control form-control-sm" formControlName="instrument_no" id="instrument_no"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="voucher_id">Service Charge</small>
+            <input type="text" class="form-control form-control-sm" formControlName="voucher_id" id="voucher_id" disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="sum_assured">Commission</small>
+            <input type="text" class="form-control form-control-sm" formControlName="sum_assured" id="sum_assured"
+              disabled>
+          </div>
+          <div class="form-group col-6">
+            <small for="audit_fees_recc">Insurance</small>
+            <input type="text" class="form-control form-control-sm" formControlName="audit_fees_recc" id="audit_fees_recc"
+              disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-link" *ngIf="showDenominationDtl" (click)="openModal(content)">
+      Denomination Details
+    </button>
+    <ng-template #content>
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Denomination Details
+        </h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-sm table-hover">
+          <thead>
+            <tr>
+              <th scope="col">&#8377;</th>
+              <th scope="col">Count</th>
+              <th scope="col">Total &#8377;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let denomination of tmDenominationTransLst">
+              <td>&#8377;{{denomination.rupees}}</td>
+              <td>{{denomination.count}}</td>
+              <td>&#8377;{{denomination.total}}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><strong>Total</strong></td>
+              <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-template>
+  </form>
+</div>

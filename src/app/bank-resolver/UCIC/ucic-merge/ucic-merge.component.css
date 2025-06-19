@@ -1,0 +1,14 @@
+small{
+    font-size: 70%;
+    font-weight: 500;
+  }
+  .suggestions{
+    position: absolute;
+    background-color: white;
+    margin-left: 3%;
+    z-index: 1;
+    font-size: x-small;
+  }
+  mat-icon{
+    color: rgb(3, 102, 3)!important;
+  }

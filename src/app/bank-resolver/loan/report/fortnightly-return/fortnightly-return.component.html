@@ -1,0 +1,418 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="showAlert = false;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    
+   
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" 
+          class="btn btn-rounded btn-primary m-1" 
+          [useExistingCss]="true"
+          printSectionId="abc" 
+          ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" id="abc">
+        
+     
+  
+
+    <table class="p-3"  id="trial">
+      <thead>
+        <th colspan="10">
+          <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+            <h4>{{ardbName}} {{branchName}}</h4>
+            <h4>Run Date & Time : {{today}} </h4>
+            <h4> <u>FORTNIGHTLY RETURN FROM {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} TO
+              {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}  (Rs. In Lakh) </u></h4>
+          </div>
+        </th>
+        
+      </thead>
+      
+        <tbody *ngIf="reportData">
+            <th colspan="10"><h4><b>Demand for the Financial year {{getFinancialYear(reportcriteria.controls.fromDate.value)}}</b></h4></th>
+        
+      <tr>
+        
+        <th style="text-align:center">Category of Demand (Principal)</th>
+        <th style="text-align:center">Farm Loan (Principal)</th>
+        <th style="text-align:center">Non Farm  (Principal)</th>
+        <th style="text-align:center">Rural Housing  (Principal)</th>
+        <th style="text-align:center"> S.H.G/J.L.G (Principal)</th>
+        <th style="text-align:center"> Total demand this year (Principal)</th>
+      </tr>
+      
+        <tr>
+          <td style="text-align:center">Overdue</td>
+          <td style="text-align:center">{{reportData.farm_overdue_prn  }}</td>
+          <td style="text-align:center">{{reportData.nonfarm_overdue_prn }}</td>
+          <td style="text-align:center">{{reportData.housing_overdue_prn }}</td>
+          <td style="text-align:center">{{reportData.shg_overdue_prn }}</td>
+          <td style="text-align:center">{{reportData.farm_overdue_prn+reportData.nonfarm_overdue_prn+reportData.housing_overdue_prn+reportData.shg_overdue_prn | number : '1.2-2'}}</td>
+          <!-- <td style="text-align:center">{{reportData.ovd_prn}}</td>
+          <td style="text-align:center">{{reportData.curr_prn+reportData.ovd_prn}}</td> -->
+        </tr>
+        <tr>
+            <td style="text-align:center">Current</td>
+            <td style="text-align:center">{{reportData.farm_current_prn}}</td>
+            <td style="text-align:center">{{reportData.nonfarm_current_prn }}</td>
+            <td style="text-align:center">{{reportData.housing_current_prn }}</td>
+            <td style="text-align:center">{{reportData.shg_current_prn}}</td>
+            <td style="text-align:center">{{reportData.farm_current_prn+reportData.nonfarm_current_prn+reportData.housing_current_prn+reportData.shg_current_prn | number : '1.2-2'}}</td>
+            <!-- <td style="text-align:center">{{reportData.ovd_prn}}</td>
+            <td style="text-align:center">{{reportData.curr_prn+reportData.ovd_prn}}</td> -->
+          </tr>
+          <tr>
+            <td style="text-align:center"><b>Total Principal</b></td>
+            <td style="text-align:center"><b>{{reportData.farm_current_prn + reportData.farm_overdue_prn | number : '1.2-2'}}</b></td>
+            <td style="text-align:center"><b>{{reportData.nonfarm_current_prn + reportData.nonfarm_overdue_prn | number : '1.2-2'}}</b></td>
+            <td style="text-align:center"><b>{{reportData.housing_current_prn + reportData.housing_overdue_prn | number : '1.2-2'}}</b></td>
+            <td style="text-align:center"><b>{{reportData.shg_current_prn + reportData.shg_overdue_prn | number : '1.2-2'}}</b></td>
+            <td style="text-align:center"><b>{{reportData.farm_current_prn + reportData.farm_overdue_prn +
+                                            reportData.nonfarm_current_prn + reportData.nonfarm_overdue_prn+
+                                            reportData.housing_current_prn + reportData.housing_overdue_prn+
+                                            reportData.shg_current_prn + reportData.shg_overdue_prn | number : '1.2-2'}}</b></td>
+          </tr>
+       
+      <tr >
+        
+        <th style="text-align:center">Category of Demand (Interest)</th>
+        <th style="text-align:center">Farm Loan (Interest)</th>
+        <th style="text-align:center">Non Farm  (Interest)</th>
+        <th style="text-align:center">Rural Housing  (Interest)</th>
+        <th style="text-align:center"> S.H.G/J.L.G (Interest)</th>
+        <th style="text-align:center"> Total demand this year (Interest)</th>
+      </tr>
+      <tr  >
+        <td style="text-align:center">Overdue</td>
+        <td style="text-align:center">{{reportData.farm_overdue_intt  }}</td>
+        <td style="text-align:center">{{reportData.nonfarm_overdue_intt }}</td>
+        <td style="text-align:center">{{reportData.housing_overdue_intt }}</td>
+        <td style="text-align:center">{{reportData.shg_overdue_intt }}</td>
+        <td style="text-align:center">{{reportData.farm_overdue_intt +reportData.nonfarm_overdue_intt +reportData.housing_overdue_intt +reportData.shg_overdue_intt | number : '1.2-2'}}</td>
+        <!-- <td style="text-align:right">{{reportData.ovd_prn}}</td>
+        <td style="text-align:right">{{reportData.curr_prn+reportData.ovd_prn}}</td> -->
+      </tr>
+      <tr  >
+        <td style="text-align:center">Current</td>
+        <td style="text-align:center">{{reportData.farm_current_intt}}</td>
+        <td style="text-align:center">{{reportData.nonfarm_current_intt }}</td>
+        <td style="text-align:center">{{reportData.housing_current_intt }}</td>
+        <td style="text-align:center">{{reportData.shg_current_intt }}</td>
+        <td style="text-align:center">{{reportData.farm_current_intt +reportData.nonfarm_current_intt +reportData.housing_current_intt +reportData.shg_current_intt | number : '1.2-2'}}</td>
+      </tr>
+      <tr  >
+        <td style="text-align:center"><b>Total Interest</b></td>
+        <td style="text-align:center"><b>{{reportData.farm_current_intt + reportData.farm_overdue_intt | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.nonfarm_current_intt +reportData.nonfarm_overdue_intt | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.housing_current_intt + reportData.housing_overdue_intt | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.shg_current_intt + reportData.shg_overdue_intt | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.farm_current_intt + reportData.farm_overdue_intt+
+                                        reportData.nonfarm_current_intt +reportData.nonfarm_overdue_intt+
+                                        reportData.housing_current_intt + reportData.housing_overdue_intt+
+                                        reportData.shg_current_intt + reportData.shg_overdue_intt | number : '1.2-2'}}</b></td>
+      </tr>
+      <tr  >
+        <td style="text-align:center"><b>Grand Total</b></td>
+        <td style="text-align:center"><b>{{reportData.farm_current_intt + reportData.farm_overdue_intt +reportData.farm_current_prn + reportData.farm_overdue_prn | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.nonfarm_current_intt +reportData.nonfarm_overdue_intt + reportData.nonfarm_current_prn + reportData.nonfarm_overdue_prn | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.housing_current_intt + reportData.housing_overdue_intt +reportData.housing_current_prn + reportData.housing_overdue_prn | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.shg_current_intt + reportData.shg_overdue_intt+ reportData.shg_current_prn + reportData.shg_overdue_prn | number : '1.2-2'}}</b></td>
+        <td style="text-align:center"><b>{{reportData.farm_current_intt + reportData.farm_overdue_intt+ reportData.farm_current_prn + reportData.farm_overdue_prn+
+                                        reportData.nonfarm_current_intt +reportData.nonfarm_overdue_intt+reportData.nonfarm_current_prn + reportData.nonfarm_overdue_prn+
+                                        reportData.housing_current_intt + reportData.housing_overdue_intt+reportData.housing_current_prn + reportData.housing_overdue_prn+
+                                        reportData.shg_current_intt + reportData.shg_overdue_intt+reportData.shg_current_prn + reportData.shg_overdue_prn | number : '1.2-2'}}</b></td>
+      </tr>
+      </tbody><br><br><br>
+      <tbody *ngIf="reportData2">
+        <th colspan="10"><h4><b>Collections made during {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to
+            {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</b> </h4></th>
+    <tr>
+        <th colspan="10"  style="text-align: center;"> Principal</th>
+    </tr>
+    <tr>
+    <th style="text-align:center">Category of Demand</th>
+    <th style="text-align:center">Farm Loan</th>
+    <th style="text-align:center">Non Farm Loan</th>
+    <th style="text-align:center">Housing Lan</th>
+    <th style="text-align:center"> SHG & JLG Loan</th>
+    <th style="text-align:center"> Total</th>
+  </tr>
+  
+    <tr>
+      <td style="text-align:center">Overdue</td>
+      <td style="text-align:center">{{reportData2.farm_overdue_recov_prn  }}</td>
+      <td style="text-align:center">{{reportData2.nonfarm_overdue_recov_prn }}</td>
+      <td style="text-align:center">{{reportData2.housing_overdue_recov_prn }}</td>
+      <td style="text-align:center">{{reportData2.shg_overdue_recov_prn }}</td>
+      <td style="text-align:center">{{reportData2.farm_overdue_recov_prn+reportData2.nonfarm_overdue_recov_prn+reportData2.housing_overdue_recov_prn+reportData2.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+      <!-- <td style="text-align:center">{{reportData2.ovd_prn}}</td>
+      <td style="text-align:center">{{reportData2.curr_prn+reportData2.ovd_prn}}</td> -->
+    </tr>
+        <tr>
+            <td style="text-align:center">Current</td>
+            <td style="text-align:center">{{reportData2.farm_current_recov_prn}}</td>
+            <td style="text-align:center">{{reportData2.nonfarm_current_recov_prn }}</td>
+            <td style="text-align:center">{{reportData2.housing_current_recov_prn }}</td>
+            <td style="text-align:center">{{reportData2.shg_current_recov_prn }}</td>
+            <td style="text-align:center">{{reportData2.farm_current_recov_prn+reportData2.nonfarm_current_recov_prn+reportData2.housing_current_recov_prn+reportData2.shg_current_recov_prn | number : '1.2-2'}}</td>
+            <!-- <td style="text-align:center">{{reportData2.ovd_prn}}</td>
+            <td style="text-align:center">{{reportData2.curr_prn+reportData2.ovd_prn}}</td> -->
+      </tr>
+    <tr>
+        <td style="text-align:center">Advance</td>
+        <td style="text-align:center">{{reportData2.farm_advance_recov_prn}}</td>
+        <td style="text-align:center">{{reportData2.nonfarm_advance_recov_prn }}</td>
+        <td style="text-align:center">{{reportData2.housing_advance_recov_prn }}</td>
+        <td style="text-align:center">{{reportData2.shg_advance_recov_prn }}</td>
+        <td style="text-align:center">{{reportData2.farm_advance_recov_prn+reportData2.nonfarm_advance_recov_prn+reportData2.housing_advance_recov_prn+reportData2.shg_advance_recov_prn | number : '1.2-2'}}</td>
+    </tr>
+    <tr>
+      <td style="text-align:center">Total Principal</td>
+      <td style="text-align:center">{{reportData2.farm_advance_recov_prn+reportData2.farm_current_recov_prn+reportData2.farm_overdue_recov_prn | number : '1.2-2'}}</td>
+      <td style="text-align:center">{{reportData2.nonfarm_advance_recov_prn+reportData2.nonfarm_current_recov_prn +reportData2.nonfarm_overdue_recov_prn | number : '1.2-2'}}</td>
+      <td style="text-align:center">{{reportData2.housing_advance_recov_prn+reportData2.housing_current_recov_prn+reportData2.housing_overdue_recov_prn | number : '1.2-2'}}</td>
+      <td style="text-align:center">{{reportData2.shg_advance_recov_prn+reportData2.shg_current_recov_prn+reportData2.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+      <td style="text-align:center">{{reportData2.farm_advance_recov_prn+reportData2.nonfarm_advance_recov_prn+reportData2.housing_advance_recov_prn+reportData2.shg_advance_recov_prn
+                                      +reportData2.farm_current_recov_prn+reportData2.nonfarm_current_recov_prn+reportData2.housing_current_recov_prn+reportData2.shg_current_recov_prn+
+                                      reportData2.farm_overdue_recov_prn+reportData2.nonfarm_overdue_recov_prn+reportData2.housing_overdue_recov_prn+reportData2.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+  </tr>
+    <tr>
+        <th colspan="10" style="text-align: center;"> Interest</th>
+    </tr>
+  <tr *ngIf="reportData2">
+    
+    <th style="text-align:center">Category of Demand</th>
+    <th style="text-align:center">Farm Loan</th>
+    <th style="text-align:center">Non Farm Loan</th>
+    <th style="text-align:center">Housing Lan</th>
+    <th style="text-align:center"> SHG & JLG Loan</th>
+    <th style="text-align:center"> Total</th>
+  </tr>
+  <tr  >
+    <td style="text-align:center">Overdue</td>
+    <td style="text-align:center">{{reportData2.farm_overdue_recov_intt  }}</td>
+    <td style="text-align:center">{{reportData2.nonfarm_overdue_recov_intt }}</td>
+    <td style="text-align:center">{{reportData2.housing_overdue_recov_intt }}</td>
+    <td style="text-align:center">{{reportData2.shg_overdue_recov_intt }}</td>
+    <td style="text-align:center">{{reportData2.farm_overdue_recov_intt +reportData2.nonfarm_overdue_recov_intt +reportData2.housing_overdue_recov_intt +reportData2.shg_overdue_recov_intt | number : '1.2-2'}}</td>
+    <!-- <td style="text-align:right">{{reportData2.ovd_prn}}</td>
+    <td style="text-align:right">{{reportData2.curr_prn+reportData2.ovd_prn}}</td> -->
+  </tr>
+  <tr  >
+    <td style="text-align:center">Current</td>
+    <td style="text-align:center">{{reportData2.farm_current_recov_intt}}</td>
+    <td style="text-align:center">{{reportData2.nonfarm_current_recov_intt }}</td>
+    <td style="text-align:center">{{reportData2.housing_current_recov_intt }}</td>
+    <td style="text-align:center">{{reportData2.shg_current_recov_intt }}</td>
+    <td style="text-align:center">{{reportData2.farm_current_recov_intt +reportData2.nonfarm_current_recov_intt +reportData2.housing_current_recov_intt +reportData2.shg_current_recov_intt | number : '1.2-2'}}</td>
+    
+  </tr>
+  <tr  >
+    <td style="text-align:center">Total Interest</td>
+    <td style="text-align:center">{{reportData2.farm_current_recov_intt + reportData2.farm_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.nonfarm_current_recov_intt + reportData2.nonfarm_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.housing_current_recov_intt + reportData2.housing_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.shg_current_recov_intt + reportData2.shg_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.farm_current_recov_intt +reportData2.nonfarm_current_recov_intt +reportData2.housing_current_recov_intt +reportData2.shg_current_recov_intt +
+                                    reportData2.farm_overdue_recov_intt +reportData2.nonfarm_overdue_recov_intt +reportData2.housing_overdue_recov_intt +reportData2.shg_overdue_recov_intt | number : '1.2-2'}}</td>
+  </tr>
+  <tr  >
+    <td style="text-align:center">Grand Total</td>
+    <td style="text-align:center">{{reportData2.farm_current_recov_intt + reportData2.farm_overdue_recov_intt + reportData2.farm_advance_recov_prn+reportData2.farm_current_recov_prn+reportData2.farm_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.nonfarm_current_recov_intt + reportData2.nonfarm_overdue_recov_intt + reportData2.nonfarm_advance_recov_prn+reportData2.nonfarm_current_recov_prn +reportData2.nonfarm_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.housing_current_recov_intt + reportData2.housing_overdue_recov_intt + reportData2.housing_advance_recov_prn+reportData2.housing_current_recov_prn+reportData2.housing_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.shg_current_recov_intt + reportData2.shg_overdue_recov_intt + reportData2.shg_advance_recov_prn+reportData2.shg_current_recov_prn+reportData2.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData2.farm_current_recov_intt +reportData2.nonfarm_current_recov_intt +reportData2.housing_current_recov_intt +reportData2.shg_current_recov_intt +
+                                    reportData2.farm_overdue_recov_intt +reportData2.nonfarm_overdue_recov_intt +reportData2.housing_overdue_recov_intt +reportData2.shg_overdue_recov_intt +
+                                    reportData2.farm_advance_recov_prn+reportData2.nonfarm_advance_recov_prn+reportData2.housing_advance_recov_prn+reportData2.shg_advance_recov_prn+
+                                    reportData2.farm_current_recov_prn+reportData2.nonfarm_current_recov_prn+reportData2.housing_current_recov_prn+reportData2.shg_current_recov_prn+
+                                    reportData2.farm_overdue_recov_prn+reportData2.nonfarm_overdue_recov_prn+reportData2.housing_overdue_recov_prn+reportData2.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+  </tr>
+      </tbody><br><br><br>
+
+      <tbody *ngIf="reportData3">
+        <th colspan="10"><h4><b>Progressive total of Collection made during the period {{yearFastDay}} to
+          {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</b> </h4></th>
+    <tr>
+        <th colspan="10"  style="text-align: center;"> Principal</th>
+    </tr>
+    <tr>
+    <th style="text-align:center">Category of Demand</th>
+    <th style="text-align:center">Farm Loan</th>
+    <th style="text-align:center">Non Farm Loan</th>
+    <th style="text-align:center">Housing Lan</th>
+    <th style="text-align:center"> SHG & JLG Loan</th>
+    <th style="text-align:center"> Total</th>
+  </tr>
+  
+    <tr>
+      <td style="text-align:center">Overdue</td>
+      <td style="text-align:center">{{reportData3.farm_overdue_recov_prn  }}</td>
+      <td style="text-align:center">{{reportData3.nonfarm_overdue_recov_prn }}</td>
+      <td style="text-align:center">{{reportData3.housing_overdue_recov_prn }}</td>
+      <td style="text-align:center">{{reportData3.shg_overdue_recov_prn }}</td>
+      <td style="text-align:center">{{reportData3.farm_overdue_recov_prn+reportData3.nonfarm_overdue_recov_prn+reportData3.housing_overdue_recov_prn+reportData3.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+      <!-- <td style="text-align:center">{{reportData3.ovd_prn}}</td>
+      <td style="text-align:center">{{reportData3.curr_prn+reportData3.ovd_prn}}</td> -->
+    </tr>
+        <tr>
+            <td style="text-align:center">Current</td>
+            <td style="text-align:center">{{reportData3.farm_current_recov_prn}}</td>
+            <td style="text-align:center">{{reportData3.nonfarm_current_recov_prn }}</td>
+            <td style="text-align:center">{{reportData3.housing_current_recov_prn }}</td>
+            <td style="text-align:center">{{reportData3.shg_current_recov_prn }}</td>
+            <td style="text-align:center">{{reportData3.farm_current_recov_prn+reportData3.nonfarm_current_recov_prn+reportData3.housing_current_recov_prn+reportData3.shg_current_recov_prn | number : '1.2-2'}}</td>
+            <!-- <td style="text-align:center">{{reportData3.ovd_prn}}</td>
+            <td style="text-align:center">{{reportData3.curr_prn+reportData3.ovd_prn}}</td> -->
+      </tr>
+      <tr>
+        <td style="text-align:center">Advance</td>
+        <td style="text-align:center">{{reportData3.farm_advance_recov_prn}}</td>
+        <td style="text-align:center">{{reportData3.nonfarm_advance_recov_prn }}</td>
+        <td style="text-align:center">{{reportData3.housing_advance_recov_prn }}</td>
+        <td style="text-align:center">{{reportData3.shg_advance_recov_prn }}</td>
+        <td style="text-align:center">{{reportData3.farm_advance_recov_prn+reportData3.nonfarm_advance_recov_prn+reportData3.housing_advance_recov_prn+reportData3.shg_advance_recov_prn | number : '1.2-2'}}</td>
+        <!-- <td style="text-align:center">{{reportData3.ovd_prn}}</td>
+        <td style="text-align:center">{{reportData3.curr_prn+reportData3.ovd_prn}}</td> -->
+  </tr>
+  <tr>
+    <td style="text-align:center">Total Principal</td>
+    <td style="text-align:center">{{reportData3.farm_advance_recov_prn+reportData3.farm_current_recov_prn+reportData3.farm_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.nonfarm_advance_recov_prn+reportData3.nonfarm_current_recov_prn +reportData3.nonfarm_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.housing_advance_recov_prn+reportData3.housing_current_recov_prn+reportData3.housing_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.shg_advance_recov_prn+reportData3.shg_current_recov_prn+reportData3.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.farm_advance_recov_prn+reportData3.nonfarm_advance_recov_prn+reportData3.housing_advance_recov_prn+reportData3.shg_advance_recov_prn
+                                    +reportData3.farm_current_recov_prn+reportData3.nonfarm_current_recov_prn+reportData3.housing_current_recov_prn+reportData3.shg_current_recov_prn+
+                                    reportData3.farm_overdue_recov_prn+reportData3.nonfarm_overdue_recov_prn+reportData3.housing_overdue_recov_prn+reportData3.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+</tr>
+    <tr>
+        <th colspan="10" style="text-align: center;"> Interest</th>
+    </tr>
+  <tr *ngIf="reportData3">
+    
+    <th style="text-align:center">Category of Demand</th>
+    <th style="text-align:center">Farm Loan</th>
+    <th style="text-align:center">Non Farm Loan</th>
+    <th style="text-align:center">Housing Lan</th>
+    <th style="text-align:center"> SHG & JLG Loan</th>
+    <th style="text-align:center"> Total</th>
+  </tr>
+  <tr  >
+    <td style="text-align:center">Overdue</td>
+    <td style="text-align:center">{{reportData3.farm_overdue_recov_intt  }}</td>
+    <td style="text-align:center">{{reportData3.nonfarm_overdue_recov_intt }}</td>
+    <td style="text-align:center">{{reportData3.housing_overdue_recov_intt }}</td>
+    <td style="text-align:center">{{reportData3.shg_overdue_recov_intt }}</td>
+    <td style="text-align:center">{{reportData3.farm_overdue_recov_intt +reportData3.nonfarm_overdue_recov_intt +reportData3.housing_overdue_recov_intt +reportData3.shg_overdue_recov_intt | number : '1.2-2'}}</td>
+    <!-- <td style="text-align:right">{{reportData3.ovd_prn}}</td>
+    <td style="text-align:right">{{reportData3.curr_prn+reportData3.ovd_prn}}</td> -->
+  </tr>
+  <tr  >
+    <td style="text-align:center">Current</td>
+    <td style="text-align:center">{{reportData3.farm_current_recov_intt}}</td>
+    <td style="text-align:center">{{reportData3.nonfarm_current_recov_intt }}</td>
+    <td style="text-align:center">{{reportData3.housing_current_recov_intt }}</td>
+    <td style="text-align:center">{{reportData3.shg_current_recov_intt }}</td>
+    <td style="text-align:center">{{reportData3.farm_current_recov_intt +reportData3.nonfarm_current_recov_intt +reportData3.housing_current_recov_intt +reportData3.shg_current_recov_intt | number : '1.2-2'}}</td>
+    <!-- <td style="text-align:right">{{reportData.ovd_prn}}</td>
+    <td style="text-align:right">{{reportData.curr_prn+reportData.ovd_prn}}</td> -->
+  </tr>
+  <tr  >
+    <td style="text-align:center">Total Interest</td>
+    <td style="text-align:center">{{reportData3.farm_current_recov_intt + reportData3.farm_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.nonfarm_current_recov_intt + reportData3.nonfarm_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.housing_current_recov_intt + reportData3.housing_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.shg_current_recov_intt + reportData3.shg_overdue_recov_intt | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.farm_current_recov_intt +reportData3.nonfarm_current_recov_intt +reportData3.housing_current_recov_intt +reportData3.shg_current_recov_intt +
+                                    reportData3.farm_overdue_recov_intt +reportData3.nonfarm_overdue_recov_intt +reportData3.housing_overdue_recov_intt +reportData3.shg_overdue_recov_intt | number : '1.2-2'}}</td>
+  </tr>
+  <tr  >
+    <td style="text-align:center">Grand Total</td>
+    <td style="text-align:center">{{reportData3.farm_current_recov_intt + reportData3.farm_overdue_recov_intt + reportData3.farm_advance_recov_prn+reportData3.farm_current_recov_prn+reportData3.farm_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.nonfarm_current_recov_intt + reportData3.nonfarm_overdue_recov_intt + reportData3.nonfarm_advance_recov_prn+reportData3.nonfarm_current_recov_prn +reportData3.nonfarm_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.housing_current_recov_intt + reportData3.housing_overdue_recov_intt + reportData3.housing_advance_recov_prn+reportData3.housing_current_recov_prn+reportData3.housing_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.shg_current_recov_intt + reportData3.shg_overdue_recov_intt + reportData3.shg_advance_recov_prn+reportData3.shg_current_recov_prn+reportData3.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+    <td style="text-align:center">{{reportData3.farm_current_recov_intt +reportData3.nonfarm_current_recov_intt +reportData3.housing_current_recov_intt +reportData3.shg_current_recov_intt +
+                                    reportData3.farm_overdue_recov_intt +reportData3.nonfarm_overdue_recov_intt +reportData3.housing_overdue_recov_intt +reportData3.shg_overdue_recov_intt +
+                                    reportData3.farm_advance_recov_prn+reportData3.nonfarm_advance_recov_prn+reportData3.housing_advance_recov_prn+reportData3.shg_advance_recov_prn+
+                                    reportData3.farm_current_recov_prn+reportData3.nonfarm_current_recov_prn+reportData3.housing_current_recov_prn+reportData3.shg_current_recov_prn+
+                                    reportData3.farm_overdue_recov_prn+reportData3.nonfarm_overdue_recov_prn+reportData3.housing_overdue_recov_prn+reportData3.shg_overdue_recov_prn | number : '1.2-2'}}</td>
+  </tr>
+      </tbody>
+      
+      <tfoot style="text-align:left">
+        <tr>
+          <td colspan="10"> <small>
+            This report is generated through CFS-2022
+           </small> </td>
+        </tr> </tfoot>
+    </table>
+   
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" 
+          class="btn btn-rounded btn-primary m-1" 
+          [useExistingCss]="true"
+          printSectionId="abc" 
+          ngxPrint>Print</button>
+            <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

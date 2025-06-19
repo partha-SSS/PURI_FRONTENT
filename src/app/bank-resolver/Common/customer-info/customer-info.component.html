@@ -1,0 +1,35 @@
+<div>
+  <form [formGroup]="custMstrFrm">
+    <!-- <h6 *ngIf="title">{{title}}</h6> -->
+    <h6 style="background-color:lightskyblue">Personal Information</h6>
+    <div class="form-row">
+      <div class="form-group col-12">
+        <small for="cust_name">Customer Name</small>
+        <input type="text" class="form-control form-control-sm" formControlName="cust_name" id="cust_name"
+         disabled>
+      </div>
+      <div class="form-group  col-12" *ngIf="mode1">
+        <small for="guardian_name">Guardian Name</small>
+        <input type="text" class="form-control form-control-sm text-capitalize" formControlName="guardian_name" id="guardian_name"
+           disabled>
+      </div>
+      <div class="form-group  col-6">
+        <small for="dt_of_birth">Date Of Birth</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dt_of_birth"
+        id="dt_of_birth"  disabled>
+        <!-- <small>{{f.dt_of_birth.value | date:"MM/dd/yyyy"}}</small> -->
+      </div>
+      <div class="form-group col-6" *ngIf="mode2">
+        <small for="catg_cd">Category</small>
+        <input type="text" class="form-control form-control-sm" formControlName="catg_desc" id="catg_desc"
+           disabled>
+      </div>
+      <div class="form-group col-12" *ngIf="mode2 || mode1">
+        <small for="present_address">Address</small>
+        <input type="text" class="form-control form-control-sm" id="present_address" formControlName="present_address"
+          disabled>
+      </div>
+    </div>
+
+  </form>
+</div>

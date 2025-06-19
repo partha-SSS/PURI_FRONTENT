@@ -1,0 +1,66 @@
+<div *ngIf="show">
+  <loading *ngIf="isLoading"></loading>
+  <form [formGroup]="accDtlsFrm">
+    <h6 style="background-color:lightskyblue">Account Details</h6>
+    <div class="form-row">
+      <!-- <div class="form-group col-12">
+        <small for="acc_num">Name</small>
+        <input type="text" class="form-control form-control-sm" formControlName="acc_num" id="acc_num"
+          placeholder="Name" disabled>
+      </div> -->
+      <div class="form-group col-6">
+        <small for="constitution_cd">Constitution</small>
+        <input type="text" class="form-control form-control-sm" formControlName="constitution_cd" id="constitution_cd"
+        hidden disabled>
+      <input type="text" class="form-control form-control-sm" formControlName="constitution_cd_desc"
+        id="constitution_cd_desc" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="dep_period">Deposit Period</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period" id="dep_period"
+           disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="opening_dt">Opening Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="opening_dt" id="opening_dt"
+          disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="mat_dt">Maturity Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="mat_dt" id="mat_dt"
+           disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="prn_amt">Principal Amount</small>
+        <input type="text" class="form-control form-control-sm" formControlName="prn_amt" id="prn_amt"
+          disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="clr_bal">Cleared Balance</small>
+        <input type="text" class="form-control form-control-sm" formControlName="clr_bal" id="clr_bal" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="curr_bal">Current Balance</small>
+        <input type="text" class="form-control form-control-sm" formControlName="curr_bal" id="curr_bal" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="oprn_instr_cd">Operation</small>
+        <input type="text" class="form-control form-control-sm" formControlName="oprn_instr_cd" id="oprn_instr_cd"
+          disabled hidden>
+        <input type="text" class="form-control form-control-sm" formControlName="oprn_instr_cd_desc"
+          id="oprn_instr_cd_desc" disabled>
+      </div>
+
+      <div class="form-group col-6">
+        <small for="intt_rt">Interest Rate</small>
+        <input type="text" class="form-control form-control-sm" formControlName="intt_rt" id="intt_rt"
+           disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="intt_amt">Interest Amount</small>
+        <input type="text" class="form-control form-control-sm" formControlName="intt_amt" id="intt_amt"
+           disabled>
+      </div>
+    </div>
+  </form>
+</div>

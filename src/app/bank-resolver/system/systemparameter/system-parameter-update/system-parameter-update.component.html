@@ -1,0 +1,95 @@
+<loading *ngIf="isLoading"></loading>
+
+<div class="row d-flex justify-content-center align-items-center">
+
+  <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+  </div>
+
+
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <!-- <div class="container border"> -->
+
+    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+             'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="container border scroll-style">
+
+      <h1></h1>
+      <h4 class="customHeader">Update System Parameter</h4>
+
+
+      <h1></h1>
+      <div class="form-row">
+        <div class="form-group col-2">
+          <small for="nom_name">Parameter Code</small>
+        </div>
+
+        <div class="form-group col-5">
+          <small for="nom_addr">Parameter Description</small>
+        </div>
+
+        <div class="form-group col-3">
+          <small for="nom_rel">Parameter Value</small>
+        </div>
+      </div>
+
+
+
+      <section *ngFor="let t1 of smParameterList; let i = index ">
+        <div class="form-row">
+          <div class="form-group col-2">
+            <input [(ngModel)]="t1.param_cd" style="height:25px" disabled type="text"
+              class="form-control form-control-sm text-capitalize" id="param_code" placeholder="Parameter Code">
+          </div>
+
+          <div class="form-group col-5">
+            <input [(ngModel)]="t1.param_desc" style="height:25px" disabled type="text"
+              class="form-control form-control-sm text-capitalize" id="param_desc" placeholder="Parameter Description">
+          </div>
+
+          <div class="form-group col-3">
+            <input [(ngModel)]="t1.param_value" style="height:25px" [disabled]='disableAll=="Y" ' type="text"
+              class="form-control form-control-sm text-capitalize" id="nom_rel"
+              (ngModelChange)="t1.param_value = $event.toUpperCase()" placeholder="Parameter Value">
+          </div>
+
+          <div class="form-group col-2">
+            <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm ml-3"
+            [disabled]='disableAll=="Y" ' (click)="saveData(i)">Update</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+
+    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+             'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+  </div>
+
+</div>

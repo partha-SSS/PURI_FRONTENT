@@ -1,0 +1,197 @@
+<div class="col-xs-12 col-sm-12  shadow bg-white" style="min-height: 70vh;">
+  <!-- <div class="mt-1 col-xs-12 col-sm-12  d-flex justify-content-center align-items-center" style="margin-top: 20px">
+      
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" #saveBtn (click)="callSaveFunction()">Save</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="callDeleteFunction()"
+      *ngIf="editDeleteMode">Delete</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onResetClick()">Reset</button>
+      
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+      
+    </div>
+  <hr> -->
+      <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+        <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+         'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+          <strong>{{showMsg.Message}}</strong>
+          <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+  <div class="row justify-content-center">
+    <br>
+      <form [formGroup]="accTransFrm" class="col-12">
+        <div class="form-row">
+          <div class="form-group col-2" style="margin-left:9%;">
+            <small for="acc_type_cd">Account Type</small>
+            <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+              (change)="onAcctTypeChange()">
+              <option *ngIf="AcctTypes" [readonly]="true">Choose</option>
+              <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+              </option>
+            </select>
+          </div>
+          <!-- <div class="form-group col-6">
+            <small for="acct_num">Search by Acc# / Customer Name / Phone number</small> -->
+              <!-- <small style="display: inline;" class="form-text text-muted">
+                Press tab.
+              </small> -->
+            
+            <div class="form-group col-6">
+              <small for="acc_no">Account Number</small>
+              <div class="input-group">
+                  <input style="height:25px"  (keypress)="enable($event)"
+                  formControlName="acct_num" type="text" [attr.disabled]="null == operations ? '' : null"
+                    class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="loadInvData()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+              </div>
+              <div class="suggestions" *ngIf="suggestedCustomer">
+                <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                    <tr>
+                      <th scope="col">Acc Num</th>
+                      <th scope="col">Principal Amount</th>
+                      <th scope="col">Interest Amount</th>
+                    </tr>
+                  <tbody>
+                    <tr  (click)="SelectCustomer()">
+                      <td scope="row">{{suggestedCustomer.acc_num}}</td>
+                      <td>{{suggestedCustomer.prn_amt}}</td>
+                      <td>{{suggestedCustomer.intt_amt}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- <input type="number" [attr.disabled]="null == operations ? '' : null" class="form-control form-control-sm "
+              formControlName="acct_num" id="acct_num" placeholder="Account Number"
+              (keydown.Tab)="onAccountNumTabOff()"
+              name="x-field-1" autocomplete="new-field-1"> -->
+            <!-- <div class="input-group">
+              <input type="text" [attr.disabled]="null == operations ? '' : null" class="form-control form-control-sm "
+                formControlName="acct_num" id="acct_num"
+                name="x-field-1" autocomplete="new-field-1" (input)="clearSuggestedCust()">
+              
+                            <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length>0">
+              <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.acc_num}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 150%; font-size: small;" *ngIf="shownoresult">
+              <strong class="text-danger">" {{this.f.acct_num.value}} " does not match with any customer</strong>
+          </div> -->
+          <!-- </div> -->
+          <!-- <div class="col-1" style="margin-top:1.6%" >
+           ----------------------------------------------------- [attr.disabled]="(null == operations || disableOperation) ? '' : null"
+          </div> -->
+          <div class="form-group col-2" [hidden]="editDeleteMode">
+            <small for="oprn_cd">Operation Type</small>
+            <select id="oprn_cd" [disabled]="opnTyp"
+              class="form-control form-control-sm" formControlName="oprn_cd" (change)="onOperationTypeChange()">
+              <!-- (change)="onOperationTypeChange()" -->
+              <option *ngIf="operations" selected [readonly]="true">Choose</option>
+              <option *ngFor="let oper of operations" [value]="oper.oprn_cd">{{oper.oprn_desc}}</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <hr>
+  
+  <div>
+  <div *ngIf="sel_cc">
+    <app-cc-trans [showTranDtlRe]="showTransactionDtlR" [showTranDtlCl]="showTransactionDtlC" [editDeleteMode]="editDeleteMode" ></app-cc-trans>
+  </div>
+  <div *ngIf="sel_fd">
+    <app-fd-trans></app-fd-trans>
+  </div>
+  <div *ngIf="sel_mis">
+    <app-mis-trans></app-mis-trans>
+  </div>
+  <div *ngIf="sel_rd">
+    <app-rd-trans></app-rd-trans>
+  </div>
+  </div>
+  
+  </div>
+  <ng-template #unappconfirm>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Wish to edit or delete Unapproved Transaction?
+      </h4>
+      <!-- <button mat-raised-button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button> -->
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="col-12 scroll-when-long">
+          <div class="table-responsive" *ngIf="unApprovedTransactionLst.length > 0">
+            <h4 class="customHeader">List of Unapproved Transaction for Acc# {{unApprovedTransactionLstOfAcc[0].acc_num}}.</h4>
+            <table class="table table-sm table-hover " id="customers2">
+              <!-- <thead> -->
+                <tr>
+                  <th scope="col">Trans Code</th>
+                  <th scope="col">Trans Dt</th>
+                  <th scope="col">Account Number</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col" *ngIf="unApprovedTransactionLstOfAcc.length > 1"></th>
+                </tr>
+              <!-- </thead> -->
+              <tbody>
+                <tr *ngFor="let tran of unApprovedTransactionLstOfAcc,let i=index">
+                  <td>{{tran.trans_cd}}</td>
+                  <td>{{tran.trans_dt}}</td>
+                  <td>{{tran.acc_num}}</td>
+                  <td *ngIf="tran.trans_mode=='R'; then rMode; else notrMode">
+  
+                  </td>
+                  <ng-template #rMode>
+                    {{tran.ovd_prn_recov | INRCurrency}}
+                  </ng-template>
+                  <ng-template #notrMode>
+                    {{tran.amount | INRCurrency}}
+                  </ng-template>
+  
+                  <td *ngIf="unApprovedTransactionLstOfAcc.length > 1"><button mat-raised-button type="button"
+                      class="btn btn-primary float-right" (click)="onUpapprovedConfirm(tran)">Confirm</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="customHeader" *ngIf="unApprovedTransactionLst.length <= 0">
+                    No Data found
+          </div>
+        </div>
+      </div>
+      <button mat-raised-button type="button" class="btn btn-default" (click)="onUpapprovedCancel()">Cancel</button> &nbsp;
+      <button mat-raised-button type="button" *ngIf="unApprovedTransactionLstOfAcc.length === 1" class="btn btn-primary float-right"
+        (click)="onUpapprovedConfirm(unApprovedTransactionLstOfAcc[0])">View/Edit</button>
+    </div>
+  </ng-template>
+  <loading *ngIf="isLoading"></loading>

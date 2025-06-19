@@ -1,0 +1,345 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on Date</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrive</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="mattable" ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1 pull-right" (click)="downloadexcel()">Download Excel</button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3">
+   
+
+
+     <!-- material data table begins-->
+   
+     <mat-form-field appearance="outline">
+      <mat-label>Search Member List</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Ex. abc / 123">
+    </mat-form-field>
+    <div class="mat-elevation-z8" id="mattable">
+  <table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+    <!-- Position Column -->
+   <ng-container matColumnDef="mainHeader">
+       <th mat-header-cell colspan="10" *matHeaderCellDef>
+        <div class="justify-content-center" style="text-align:center">
+          <h4>{{ardbName}} ({{branchName}})</h4>
+          <h4>Run Date & Time : {{today}} </h4>
+          <h4> <u>Member List As on {{asOnDate}} </u></h4>
+        </div>
+       </th>
+   </ng-container>
+   <ng-container matColumnDef="SLNO">
+  
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>SL NO.
+    
+    </th>
+  
+    
+    <td mat-cell *matCellDef="let element; let i=index;"> {{i+1}} </td>
+  </ng-container>
+    <ng-container matColumnDef="UCIC">
+  
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>UCIC
+      
+      </th>
+    
+      
+      <td mat-cell *matCellDef="let element"> {{element.cust_cd}} </td>
+    </ng-container>
+  
+    <!-- Name Column -->
+    <ng-container matColumnDef="Name">
+   
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Name 
+      </th>
+    
+      <td mat-cell *matCellDef="let element"> {{element.cust_name}} </td>
+    </ng-container>
+  
+    <!-- Weight Column -->
+    <ng-container matColumnDef="Guardian_Name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> 
+       Guardian Name 
+      </th>
+      <td mat-cell *matCellDef="let element"> {{element.guardian_name}} </td>
+    </ng-container>
+  
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="Address">
+    
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Address </th>
+     
+      <td mat-cell *matCellDef="let element" style="font-size:x-small"> {{element.permanent_address}} </td>
+    </ng-container>
+    <ng-container matColumnDef="Phone">
+      
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+     
+      <td mat-cell *matCellDef="let element">
+        <ng-container *ngIf="element.phone">
+          {{element.phone}}
+
+        </ng-container>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="Gender">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Gender </th> 
+      <td mat-cell *matCellDef="let element" > 
+        <ng-container *ngIf="element.sex=='M'">
+          Male
+
+        </ng-container>
+        <ng-container *ngIf="element.sex=='F'">
+          Female
+
+        </ng-container>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="Caste">
+      
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> VIllage</th>
+      
+      
+      <td mat-cell *matCellDef="let element"> 
+        {{element.vill_cd}}
+        <!-- <ng-container  *ngIf="element.caste==1">
+          General
+        </ng-container>
+        <ng-container  *ngIf="element.caste==2">
+          SC
+        </ng-container>
+        <ng-container  *ngIf="element.caste==3">
+          ST
+        </ng-container>
+        <ng-container  *ngIf="element.caste==4">
+          OBC
+        </ng-container>
+        <ng-container  *ngIf="element.caste==0 || (element.caste!=1 && element.caste!=2 && element.caste!=3 && element.caste!=4)">
+          N/A
+        </ng-container> -->
+      </td>
+      
+    </ng-container>
+    <ng-container matColumnDef="Community">
+      
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Community </th >
+
+     
+      <td mat-cell *matCellDef="let element"> 
+        <ng-container *ngIf="element.community==1">
+          Hindu
+        </ng-container>
+        <ng-container *ngIf="element.community==2">
+          Muslim
+        </ng-container>
+        <ng-container *ngIf="element.community==3">
+          Others
+        </ng-container>
+        <ng-container *ngIf="element.community==0 || (element.community!=1 && element.community!=2 && element.community!=3)">
+          Others
+        </ng-container>
+      </td>
+      
+    </ng-container>
+    <ng-container matColumnDef="Category">
+      
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+     
+      <td mat-cell *matCellDef="let element" >
+        <ng-container *ngIf="element.catg_desc">
+         {{element.catg_desc}}
+        </ng-container>
+        <ng-container  *ngIf="!element.catg_desc">
+
+        </ng-container>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+  </table>
+  <footer>
+    <small>
+      This report is generated through CFS-2022
+     </small>
+   </footer>
+  </div>
+  <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[50,100,500,1000, this.reportData.length]" MatPaginator></mat-paginator>
+
+  <!-- material data table ends -->
+    <pagination hidden style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+    [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+    (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination>
+  
+ 
+    <table hidden class="p-3" id="trial">
+    <tr *ngIf="reportData">
+      <th>UCIC</th>
+      <th >Name</th>
+      <th >Guardian name</th>
+      <th >Address</th>
+      <th >Phone</th>
+      <th >Gender</th>
+      <th >Caste</th>
+      <th >Community</th>
+      <th >Category </th>
+    </tr>
+    <tbody *ngFor="let i of pagedItems let itr=index;">
+      <tr>
+        <td >{{i.cust_cd}}</td>
+        <td >{{i.title}} {{i.cust_name}}</td>
+        <td >{{i.guardian_name}}</td>
+        <td >{{i.permanent_address}}</td>
+        <td *ngIf="i.phone">{{i.phone}}</td>
+        <td *ngIf="!i.phone"></td>
+        <td *ngIf="i.sex=='M'">Male</td>
+        <td *ngIf="i.sex=='F'">Female</td>
+        <td *ngIf="i.caste==1">General</td>
+        <td *ngIf="i.caste==2">SC</td>
+        <td *ngIf="i.caste==3">ST</td>
+        <td *ngIf="i.caste==4">OBC</td>
+        <!-- <td *ngIf="i.caste==0">N/A</td> -->
+        <td *ngIf="i.caste==0 || (i.caste!=1 && i.caste!=2 && i.caste!=3 && i.caste!=4)">N/A</td>
+        <td *ngIf="i.community==1">Hindu</td>
+        <td *ngIf="i.community==2">Muslim</td>
+        <td *ngIf="i.community==3">Others</td>
+        <!-- <td *ngIf="i.community==0">N/A</td> -->
+        <td *ngIf="i.community==0 || (i.community!=1 && i.community!=2 && i.community!=3)">N/A</td>
+        <td *ngIf="i.catg_desc">{{i.catg_desc}}</td>
+        <td *ngIf="!i.catg_desc"></td>
+      </tr>
+    </tbody>
+    <tfoot style="text-align:left">
+      <tr>
+        <td colspan="9"> <small>
+          This report is generated through CFS-2022
+         </small> </td>
+      </tr> </tfoot>
+  </table>
+  <!-- <div id="newtab" #content1>
+    hello
+  </div> -->
+  <!-- <div>
+    <small>
+      This report is generated through CFS-2022
+     </small> 
+  </div> -->
+  <div hidden id="hiddenTab" #content1>
+    <div class="justify-content-center" style="text-align:center">
+      <h4>{{ardbName}} {{branchName}}</h4>
+      <h4>Run Date & Time : {{today}} </h4> <br>
+      <h4> <u>Member List</u></h4>
+    </div>
+    <table class="p-3" id="trial1" class="mkSmall1" >
+      <thead>
+          <tr *ngIf="reportData">
+              <th >UCIC</th>
+              <th >Name</th>
+              <th >Guardian name</th>
+              <th >Address</th>
+              <th >Phone</th>
+              <th >Gender</th>
+              <th >Caste</th>
+              <th >Community</th>
+              <th >Category </th>
+            </tr>
+      </thead>
+      <tbody *ngFor="let i of reportData let itr=index;">
+        <tr>
+          <td >{{i.cust_cd}}</td>
+          <td >{{i.title}} {{i.cust_name}}</td>
+          <td >{{i.guardian_name}}</td>
+          <td >{{i.permanent_address}}</td>
+          <td *ngIf="i.phone">{{i.phone}}</td>
+        <td *ngIf="!i.phone"></td>
+          <td *ngIf="i.sex=='M'">Male</td>
+          <td *ngIf="i.sex=='F'">Female</td>
+          <td *ngIf="i.caste==1">General</td>
+          <td *ngIf="i.caste==2">SC</td>
+          <td *ngIf="i.caste==3">ST</td>
+          <td *ngIf="i.caste==4">OBC</td>
+        <td *ngIf="i.caste==0 || (i.caste!=1 && i.caste!=2 && i.caste!=3 && i.caste!=4)">N/A</td>
+          <td *ngIf="i.community==1">Hindu</td>
+          <td *ngIf="i.community==2">Muslim</td>
+          <td *ngIf="i.community==3">Others</td>
+        <td *ngIf="i.community==0 || (i.community!=1 && i.community!=2 && i.community!=3)">N/A</td>
+          <td *ngIf="i.catg_desc">{{i.catg_desc}}</td>
+          <td *ngIf="!i.catg_desc"></td>
+        </tr>
+        </tbody>
+      <tfoot>
+        <tr>
+         <td>&nbsp;</td>
+         <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         </tr>
+      </tfoot>
+    </table>
+    <footer>
+      <small>
+        This report is generated through CFS-2022
+       </small> 
+     </footer>
+  </div>
+    <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrive</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="hiddenTab" ngxPrint>Print</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="mattable" ngxPrint>Print</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1 pull-right" (click)="downloadPDF()">Download PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1 pull-right" (click)="downloadexcel()">Download Excel</button>
+
+    </div>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>

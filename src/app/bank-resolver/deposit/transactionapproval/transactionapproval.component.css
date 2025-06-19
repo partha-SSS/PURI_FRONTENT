@@ -1,0 +1,46 @@
+.scroll-when-long{
+  max-height: 60vh;
+  overflow: auto;
+}
+/* .scroll-when-long:hover{
+  overflow: auto;
+} */
+thead tr:nth-child(1) th{
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.form-group {
+  margin-bottom: 0rem!important;
+}
+
+
+.customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.customers td, .customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.customers tr:nth-child(even){background-color: #f2f2f2;}
+
+.customers tr:hover {background-color: #aeeea6;  ;}
+
+.customers th {
+  /* padding-top: 12px;
+  padding-bottom: 12px; */
+  text-align: left;
+  background-color: #34723a;
+  color: white;
+}
+.holderButton{
+  background-color: #34703a;
+  color: white;
+  border-radius: 30px;
+  margin-left:14px;
+}

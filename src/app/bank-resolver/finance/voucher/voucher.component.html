@@ -1,0 +1,554 @@
+<ng-template #print>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left customHeader" style="padding-right: 10px;">Print voucher </h4>
+    
+    <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row print" id="challan">
+      <div class="col-12 table-container" >
+        <div >
+          <div>
+            <div class="justify-content-center" style="text-align:center" >
+              <br><h4>{{ardbName}} </h4>
+              <h4>{{branchName}}</h4>
+              <h4>Run Date & Time : {{today}} </h4>
+              <h4>{{ardbAddr}}</h4>
+              <h5>Bank's Copy</h5>
+          </div>
+          </div>
+          <hr>
+          <div class="row" style="padding-left: 5px;" >
+            <div class="col-6">
+            <b>Voucher Date:</b> {{_cDt.substr(0,10)}}<br>
+            <b>Name:</b> {{_cName}}<br>
+            <b>Address:</b> {{_cAddress}}
+
+            </div>
+            <div class="col-6">
+              <b>Voucher ID:</b> {{_voucherId}}<br>
+            <b>Voucher Type:</b> {{_voucherTypeName}}
+
+            </div>
+          </div><br>
+
+          <div class="row" style="padding-left: 5px;">
+            <div class="col-12">
+              <p style="text-align: center;">Total {{_voucherTypeName}} of <b>Rs.{{_voucherTypeName=="Cash Receipt"?_totalCr:_totalDr | currency:'INR'}}</b> </p>
+              <table border="1">
+                <thead>
+                  <tr>
+                    <th>Account Code</th>
+                    <th>Account Name</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let transaction of printData">
+                    <td>{{ transaction.acc_cd }}</td>
+                    <td>{{ transaction.narration }}</td>
+                    <td style="text-align: right;">{{ transaction.debit_credit_flag === 'D' ? transaction.dr_amount : 0 | number:'1.2-2'}}</td>
+                    <td style="text-align: right;">{{ transaction.debit_credit_flag === 'C' ? transaction.cr_amount : 0 | number:'1.2-2'}}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td style="text-align: right;"><strong>{{ totalDebit | number:'1.2-2'}}</strong></td>
+                    <td style="text-align: right;"><strong>{{ totalCredit | number:'1.2-2'}}</strong></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                 
+                  <tr>
+                    <td colspan="4">Narration:{{ printData[0]?.narrationdtl }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+              <!-- <table style="width: 100%;">
+                <tr *ngFor="let i of printData">
+                  <td style="text-align: left;">{{i.acc_cd}}</td>
+                  <td style="text-align: left;">{{i.narration}} of Rs. </td>
+                  <td style="text-align: right;padding-right: 10px;"><b>{{i.amount| currency:'INR'}}({{i.debit_credit_flag=='D'?'Dr':'Cr'}})</b></td>
+                </tr>
+                
+                <tr style="border-top: 1px solid rgb(223, 220, 210);">
+                  <td style="text-align: right;" colspan="2"><b>Total</b></td>
+                  <td style="text-align: center;" ><b>{{_voucherTypeName=="Cash Receipt"?_totalCr:_totalDr | currency:'INR'}}</b></td>
+                </tr>
+                <tr>
+                  <td>Narration: {{printData[0].narrationdtl}}</td>
+                </tr>
+              </table> -->
+            </div>
+          </div>
+          <br><br>
+          <div class="row" style="padding-left: 5px;padding-bottom: 10px;">
+            <div class="col-4">
+              <b>Details</b>
+            </div>
+            <div class="col-4">
+              <b>Accountant</b>
+            </div>
+            <div class="col-4">
+              <b>Cashier</b>
+            </div>
+          </div>
+          <br><br>
+          <div class="row" style="padding-left: 5px;padding-bottom: 10px;">
+            <div class="col-6">
+              <b>Receiver's/Payer's Signature</b>
+            </div>
+            <div class="col-6" style="padding-right: 85px;text-align: right;">
+              <b>Manager/CEO</b>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      <div class="col-12 table-container" >
+        <div >
+          <div>
+            <div class="justify-content-center" style="text-align:center" >
+              <br><h4>{{ardbName}} </h4>
+              <h4>{{branchName}}</h4>
+              <h4>Run Date & Time : {{today}} </h4>
+              <h4>{{ardbAddr}}</h4>
+              <h5>Receiver's/Payer's Copy </h5>
+          </div>
+          </div>
+          <hr>
+          <div class="row" style="padding-left: 5px;" >
+            <div class="col-6">
+            <b>Voucher Date:</b> {{_cDt.substr(0,10)}}<br>
+            <b>Name:</b> {{_cName}}<br>
+            <b>Address:</b> {{_cAddress}}
+
+            </div>
+            <div class="col-6">
+              <b>Voucher ID:</b> {{_voucherId}}<br>
+            <b>Voucher Type:</b> {{_voucherTypeName}}
+
+            </div>
+          </div><br>
+          <div class="row" style="padding-left: 5px;">
+            <div class="col-12">
+              <p style="text-align: center;">Total {{_voucherTypeName}} of <b>Rs.{{_voucherTypeName=="Cash Receipt"?_totalCr:_totalDr | currency:'INR'}}</b> </p>
+              <table border="1">
+                <thead>
+                  <tr>
+                    <th>Account Code</th>
+                    <th>Account Name</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let transaction of printData">
+                    <td>{{ transaction.acc_cd }}</td>
+                    <td>{{ transaction.narration }}</td>
+                    <td style="text-align: right;">{{ transaction.debit_credit_flag === 'D' ? transaction.dr_amount : 0 | number:'1.2-2'}}</td>
+                    <td style="text-align: right;">{{ transaction.debit_credit_flag === 'C' ? transaction.cr_amount : 0 | number:'1.2-2'}}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td style="text-align: right;"><strong>{{ totalDebit | number:'1.2-2'}}</strong></td>
+                    <td style="text-align: right;"><strong>{{ totalCredit | number:'1.2-2'}}</strong></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                 
+                  <tr>
+                    <td colspan="4">Narration: {{ printData[0]?.narrationdtl }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+              <!-- <table style="width: 100%;">
+                <tr *ngFor="let i of printData">
+                  <td style="text-align: left;">{{i.acc_cd}}</td>
+                  <td style="text-align: left;">{{i.narration}} of Rs. </td>
+                  <td style="text-align: right;padding-right: 10px;"><b>{{i.amount| currency:'INR'}}({{i.debit_credit_flag=='D'?'Dr':'Cr'}})</b></td>
+                </tr>
+                
+                <tr style="border-top: 1px solid rgb(223, 220, 210);">
+                  <td style="text-align: right;" colspan="2"><b>Total</b></td>
+                  <td style="text-align: center;" ><b>{{_voucherTypeName=="Cash Receipt"?_totalCr:_totalDr | currency:'INR'}}</b></td>
+                </tr>
+                <tr>
+                  <td>Narration: {{printData[0].narrationdtl}}</td>
+                </tr>
+              </table> -->
+            </div>
+          </div><br><br>
+          <div class="row" style="padding-left: 5px;padding-bottom: 10px;">
+            <div class="col-4">
+              <b>Details</b>
+            </div>
+            <div class="col-4">
+              <b>Accountant</b>
+            </div>
+            <div class="col-4">
+              <b>Cashier</b>
+            </div>
+          </div>
+          <br><br>
+          <div class="row" style="padding-left: 5px;padding-bottom: 10px;">
+            <div class="col-6">
+              <b>Receiver's/Payer's Signature</b>
+            </div>
+            <div class="col-6" style="padding-right: 85px;text-align: right;">
+              <b>Manager/CEO</b>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+     
+    </div>
+    <h4>Are you want to print this Voucher?</h4>
+  </div>
+  <div class="modal-footer">
+    <div class="print">
+        <button mat-raised-button type="button" [useExistingCss]="true" class="btn btn-rounded btn-primary m-1" 
+        printSectionId="challan" ngxPrint (click)="modalRef.hide()">Print Voucher</button>
+    </div>
+  </div>
+</ng-template>
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Retrieve Voucher</h4>
+    <!-- <button mat-raised-button type="button" class="close" aria-label="Close" data-dismiss="modal" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <form [formGroup]="reportcriteria" (ngSubmit)="Submit()">
+
+  <div class="modal-body">
+    <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+      <div>
+        <label for="fromDate">From Date</label>
+        <div class="input-group">
+          <!-- <input id="fromDate" class="form-control" placeholder="yyyy-mm-dd" name="fd" [ngModel]="fromdate  | date:'yyyy-MM-dd' " formControlName="fromDate"
+            id="fd" type="date"> -->
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" [readonly]="true" bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label for="voucherNo">Voucher No</label>
+        <div class="input-group">
+          <input id="voucherNo" class="form-control" name="vn" formControlName="voucherNo" id="vn" type="text">
+        </div>
+      </div>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" type="submit">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</form>
+</ng-template>
+
+<ng-template #contentbatch let-modal bd-example-modal-lg>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Retrieve All Voucher</h4>
+    <!-- <button mat-raised-button type="button" class="close" aria-label="Close" data-dismiss="modal" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <!-- Default inline 1-->
+    <div>
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" id="U" name="app_flg" [(ngModel)]="app_flg" value="U"
+          (change)="changeAppFlg()" mdbInput>
+        <label class="custom-control-label" for="U"><strong class="shiftLabel">UnApproved</strong></label>
+      </div>
+
+      <!-- Default inline 2-->
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" id="A" name="app_flg" [(ngModel)]="app_flg" value="A"
+          (change)="changeAppFlg()" mdbInput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <label class="custom-control-label" for="A"><strong class="shiftLabel">Approved</strong></label>
+      </div>
+    </div>
+
+
+
+    <div style="overflow: scroll;">
+      <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Narration</th>
+        <th>Type</th>
+      </tr>
+      <tr *ngFor="let item of tvnRetFilter; let i = index;"title="Click to Select"  (click)="OpenVoucher(item)" style="cursor: pointer;">
+        <td>{{item.voucher_id}}</td>
+        <td>{{item.voucher_dt.substr(0,10)}}</td>
+        <td>{{item.narrationdtl}}</td>
+        <td>{{item.transaction_type}}</td>
+      </tr>
+    </div>
+      
+    
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="Submit()">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<loading *ngIf="isLoading"></loading>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+<ng-template #buttonDiv>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+
+    <!-- {{onVoucherCreation.invalid}} -->
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="isRetrieve"
+        (click)="Retrieve()">Retrieve</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="isRetrieveBatch"
+        (click)="RetrieveBatch()">Retrieve Batch</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="isNew"
+        (click)="New()">New</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="isRemove"
+        (click)="openModal(Delconfirm)">Delete</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm"
+        [disabled]="onVoucherCreation.invalid" (click)="Save()">Save</button>
+
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="isApprove"
+        (click)="Approve()">Approve</button> -->
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="isModify"
+        (click)="Modify()">Modify</button> -->
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="isClear"
+        (click)="Clear()">Clear</button>
+      
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" style="position: absolute;"  
+        (click)="ShowVPrint()" >Print Voucher</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()"
+        style="position: absolute;right: 10px;">Close</button>
+      <!-- <input type="text" value="{{ getTotalCr() }}" />
+  <input type="text" value="{{ getTotalCr() }}" /> -->
+    </div>
+  </div>
+</ng-template>
+ <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+  <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 shadow-sm mb-4 bg-white p-3">
+    <!-- <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error!</strong> {{alertMsg}}
+      <button mat-raised-button type="button" class="close " data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div> -->
+    <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="form-group col-xs-12">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <td>
+                <h4>Voucher ID : {{_voucherId}}</h4>
+              </td>
+              <td>
+                <h4>Voucher Dt : {{_voucherDt | date}}</h4>
+                 <!-- <h3>{{_voucherDt | date}}</h3> -->
+              </td>
+              <td *ngIf="!insertMode">
+                <h4>Voucher Type : {{_voucherTypeName}}</h4>
+                <!-- <h3>{{_voucherTypeName}}</h3> -->
+              </td>
+              <td *ngIf="insertMode">
+                <h4>Voucher Type : </h4>
+                  <select name="voucherTyp" class="form-control col-md-12"
+                    (change)="onChange($event.target.value)">
+                    <option value="">Select..</option>
+                    <option value="CR">Cash Receipt</option>
+                    <option value="CP">Cash Payment</option>
+
+                    <option hidden value="L">Clearing</option>
+                    <option value="T">Transfer</option>
+                  </select>
+              </td>
+              <td>
+                <h4>Approval Status : {{_approvalSts}}</h4>
+              </td>
+            </tr>
+          </thead>
+        </table>
+        <table class="table table-bordered table-striped">
+          <tbody>
+            <tr>
+              <td style="width: 10%"><b>Debit/Credit</b></td>
+              <td style="width: 10%"><b>Account Code</b></td>
+              <td style="width: 40%"><b>Description</b></td>
+              <td style="width: 10%"><b>Debit Amount</b></td>
+              <td style="width: 10%"><b>Credit Amount</b></td>
+              <td style="width: 10%"><b></b></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div [formGroup]="onVoucherCreation">
+          <table class="table table-bordered table-striped --head-bg-metal">
+            <!-- <div formArrayName="VoucherF" *ngFor="let item of onVoucherCreation.get('VoucherF').controls; let i = index;"> -->
+            <tbody>
+              <tr formArrayName="VoucherF" *ngFor="let item of voucherData.controls; let i = index;">
+                <div [formGroupName]="i">
+                  <td style="width: 10%"><input formControlName="dr_cr" type="text" [readonly]="true" class="form-control fonm-control-sm"></td>
+                  <td style="width: 10%">
+                    <input formControlName="acc_cd" type="text"   (keyup)="codeChange($event,i)" class="form-control form-control-sm">
+                      <table id="tab{{i}}" class="suggestions customers">
+                        <tbody>
+                          <tr *ngFor="let entry of maccmaster1" style="cursor:pointer" (click)="putValue(entry,i)">
+                            <td style="width: 10%"><a>{{entry.acc_cd}}</a> </td>
+                            <td style="width: 20%"><a>{{entry.acc_name}}</a> </td>
+                            <!-- <td style="width: 70%"><a [innerHTML]="item.acc_name"></a> </td> -->
+                          </tr>
+                        </tbody>
+                      </table>
+                  
+                  </td>
+                  <td style="width: 40%">
+                    <!-- <div class="ng-autocomplete"> -->
+                    <ng-autocomplete [data]="maccmaster" [searchKeyword]="keyword" placeHolder="Account Name"
+                      (selected)='selectEvent($event,i)' (inputChanged)='onChangeSearch($event,i)'
+                      (inputFocused)='onFocused($event)' historyIdentifier="maccmaster" [itemTemplate]="itemTemplate"
+                      [notFoundTemplate]="notFoundTemplate" formControlName="desc">
+                    </ng-autocomplete>
+                    <ng-template #itemTemplate let-item>
+                      <table class="customers">
+                        <tbody>
+                          <tr>
+                            <td style="width: 10%"><a [innerHTML]="item.acc_type"></a> </td>
+                            <td style="width: 20%"><a [innerHTML]="item.acc_cd"></a> </td>
+                            <td style="width: 70%"><a [innerHTML]="item.acc_name"></a> </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </ng-template>
+
+                    <ng-template #notFoundTemplate let-notFound>
+                      <div [innerHTML]="notFound"></div>
+                    </ng-template>
+                    <!-- </div> -->
+                  </td>
+                  <!-- <td style="width: 40%"><input formControlName="desc"  type="text" class="form-control"></td> -->
+                  <td style="width: 10%"><input formControlName="dr_amt" (input)="drAmountInput(i,$event)" type="number" id="numberField" (keypress)="arrowkeyOFF()"
+                     class="form-control form-control-sm"  ></td>
+                  <td style="width: 10%"><input formControlName="cr_amt"  (input)="crAmountInput(i,$event)" type="number" id="numberField" (keypress)="arrowkeyOFF()"
+                     class="form-control form-control-sm"   ></td>
+
+                     
+                  <td style="width: 10%">
+                    <button mat-raised-button class="btn btn-rounded btn-primary btn-primary-spacing btn-sm"
+                      (click)="RemoveItem(i)" *ngIf="(i!=0 && (_voucherTyp=='CR' || _voucherTyp=='CP')) ||_voucherTyp=='T'||_voucherTyp=='L'  ">Del</button>
+                    <!-- <button mat-raised-button  class="btn btn-rounded btn-primary btn-primary-spacing" >Edit</button>  -->
+                  </td>
+                </div>
+              </tr>
+            </tbody>
+            <!-- </div> -->
+          </table>
+        </div>
+        <table class="table table-bordered table-striped">
+          <tbody>
+            <!-- <tr *ngIf="_voucherTyp=='C'"> -->
+              <tr>
+              <!-- <td style="width: 10%"><b></b></td>
+                <td style="width: 10%"><b></b></td> -->
+              <td style="width: 60%"><b>Grand Total</b></td>
+              <td style="width: 10%"><b>{{ (_voucherTyp=='CR' || _voucherTyp=='CP' || this.tvdRet[0]?.transaction_type == 'C') ? (getTotalDr()>0?getTotalDr():getTotalCr()):getTotalDr()}}</b></td>
+              <td style="width: 10%"><b>{{  (_voucherTyp=='CR' || _voucherTyp=='CP' || this.tvdRet[0]?.transaction_type == 'C')? (getTotalCr()>0?getTotalCr():getTotalDr()):getTotalCr() }}</b></td>
+              <td style="width: 10%"><b><button mat-raised-button class="btn btn-rounded btn-primary btn-primary-spacing btn-sm"
+                    (click)="AddNew()" [hidden]="_voucherTyp==null || _voucherTyp==undefined || _voucherTyp==''">Add</button></b></td>
+           
+             
+            </tr>
+            <!-- <tr *ngIf="_voucherTyp!='C'">
+              
+                <td style="width: 60%"><b>Grand Total</b></td>
+                <td style="width: 10%"><b>{{ getTotalDr()}}</b></td>
+                <td style="width: 10%"><b>{{ getTotalCr()}}</b></td>
+                <td style="width: 10%"><b><button mat-raised-button class="btn btn-rounded btn-primary btn-primary-spacing btn-sm"
+                      (click)="AddNew()" [disabled]="isAddNew">Add</button></b></td>
+             
+            </tr> -->
+                     </tbody>
+        </table>
+        <div>
+          <label><strong>Narration</strong></label>
+          <input name="narr"
+            value="{{_voucherNarration}}" 
+            [(ngModel)]="_voucherNarration" 
+            type="text"
+            class="form-control form-control-sm"
+            #narrCtrl="ngModel"
+            required
+            maxlength="200">
+
+            <div *ngIf="narrCtrl.invalid && (narrCtrl.dirty || narrCtrl.touched)" class="text-danger">
+              <div *ngIf="narrCtrl.errors?.maxlength">Narration must be within 200 characters.</div>
+            </div>
+        </div>
+        <div>
+          <div class="row">
+            <div class="col-3">
+              <label><strong>Name</strong></label>
+              <input type="text" value="{{_cName}}" [(ngModel)]="_cName" class="form-control" placeholder="Name">
+            </div>
+            <div class="col-9">
+              <label><strong>Address</strong></label>
+              <input type="text" value="{{_cAddress}}" [(ngModel)]="_cAddress" class="form-control" placeholder="Address">
+            </div>
+          </div>
+          
+        </div>
+
+      </div>
+    </div>
+    <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+</div>
+<ng-template #Delconfirm >
+  <div class="modal-body text-center" >
+    <p>'Are you sure, you want to <b style="color: red;">Delete</b> this Voucher with ID {{_voucherId}}</p>
+    <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+    <button mat-raised-button type="button" class=" btn btn-primary" (click)="Remove()" >Yes</button>
+    
+  </div>
+</ng-template>
+

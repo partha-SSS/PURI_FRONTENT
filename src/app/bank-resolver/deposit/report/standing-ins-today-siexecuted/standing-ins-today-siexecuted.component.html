@@ -1,0 +1,223 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button  type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="form-group col-12">
+            <label for="fromDate">From Date</label>
+            <div class="input-group">
+              <!-- <input id="fromDate" class="form-control" placeholder="yyyy-mm-dd" name="fd"  [ngModel]="fromdate
+                        | date:'yyyy-dd-MM' "   formControlName="fromDate" id="fd" type="date" > -->
+              <input style="height: 38px;" type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" [ngModel]="fromdate"
+                disabled bsDatepicker formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button  class="btn btn-outline-secondary btn-sm" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+  
+      </form>
+  
+      <!-- <form [formGroup]="reportcriteria">
+          <div>
+            <label for="fromDate">From Date</label>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+              formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+          <div >
+              <label for="toDate">To Date</label>
+              <div class="input-group">
+                <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="todate" disabled bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+              </div>
+            </div>
+        </form> -->
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-outline-dark" data-dismiss="modal">Submit</button> -->
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportPDFTitle()">Download PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as CSV</button> -->
+        <button mat-raised-button type="button" 
+        class="btn btn-rounded btn-primary m-1" 
+        [useExistingCss]="true"
+        printSectionId="trial111" 
+        ngxPrint>Print</button>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+      </div>
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+      
+        <mat-form-field appearance="outline" >
+         <mat-label>Search Cash Account</mat-label>
+         <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+       </mat-form-field>
+       
+       <div class="mat-elevation-z8" id="trial111">
+         
+         <table mat-table [dataSource]="dataSource" matSort >
+           <!-- <ng-container matColumnDef="SLNO">
+             <th mat-header-cell *matHeaderCellDef mat-sort-header>Srl No.
+             </th>
+           <td mat-cell *matCellDef="let row; let i=index;"> {{i+1}} </td>
+           </ng-container> -->
+          <!-- ID Column -->
+           <ng-container matColumnDef="dr_type" >
+             <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+             <td mat-cell *matCellDef="let row">  
+              {{row.acc_type_from}}
+             </td>
+           </ng-container>
+           <!-- Fruit Column -->
+           <ng-container matColumnDef="dr_accNo" >
+             <th mat-header-cell *matHeaderCellDef mat-sort-header> A/C No. </th>
+             <td mat-cell *matCellDef="let row"> 
+               {{row.acc_num_from}} </td>
+           </ng-container>
+           <ng-container matColumnDef="custName" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:center;"> Name </th>
+            <td mat-cell *matCellDef="let row" > {{row.cust_name}}
+              
+            </td>
+          </ng-container>
+           <!-- Fruit Column -->
+           <ng-container matColumnDef="cr_type" >
+             <th mat-header-cell *matHeaderCellDef mat-sort-header > Type </th>
+             <td mat-cell *matCellDef="let row" >
+               {{row.acc_type_to}} 
+             </td>
+           </ng-container>
+           <!-- ID Column -->
+           <ng-container matColumnDef="cr_accNo" >
+             <th mat-header-cell *matHeaderCellDef mat-sort-header> A/C No. </th>
+             <td mat-cell *matCellDef="let row"> 
+              {{row.acc_num_to }}
+             </td>
+           </ng-container>
+       
+           <!-- Name Column -->
+           <ng-container matColumnDef="amount" >
+             <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount </th>
+             <td mat-cell *matCellDef="let row" style=" margin-right: 160px;"> 
+             {{row.amount | currency:"INR"}}
+             </td>
+           </ng-container>
+       
+           <!-- Header column -->
+           <ng-container matColumnDef="Header">
+             <th mat-header-cell *matHeaderCellDef colspan="12">
+               <div class="justify-content-center" style="text-align:center">
+                 <br><h4>{{ardbName}} ({{branchName}})</h4>
+                 
+                 <h4>Run Date & Time : {{today}} </h4>
+                 <h4> <u> Executed Standing Instruction As On {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+              </div>
+             </th>
+           </ng-container>
+          
+           <ng-container matColumnDef="dr">
+             <th mat-header-cell *matHeaderCellDef colspan="2"><b>Debit A/C Details</b></th>
+           </ng-container>
+           <ng-container matColumnDef="ss">
+            <th mat-header-cell *matHeaderCellDef colspan="1"></th>
+          </ng-container>
+         
+           <ng-container matColumnDef="cr">
+             <th mat-header-cell *matHeaderCellDef colspan="2"><b>Credit A/C Details</b></th>
+           </ng-container>
+           <ng-container matColumnDef="s">
+            <th mat-header-cell *matHeaderCellDef colspan="1"></th>
+          </ng-container>
+           
+           
+           <!-- Footer column -->
+           <!-- <ng-container matColumnDef="Total">
+             <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: left;">
+               <b>Total</b>
+             </td>
+           </ng-container>
+           <ng-container matColumnDef="disclaimer1">
+             <td mat-footer-cell *matFooterCellDef colspan="2" style="text-align: right;">
+              
+               <b>{{crSum | currency:"INR"}}</b>
+             </td>
+            </ng-container>
+            <ng-container matColumnDef="disclaimer2">
+             <td mat-footer-cell *matFooterCellDef colspan="4" style="text-align: right;">
+               <b>{{drSum | currency:"INR"}}</b>
+             
+             </td>
+            </ng-container> -->
+             
+           <tr mat-header-row *matHeaderRowDef="['Header']"
+            class="example-second-header-row">
+           </tr>
+           <tr mat-header-row *matHeaderRowDef="['dr','ss', 'cr','s']"
+               class="example-second-header-row">
+           </tr>
+           
+           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+           <!-- <tr mat-footer-row *matFooterRowDef="['Total','disclaimer1', 'disclaimer2']" class="example-second-footer-row"></tr> -->
+           
+           <!-- Row shown when there is no matching data. -->
+               </table>
+         <footer>
+           <small>
+             This report is generated through CFS-2022
+            </small> 
+            <!-- <ng-container matColumnDef="disclaimer">
+             <td mat-footer-cell *matFooterCellDef colspan="2">
+               This report is generated through CFS-2022
+           
+             </td>
+            </ng-container> -->
+           </footer>
+       </div>
+       <!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[5, 10, 25, 100,this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+         
+    </div>
+</div>

@@ -1,0 +1,2 @@
+Points To Be Remember: After Deploying This angular application on iis server ,We have to change  basehref from '/' (FOR LOCALHOST)
+to '/ardb.SynergicBanking/' (FOR IIS SERVER)

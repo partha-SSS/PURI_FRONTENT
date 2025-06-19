@@ -1,0 +1,288 @@
+ <div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="ConfrmModal(Conformation)">Marged</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onReset()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <button mat-raised-button type="button" 
+    class="ml-2 btn btn-primary btn-primary-spacing btn-sm" 
+    [useExistingCss]="true"
+    printSectionId="_voucher" 
+    ngxPrint>Print</button>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-12 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Transaction Details</h4>
+            <!-- <div class="row  align-items-center  text-align: center;">
+                <div class="form-group col-4">
+                  <h2><b>All Transaction Between {{this.fromdate.toISOString()}}, Branch {{this.sys.BranchCode}}</b></h2>
+                </div>
+                
+            </div> -->
+            <!-- <div class="table-responsive" class="scroll-when-long">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" style="text-align: center;">Trans Code</th>
+                    <th scope="col" style="text-align: center;">Voucher Id</th>
+                    <th scope="col" style="text-align: left;">Trans Type</th>
+                    <th scope="col" style="text-align: left;">A/C Type</th>
+                    <th scope="col" style="text-align: left;">A/C Number</th>
+                    <th scope="col" style="text-align: left;">Customer Name</th>
+                    <th scope="col" style="text-align: right;">Amount</th>
+                    <th scope="col" style="text-align: right;">Curr Prn Recov</th>
+                    <th scope="col" style="text-align: right;">Curr Intt Recov</th>
+                    <th scope="col" style="text-align: right;">Ovd Intt Recov</th>
+                    <th scope="col" style="text-align: right;">Balance</th>
+                    <th scope="col" style="text-align: center;">Print</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of reportData; let i=index" >
+                    <td>{{i+1}}</td>
+                    <td style="text-align: center;">{{cust.trans_cd}}</td>
+                    <td style="text-align: center;">{{cust.voucher_id}}</td>
+                    <td style="text-align: left;">{{cust.trans_type}}</td>
+                    <td style="text-align: left;">{{cust.acc_type}}</td>
+                    <td style="text-align: left;">{{cust.acc_num}}</td>
+                    <td style="text-align: left;">{{cust.cust_name}}</td>
+                    <td style="text-align: right;">{{cust.amount}}</td>
+                    <td style="text-align: right;">{{cust.curr_prn_recov}}</td>
+                    <td style="text-align: right;">{{cust.curr_intt_recov}}</td>
+                    <td style="text-align: right;">{{cust.ovd_intt_recov}}</td>
+                    <td style="text-align: right;">{{cust.balance}}</td>
+                    <td style="text-align: center;cursor: pointer;" title="Click to Show Dtls" > <mat-icon (click)="openModal(contentLoanStmt,cust)">print</mat-icon></td>
+                    
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+            </div> -->
+            <div class="container">
+              <!-- Search Input -->
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Search</mat-label>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Search anything..." />
+              </mat-form-field>
+              <mat-radio-group aria-label="Select an option"  [value]="selectedFilter" (change)="onFilterChange($event)">
+                <mat-radio-button value="C">
+                  <label style="margin-top: 10px;">Credit</label>
+                </mat-radio-button>
+                <mat-radio-button value="D"> 
+                  <label style="margin-top: 10px;">Debit</label>
+                </mat-radio-button>
+                <mat-radio-button value="B"> 
+                  <label style="margin-top: 10px;">Both</label>
+                </mat-radio-button>
+              </mat-radio-group>
+              <!-- Responsive Material Table -->
+              <div class="table-responsive" id="_voucher">
+                <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+            
+                  <!-- Index Column -->
+                  <ng-container matColumnDef="index">
+                    <th mat-header-cell *matHeaderCellDef>#</th>
+                    <td mat-cell *matCellDef="let element; let i = index"> {{ i + 1 }} </td>
+                  </ng-container>
+            
+                  <!-- Transaction Code Column -->
+                  <ng-container matColumnDef="trans_cd">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;">Trans Code</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: center;"> {{ element.trans_cd }} </td>
+                  </ng-container>
+            
+                  <!-- Voucher ID Column -->
+                  <ng-container matColumnDef="voucher_id">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;">Voucher Id</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: center;"> {{ element.voucher_id }} </td>
+                  </ng-container>
+            
+                  <!-- Transaction Type Column -->
+                  <ng-container matColumnDef="trans_type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">Trans Type</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.trans_type }} </td>
+                  </ng-container>
+            
+                  <!-- Account Type Column -->
+                  <ng-container matColumnDef="acc_type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">A/C Type</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.acc_type }} </td>
+                  </ng-container>
+            
+                  <!-- Account Number Column -->
+                  <ng-container matColumnDef="acc_num">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">A/C Number</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.acc_num }} </td>
+                  </ng-container>
+            
+                  <!-- Customer Name Column -->
+                  <ng-container matColumnDef="cust_name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">Customer Name</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.cust_name }} </td>
+                  </ng-container>
+            
+                  <!-- Amount Column -->
+                  <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;">Amount</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: right;"> {{ element.amount | number : '1.2-2'  }} </td>
+                  </ng-container>
+            
+                  <!-- Balance Column -->
+                  <ng-container matColumnDef="balance">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;">Balance</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: right;"> {{ element.balance | number : '1.2-2'  }} </td>
+                  </ng-container>
+            
+                  <!-- Print Column -->
+                  <ng-container matColumnDef="print">
+                    <th mat-header-cell *matHeaderCellDef style="text-align: center;">Print</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: center;">
+                      <mat-icon style="cursor: pointer;" title="Click to Show Details" (click)="openModal(contentLoanStmt,element)">print</mat-icon>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="Header">
+                    <th mat-header-cell *matHeaderCellDef colspan="10">
+                      <div class="justify-content-center" style="text-align:center">
+                        <br><h2>{{ardbName}}</h2>
+                        
+                        <h3><b>All Transaction As on {{this.fromdate.toDateString()| date: 'dd/MM/yyyy'}}, Branch {{this.sys.BranchCode}}</b></h3>
+                        <!-- <h4> <u> Cash Account from {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} to  {{todate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4> -->
+                     </div>
+                    </th>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="['Header']"
+                  class="example-second-header-row">
+                 </tr>
+                  <!-- Table Header & Row Definitions -->
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            
+                </table>
+              </div>
+            </div>
+            
+          </div>
+         
+        </div>
+      </div>
+        </div>
+  </div>
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="ConfrmModal(Conformation)">Marged</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onReset()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <button mat-raised-button type="button" 
+    class="ml-2 btn btn-primary btn-primary-spacing btn-sm" 
+    [useExistingCss]="true"
+    printSectionId="_voucher" 
+    ngxPrint>Print</button>
+  </div>
+</div>
+
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<ng-template #contentLoanStmt let-modal bd-example-modal-xl>
+    <div class="modal-header">
+      <h4 class="modal-title customHeader" id="modal-basic-title">Transaction Details &nbsp;&nbsp;&nbsp;</h4>
+    </div>
+|    <div class="modal-body ">
+      <div  id="mattable2" >
+        <!-- <img src="./assets/images/landing.png" class="watermark" /> -->
+        <div class="justify-content-center" style="width: 100%;  font-family:'Verdana'; ">
+             <h4>{{ardbName}}</h4>
+               <h5>Govt. Regd. No: 143-07/13-13, Regd/H.O- Raghunathpur, Jagatsinghpur (HO. MOB-9078191393) </h5>
+               <h5>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; BRANCH: {{branchName}} </h5>
+               <h4>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+                &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;<u>CASH RECEIPT</u></h4>
+           </div>
+           <div style="width: 100%; font-family:'Verdana'; ">
+            <p><b> Date:</b>{{fullCustData?.trans_dt?.substr(0,10)}}  &nbsp; &nbsp;&nbsp; &nbsp;<b>Acc Cd:</b>{{fullCustData?.acc_cd}}</p>
+             <p><b> Vch No.:</b>  {{fullCustData?.voucher_id}} &nbsp; &nbsp;&nbsp; &nbsp;<b>Trans Cd:</b>{{fullCustData?.trans_cd}}</p>
+             <p><b>Name:</b>   {{fullCustData?.cust_name}}</p>
+             <p><b>A/C Type:</b>  {{fullCustData?.acc_type}}</p>
+             <p><b>A/C No.:</b>   {{fullCustData?.acc_num}}&nbsp; &nbsp;<b>Type:</b>{{fullCustData?.trans_type=='R'?'Recovery':fullCustData?.trans_type=='D'?'Deposit':fullCustData?.trans_type=='W'?'Withdrawal':'Disb'}}</p>
+             <p><b>Amount:</b>   {{fullCustData?.amount}}&nbsp; &nbsp;<b>Penalty:</b> {{fullCustData?.ovd_intt_recov}}&nbsp; &nbsp;<b>Total:</b> {{(+fullCustData?.amount)+(+fullCustData?.ovd_intt_recov)}}</p>
+             <p><b>In Words:</b>   {{fullCustData?.amount| amountToWord}}</p>
+             <p><b>Balance:</b>   {{fullCustData?.balance | number : '1.2-2'}}</p>
+             <p><b> Intt Recove:</b>  {{fullCustData?.curr_intt_recov}}</p>
+             <p><b>Prn Recove:</b>   {{fullCustData?.curr_prn_recov}}</p>
+             <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; CASHIER/SECRETARY</p>
+           </div>
+            
+       
+       </div>
+       <button mat-raised-button type="button" 
+    class="btn btn-rounded btn-primary m-1" 
+    (click)="printWithoutPreview()">Print </button>
+
+
+    </div>
+
+   
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Ok</button>
+    </div>
+  </ng-template>

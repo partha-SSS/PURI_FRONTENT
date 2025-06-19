@@ -1,0 +1,763 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-12">
+            <small for="fundType">Fund Type</small>
+            <select id="fundType" class="form-control form-control-sm" formControlName="fundType">
+              <option disabled>Choose</option>
+              <option value="O">Deposit Scheme Fund</option>
+              <option value="N">Borrowed Fund</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" 
+        [useExistingCss]="true"
+        [printStyle]="{ '@page': { size: 'landscape !important' } }"
+        printSectionId="matTable" ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+
+      <!-- <mat-form-field appearance="outline">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+      </mat-form-field> -->
+
+      <mat-accordion>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              General Search
+            </mat-panel-title>
+            <mat-panel-description>
+              Click here to search any field
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <div class="row">
+            <div class="col-12">
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-label>Search Demand List</mat-label>
+                <input matInput id="myInput" (keyup)="applyFilter0($event)" placeholder="Ex. abc / 123">
+              </mat-form-field> &nbsp;
+             </div>
+          </div>
+        </mat-expansion-panel> <br>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Field-specific Search
+            </mat-panel-title>
+            <mat-panel-description>
+              Click here to search field-wise values
+            </mat-panel-description>
+          </mat-expansion-panel-header> 
+          <div class="row">
+            <div class="col-3">
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-label>Search {{selectedValue1}} </mat-label>
+                <mat-select name="fieldName" [(ngModel)]="selectedValue1" (selectionChange)="showFirstGroup()">
+                  <mat-option *ngFor="let selectedItem1 of selectItems1" [value]="selectedItem1.value">
+                    {{selectedItem1.name}}
+                  </mat-option>
+                 
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-3">
+             <mat-form-field appearance="outline" style="width:100%">
+               <mat-label>Search {{selectedValue1}} {{bName}}</mat-label>
+               <!-- <input matInput id="myInput2" (keyup)="applyFilter($event)" placeholder="Block Name"> -->
+               <!-- <mat-select name="fieldName" [(ngModel)]="selectedValue1" (selectionChange)="showFirstGroup()"> -->
+                <mat-select name="fieldName" [(ngModel)]="bName"  (selectionChange)="searchFirstGroup()">
+                <mat-option *ngFor="let first of firstGroup" [value]="first">
+                  {{first}}
+                </mat-option>
+               
+              </mat-select>
+             </mat-form-field> &nbsp;
+            </div>
+            <div class="col-3">
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-label>Search {{selectedValue}} under {{bName}} </mat-label>
+                <mat-select name="fieldName" [disabled]="!bName" [(ngModel)]="selectedValue" (selectionChange)="showSecondGroup()">
+                  <mat-option *ngFor="let selectedItem of selectItems" [value]="selectedItem.value">
+                    {{selectedItem.name}}
+                  </mat-option>
+                 
+                </mat-select>
+              </mat-form-field>
+            </div>
+          
+            <div class="col-3">
+             <mat-form-field appearance="outline" style="width:100%">
+               <mat-label>Search {{bName1}} in {{selectedValue}} </mat-label>
+               <!-- <input matInput id="myInput1" (keyup)="applyFilter1($event)" placeholder="Activity"> -->
+               <mat-select name="fieldName" [disabled]="!selectedValue" [(ngModel)]="bName1" (selectionChange)="searchSecondGroup()">
+                <mat-option *ngFor="let second of secondGroup" [value]="second">
+                  {{second}}
+                </mat-option>
+               
+              </mat-select>
+             </mat-form-field> &nbsp;
+            </div>
+            
+            
+           </div>
+           <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4"></div>
+            <div class="col-4 " style="text-align:right">
+              <button mat-raised-button (click)="resetList()" class="btn btn-primary mt-2" > Reset</button>
+        
+             </div>
+             
+           </div>
+        </mat-expansion-panel>
+        </mat-accordion> <br>
+      
+      
+      <div class="mat-elevation-z8" id="matTable">
+        <table mat-table style="font-size:small" [dataSource]="dataSource" matSort onscroll="abc()">
+          <ng-container matColumnDef="Header">
+            <th mat-header-cell *matHeaderCellDef colspan="22">
+              <div class="justify-content-center" style="text-align:center">
+                <br><h4>{{ardbName}} ({{branchName}})</h4>
+                
+                <h4>Run Date & Time : {{today}} </h4>
+                <h4><u> Member-wise Demand Collection List from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to
+                  {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+            </div>
+            </th>
+            </ng-container>
+          
+          <ng-container matColumnDef="block_name">
+
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Block
+            
+            </th>
+           <td mat-cell *matCellDef="let element" style="text-align: center;"> {{element.block_name}} </td>
+          </ng-container>
+          <ng-container matColumnDef="service_area_name">
+
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Service Area
+            
+            </th>
+           <td mat-cell *matCellDef="let element" style="text-align: center;"> {{element.service_area_name}} </td>
+          </ng-container>
+
+
+          <ng-container matColumnDef="vill_name">
+          
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Village
+            
+            </th>
+           
+            
+            <td mat-cell *matCellDef="let element"> {{element.vill_name}} </td>
+          </ng-container>
+          <ng-container matColumnDef="acc_name">
+          
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Account Type
+            
+            </th>
+           
+            
+            <td mat-cell *matCellDef="let element"> {{element.acc_name}} </td>
+          </ng-container>
+          <ng-container matColumnDef="activity_cd">
+          
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Purpose
+            
+            </th>
+           
+            
+            <td mat-cell *matCellDef="let element"> {{element.activity_cd}} </td>
+          </ng-container>
+          <ng-container matColumnDef="loan_id">
+          
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Loan ID
+            
+            </th>
+           
+            
+            <td mat-cell *matCellDef="let element"> {{element.loan_id}} </td>
+          </ng-container>
+          
+          <!-- Name Column -->
+          <ng-container matColumnDef="party_name">
+          
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Party Name
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.party_name}} </td>
+          </ng-container>
+          
+          <!-- Weight Column -->
+          
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="outstanding_prn">
+          
+             <th mat-header-cell *matHeaderCellDef mat-sort-header>Outstanding Principal
+             
+             </th>
+           
+             
+             <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.outstanding_prn| currency:'INR'}} </td>
+           </ng-container>
+          
+           <!-- Name Column -->
+           <ng-container matColumnDef="curr_prn">
+           
+             <th mat-header-cell *matHeaderCellDef mat-sort-header > Current Principal
+             </th>
+          
+             <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_prn | currency:'INR'}} </td>
+           </ng-container>
+           <ng-container matColumnDef="ovd_prn">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Overdue Principal
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_prn| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="curr_intt">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Current Interest
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_intt | currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="ovd_intt">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Overdue Interest
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt | currency:'INR'}} </td>
+          </ng-container>
+          
+          <ng-container matColumnDef="penal_intt">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Penal Interest
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.penal_intt| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="total_demand">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Total
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt + element.penal_intt + element.curr_intt + element.ovd_prn + element.curr_prn | currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="curr_prn_recov">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Current Principal Recovery
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.above_1 | currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="ovd_prn_recov">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Overdue Principal Recovery
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_prn_recov| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="adv_prn_recov">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Advance Principal Recovery
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_prn_recov| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="curr_intt_recov">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Current Interest Recovery
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_intt_recov| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="ovd_intt_recov">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Overdue Interest Recovery
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt_recov| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="penal_intt_recov">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Penal Interest Recovery
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.penal_intt_recov| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="total_recov">
+           
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Total
+            </th>
+          
+            <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt_recov + element.ovd_prn_recov + element.curr_intt_recov + element.curr_prn_recov + element.penal_intt_recov| currency:'INR'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="disclaimer1">
+            <td mat-footer-cell *matFooterCellDef colspan="8" style="font-weight: 800;text-align:center">
+            Total (Count-{{this.reportData?.length}})
+            </td>
+          
+          </ng-container>
+          <ng-container matColumnDef="disclaimer2">
+            <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+              {{currPrnSum | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer3" >
+            <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+              {{ovdPrnSum | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer4" >
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              {{currInttSum | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer5" >
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              {{ovdInttSum | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer6">
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              {{penalInttSum | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer7">
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              <!-- {{ovdInttSum | currency:'INR'}} -->
+              {{totalSum | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer8">
+            <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+              {{currPrnSum_recov | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer9" >
+            <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+              {{ovdPrnSum_recov | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer10" >
+            <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+              {{advPrnSum_recov | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer11" >
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              {{currInttSum_recov | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer12" >
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              {{ovdInttSum_recov | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer13">
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              {{penalInttSum_recov | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <ng-container matColumnDef="disclaimer14">
+            <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+              <!-- {{ovdInttSum | currency:'INR'}} -->
+              {{totalSum_recov | currency:'INR'}}
+            </td>
+            
+          </ng-container>
+          <tr mat-footer-row *matFooterRowDef="['disclaimer1','disclaimer2','disclaimer3','disclaimer4','disclaimer5','disclaimer6','disclaimer7','disclaimer8','disclaimer9','disclaimer10','disclaimer11','disclaimer12','disclaimer13','disclaimer14']" class="example-second-footer-row"></tr>
+          <!-- ID Column -->
+          <!-- <ng-container matColumnDef="block_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Block Name </th>
+            <td mat-cell *matCellDef="let row" style="top:20px;"> 
+                {{row.recoveryblock.block}} 
+              </td>
+           </ng-container>
+            
+          <ng-container  matColumnDef="activity_type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Activity Type</th>
+            <td *matCellDef="let row">
+            <tbody *ngFor="let e of row.recoveryactivity; let ind=index">
+              <td mat-cell>{{e.activitytype.activity}}</td>
+                  <table >
+                    <tr mat-cell>
+                      <th>Village</th>
+                      <th>Loan ID</th> 
+                      <th>Name</th>
+                      <th> Outstanding Principal</th>
+                      <th class="t1"> Current Principal</th>
+                      <th> Overdue Principal</th>
+                      <th> Current Interest</th>
+                      <th> Overdue Interest</th>
+                      <th > Penal Interest </th>
+                      <th class="t2"> <b>Total </b></th>
+                      <th> Current Principal</th>
+                      <th> Overdue Principal</th>
+                      <th> Current Interest</th>
+                      <th> Overdue Interest</th>
+                      <th> Penal Interest</th>
+                      <th class="t2"><b>Total</b></th>
+                    </tr>
+                    
+                      
+                      
+                    
+                    <tbody  *ngFor="let e1 of e.recoverylist let ind=index">
+                      <tr>
+                        <td mat-cell>{{e1.vill_name}} </td>
+                         <td mat-cell>{{e1.loan_id}}</td>
+                         <td mat-cell>{{e1.party_name}} </td>
+                         <td mat-cell>{{e1.outstanding_prn}} </td>
+                         <td mat-cell>{{e1.curr_prn}} </td>
+                         <td mat-cell>{{e1.ovd_prn}} </td>
+                         <td mat-cell>{{e1.curr_intt}} </td>
+                         <td mat-cell>{{e1.ovd_intt}} </td>
+                         <td mat-cell>{{e1.penal_intt}} </td>
+                         <td mat-cell>{{e1.ovd_intt+e1.penal_intt+e1.curr_intt+e1.ovd_prn+e1.curr_prn}}</td>
+                         <td mat-cell>{{e1.curr_prn_recov}} </td>
+                         <td mat-cell>{{e1.ovd_prn_recov}} </td>
+                         <td mat-cell>{{e1.curr_intt_recov}} </td>
+                         <td mat-cell>{{e1.ovd_intt_recov}} </td>
+                         <td mat-cell>{{e1.penal_intt_recov}} </td>
+                         <td mat-cell>{{e1.ovd_intt_recov+e1.penal_intt_recov+e1.curr_intt_recov+e1.ovd_prn_recov+e1.curr_prn_recov}}</td>
+                      </tr>
+                         
+                      
+                    </tbody>
+                    
+                </table> 
+              
+              </tbody> 
+                           
+            </td>
+           
+          </ng-container>
+          -->
+          <!-- Progress Column -->
+          <!-- <ng-container matColumnDef="vill_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Acc No. </th>
+            <td mat-cell *matCellDef="let row" > {{row.vill_name}} </td>
+          </ng-container>
+       -->
+          <!-- Header column -->
+          
+          <!-- <tr mat-header-row *matHeaderRowDef="['Header']"
+          class="example-second-header-row">
+         </tr> -->
+         <ng-container matColumnDef="header2" >
+          <td mat-header-cell *matHeaderCellDef  style="text-align:left;font-weight: 800;" colspan="8">
+           
+          </td>
+          
+          <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+          <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+        </ng-container>
+         <ng-container matColumnDef="header0" >
+          <td mat-header-cell *matHeaderCellDef  style="text-align:center;font-weight: 800;" colspan="6">
+           Demand
+          </td>
+          
+          <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+          <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+        </ng-container>
+        <ng-container matColumnDef="header1" >
+          <td mat-header-cell *matHeaderCellDef style="text-align:center" colspan="7">
+            Recovery
+          </td>
+          
+          <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+          <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+        </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['Header']" ></tr>
+          <tr mat-header-row *matHeaderRowDef="['header2','header0','header1']"></tr>
+          <tr class="fixedHeader" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <!-- <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td> -->
+          </tr>
+          
+        </table>
+        <footer><small>
+          This report is generated through CFS-2022
+         </small></footer>
+      </div>
+      <mat-paginator [pageSizeOptions]="[100,500,1000,this.reportData?.length]" aria-label="Select page of users"></mat-paginator>
+      
+      <!-- <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+        <h6>{{ardbName}} {{branchName}}</h6>
+        <h6>Run Date & Time : {{today}} </h6> <br>
+        <h6> <u> Member-wise Demand Collection List from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to
+            {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h6>
+        </div> -->
+      <!-- <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+        [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+        (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+      <table class="p-3" id="trial" hidden>
+        <tr *ngIf="reportData">
+          <th colspan="5"></th>
+          <th colspan="6" style="text-align: center;">Demand</th>
+          <th colspan="6" style="text-align: center;">Recovery</th>
+        </tr>
+        <tr *ngIf="reportData">
+          <th>Block</th>
+         <th>Village</th>
+          <th>Loan ID</th> 
+          <th>Name</th>
+         <!-- <th>Ledger Folio</th>
+          <th style="text-align:center">Disbursement Date</th>
+          <th>Purpose</th>  -->
+          <th style="text-align:right"> Outstanding Principal</th>
+          <th style="text-align:right"> Current Principal</th>
+          <th style="text-align:right"> Overdue Principal</th>
+          <th style="text-align:right"> Current Interest</th>
+          <th style="text-align:right"> Overdue Interest</th>
+          <th style="text-align:right"> Penal Interest </th>
+          <th style="text-align:right"> Total </th>
+          <th style="text-align:right"> Current Principal</th>
+          <th style="text-align:right"> Overdue Principal</th>
+          <th style="text-align:right"> Current Interest</th>
+          <th style="text-align:right"> Overdue Interest</th>
+          <th style="text-align:right"> Penal Interest </th>
+          <th style="text-align:right"> Total </th>
+        </tr>
+        <tbody *ngFor="let i of pagedItems let itr=index;">
+          <tr>
+            <td>{{i.block_name}}</td>
+            <td>{{i.vill_name}}</td>
+            <td>{{i.loan_id}}</td>
+            <td>{{i.party_name}}</td>
+            <!-- <td>{{i.loan_acc_no}}</td>
+            <td style="text-align:center">{{i.disb_dt.substr(0,10)}}</td>
+            <td>{{i.activity_cd}}</td> -->
+            <td style="text-align:right">{{i.outstanding_prn | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_prn | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_prn | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_intt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_intt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.penal_intt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn+i.penal_intt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_prn_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_prn_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_intt_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_intt_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.penal_intt_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_intt_recov+i.penal_intt_recov+i.curr_intt_recov+i.ovd_prn_recov+i.curr_prn_recov | number : '1.2-2'}}
+            </td>
+          </tr>
+          <tr *ngIf="i.loan_id==lastLoanID">
+            <td colspan="5" style="text-align:right;font-weight:700;">
+              Total:
+            </td>
+            <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{totalSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{currPrnSum_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdPrnSum_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{currInttSum_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdInttSum_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{penalInttSum_recov | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{totalSum_recov | number : '1.2-2'}}</td>
+          </tr>
+        </tbody>
+        <tfoot style="text-align:center">
+          <tr>
+            <td colspan="9"> <small>
+              This report is generated through CFS-2022
+             </small> </td>
+          </tr>
+          
+         </tfoot>
+      </table>
+      <div hidden id="hiddenTab">
+        <div class="justify-content-center" style="text-align:center">
+          <h4>{{ardbName}} {{branchName}}</h4>
+          <h4>Run Date & Time : {{today}} </h4> <br>
+          <h4> <u>Member-wise Demand Collection List from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to
+              {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+         </div>
+        <table class="p-3" id="trial1" class="mkSmall">
+          <thead>
+            <tr *ngIf="reportData">
+              <th colspan="5"></th>
+              <th colspan="6" style="text-align: center;"> Demand</th>
+              <th colspan="6" style="text-align: center;"> Recovery</th>
+            </tr>
+            <tr *ngIf="reportData">
+              <th>Block</th>
+              <th>Village</th>
+              <th>Loan ID</th>
+              <th>Name</th>
+              <!-- <th>Ledger Folio</th>
+              <th style="text-align:center">Disbursement Date</th>
+              <th>Purpose</th> -->
+              <th style="text-align:right"> Outstanding Principal</th>
+              <th style="text-align:right"> Current Principal</th>
+              <th style="text-align:right"> Overdue Principal</th>
+              <th style="text-align:right"> Current Interest</th>
+              <th style="text-align:right"> Overdue Interest</th>
+              <th style="text-align:right"> Penal Interest </th>
+              <th style="text-align:right"> Total </th>
+              <th style="text-align:right"> Current Principal</th>
+              <th style="text-align:right"> Overdue Principal</th>
+              <th style="text-align:right"> Current Interest</th>
+              <th style="text-align:right"> Overdue Interest</th>
+              <th style="text-align:right"> Penal Interest </th>
+              <th style="text-align:right"> Total </th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let i of reportData; let itr=index;">
+            <tr>
+              <td>{{i.block_name}}</td>
+               <td>{{i.vill_name}}</td>
+              <td>{{i.loan_id}}</td>
+              <td>{{i.party_name}}</td>
+              <!-- <td>{{i.loan_acc_no}}</td>
+              <td style="text-align:center">{{i.disb_dt.substr(0,10)}}</td>
+              <td>{{i.activity_cd}}</td> -->
+              <td style="text-align:right">{{i.outstanding_prn | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_prn | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_prn | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_intt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_intt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.penal_intt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn+i.penal_intt | number : '1.2-2'}}
+              </td>
+              <td style="text-align:right">{{i.curr_prn_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_prn_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_intt_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_intt_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.penal_intt_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_intt_recov+i.penal_intt_recov+i.curr_intt_recov+i.ovd_prn_recov+i.curr_prn_recov | number : '1.2-2'}}
+              </td>
+            </tr>
+            <tr *ngIf="i.loan_id==lastLoanID">
+              <td colspan="5" style="font-weight:700;text-align:center;"> 
+                Total:
+              </td>
+              <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{totalSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{currPrnSum_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdPrnSum_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{currInttSum_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdInttSum_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{penalInttSum_recov | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{totalSum_recov | number : '1.2-2'}}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+             <td>&nbsp;</td>
+             <td>&nbsp;</td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+             </tr>
+          </tfoot>
+        </table>
+        <footer>
+          <small>
+            This report is generated through CFS-2022
+           </small> 
+         </footer>
+      </div>
+      <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" 
+        [useExistingCss]="true"
+        [printStyle]="{ '@page': { size: 'landscape !important' } }"
+          printSectionId="matTable" ngxPrint>Print</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+      </div>
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

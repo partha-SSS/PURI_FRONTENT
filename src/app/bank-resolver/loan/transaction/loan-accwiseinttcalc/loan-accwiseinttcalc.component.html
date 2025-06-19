@@ -1,0 +1,88 @@
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onApproveClick()">Post Interest</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-6 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Calculate Interest</h4>
+            <div class="row  align-items-center  text-align: center;">
+            <div class="form-group col-4">
+              <small for="date_of_payment">As on Date<span class="text-danger">*</span></small>
+                <div class="input-group">
+                <input type="text" placeholder="dd/mm/yyyy" class="form-control" 
+                [(ngModel)]="asOnDate"  bsDatepicker
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenFromDp">
+                <div class="input-group-append">
+                  <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            </div>
+            <div class="table-responsive" class="scroll-when-long">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Account Code</th>
+                    <th scope="col">Account Description</th>
+                    <th scope="col">Calculate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td> <div class="custom-control form-control-sm custom-switch"><label class="btn btn-filter">
+                      <input type="checkbox" name="allTrades"  (change)="allTrades($event)">
+                    </label> </div> </td>
+                  </tr>
+                  <tr *ngFor="let acctype of accountTypeList; let i=index" title="Click to Select" style="cursor: pointer;">
+                    <td>{{acctype.acc_type_cd}}</td>
+                    <td>{{acctype.acc_type_desc}}</td>
+                    <td>   <div class="custom-control form-control-sm custom-switch">
+                        <label class="btn btn-filter">
+                          <input type="checkbox" name="trades" [checked]="acctype.calc" (change)="changeTradesByCategory(i)">
+                        </label>&nbsp;
+                      </div></td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+        </div>
+  </div>
+
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onApproveClick()">Post Interest</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+
+

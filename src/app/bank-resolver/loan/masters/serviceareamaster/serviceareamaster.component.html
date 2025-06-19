@@ -1,0 +1,93 @@
+<loading *ngIf="isLoading"></loading>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isRetrieve" (click)="retrieve()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isNew" (click)="new()">New</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isSave" (click)="saveuser()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isModify" (click)="updateuser()">Modify</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isClear" (click)="clearuser()">Clear</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isDel" (click)="deleteuser()">Delete</button> -->
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+  </div>
+</div>
+ <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3"> 
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <form [formGroup]="servicearea" autocomplete="chrome-off" >
+    <div class="form-row">
+      <div class="form-group  col-3">
+        <small for="blk_state">State</small>
+        <select id="state" disabled  class="form-control form-control-sm" formControlName="state">
+            <option value="10">West Bengal</option>
+            </select>
+      </div>
+      <div class="form-group col-2">
+        <small for="blk_dist">District</small>
+        <select id="blk_dist" class="form-control form-control-sm"  formControlName="district">
+          <option *ngIf="districts" >Choose</option>
+          <option *ngFor="let district of districts" [value]="district.dist_cd">{{district.dist_name}}</option>
+        
+        </select>
+      </div>
+      <div class="form-group col-2">
+        <small for="sareablock">Blocks <span class="text-danger">*</span> </small>
+        <select id="sareablock" class="form-control form-control-sm" formControlName="sareablock"
+          (click)=getBlock()>
+          <option *ngIf="block">Choose Block</option>
+          <option *ngFor="let blocks of block" [value]="blocks.block_cd">{{blocks.block_name}}</option>
+        </select>
+
+          </div>
+   
+      <!-- <div class="form-group col-2">
+        <small for="fname">Service Area CD<span class="text-danger">*</span></small>
+        <input type="text" class="form-control form-control-sm " [disabled]="disableSArea" formControlName="sareacd" id="sareacd">
+      </div> -->
+
+
+      <div class="form-group col-3">
+        <small for="Service_Area">Service Area CD</small>
+        <div class="input-group">
+    
+        <input style="height:25px" type="text"
+          class="form-control form-control-sm " formControlName="sareacd" id="sareacd" placeholder="Enter Area Code or Name"
+            name="x-field-1"
+          autocomplete="new-field-1">
+        <div class="input-group-append">
+    <button  class="btn btn-primary btn-sm" [hidden]="hideSArea" style="font-size:x-small" (click)="GetServiceAreaMaster()"><i class="fa fa-search"></i></button>
+
+        </div>
+        </div>
+        <div class="suggestions border p-2" *ngIf="allServiceArea">
+          <strong> Area Code / Area Name </strong>
+          <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let sarea of allServiceArea"
+            (click)="setAreaDtls(sarea)">
+            {{ sarea.service_area_cd  +'/'+ sarea.service_area_name}}
+          </p>
+        </div>
+        <div class="suggestions border p-2" style="width: 200%; font-size: small;"
+      *ngIf="showNoResult">
+     <strong class="text-danger">" {{servicearea.sareacd} " does not match with any customer"</strong>
+      </div> 
+      </div>
+
+          <div class="form-group col-2">
+            <small for="mname">Service Area Name</small>
+            <input type="text" class="form-control form-control-sm " formControlName="sareaname" id="sareaname">
+          </div>
+         </div>
+  </form>
+</div>
+</div>
+  
+ 

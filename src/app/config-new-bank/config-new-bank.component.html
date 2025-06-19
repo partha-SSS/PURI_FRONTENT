@@ -1,0 +1,83 @@
+<!-- <div class="container"> -->
+
+  <table class="table  ml-2 mt-2 mb-0 " style="width:1347px;">
+    <tr class="divc3">
+      <td>
+        <button type="button" class="btn btn-primary" (click)="navigateBack()">
+          <i class="fa fa-arrow-circle-left fa-1x "></i></button>
+      </td>
+
+      <td style="width: 1300px; text-align: center;">
+        <h5>Config New Bank</h5>
+      </td>
+      <td></td>
+    </tr>
+  </table>
+
+  <table class="table ml-2 mt-0" style="width:1150px;">
+    <tr class="divc5">
+      <td class="text" style="width: 5%"><b>BankName</b></td>
+      <td class="text" style="width: 17%"><b>Description</b></td>
+      <td class="text" style="width: 10%"><b>ServerIP</b></td>
+      <td class="text" style="width: 10%"><b>DbIP</b></td>
+      <td class="text" style="width: 5%"><b>User1</b></td>
+      <td class="text" style="width: 9%"><b>Pass1</b></td>
+      <td class="text" style="width: 5%"><b>User2</b></td>
+      <td class="text" style="width: 9%"><b>Pass2</b></td>
+      <td class="text" style="width: 30%"><b>SMS_Provider</b></td>
+      <td style="width: 5%"></td>
+    </tr>
+
+    <tr class="divc4"></tr>
+
+    <tr *ngFor="let t of bnkConfigList; let i = index" class="divc3">
+      <td><input mdbInput class="inp2" size="5" placeholder="BankName" [(ngModel)]="t.bank_name" type="text"></td>
+      <td><input mdbInput class="inp2" size="17" placeholder="BankDesc" [(ngModel)]="t.bank_desc" type="text"></td>
+      <td><input mdbInput class="inp2" size="10" placeholder="ServerIP" [(ngModel)]="t.server_ip" type="text"></td>
+      <td><input mdbInput class="inp2" size="10" placeholder="DBServerIP" [(ngModel)]="t.db_server_ip" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="User1" [(ngModel)]="t.user1" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="Pass1" [(ngModel)]="t.pass1" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="User2" [(ngModel)]="t.user2" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="Pass2" [(ngModel)]="t.pass2" type="text"></td>
+      <td><input mdbInput class="inp2" size="30" placeholder="SMS Provider" [(ngModel)]="t.sms_provider" type="text"></td>
+      <td><button type="button" class="btn btn-primary btn-sm" (click)="update(i)">Updt</button></td>
+    </tr>
+
+
+    <tr *ngIf="addRec" class="divc3">
+      <td><input mdbInput class="inp2" size="5" placeholder="BankName" [(ngModel)]="bnkConfig.bank_name" type="text"></td>
+      <td><input mdbInput class="inp2" size="17" placeholder="BankDesc" [(ngModel)]="bnkConfig.bank_desc" type="text"></td>
+      <td><input mdbInput class="inp2" size="10" placeholder="ServerIP" [(ngModel)]="bnkConfig.server_ip" type="text"></td>
+      <td><input mdbInput class="inp2" size="10" placeholder="DBServerIP" [(ngModel)]="bnkConfig.db_server_ip" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="User1" [(ngModel)]="bnkConfig.user1" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="Pass1" [(ngModel)]="bnkConfig.pass1" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="User2" [(ngModel)]="bnkConfig.user2" type="text"></td>
+      <td><input mdbInput class="inp2" size="5" placeholder="Pass2" [(ngModel)]="bnkConfig.pass2" type="text"></td>
+      <td><input mdbInput class="inp2" size="30" placeholder="SMS Provider" [(ngModel)]="bnkConfig.sms_provider" type="text"></td>
+    </tr>
+
+  </table>
+
+  <div *ngIf="showAlert" style="width:1300px;">
+    <div class="alert alert-danger alert-dismissible fade show ml-2 w" role="alert">
+      <strong>Error!</strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="showAlert2" style="width:1347px;">
+    <div class="alert alert-success alert-dismissible fade show ml-2 w" role="alert">
+      <strong>Info!</strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <button *ngIf="addFlg" type="button" class="btn btn-primary btn-sm ml-2" (click)="addBank()">Add</button>
+  <button *ngIf="SaveFlg" type="button" class="btn btn-primary btn-sm ml-2" (click)="saveData()">Save</button>
+  <button type="button" class="btn btn-primary btn-sm m-2" (click)="cancel()">Cancel</button>
+
+<!-- </div> -->

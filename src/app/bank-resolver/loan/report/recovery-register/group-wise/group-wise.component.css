@@ -1,0 +1,129 @@
+.mkScroll {
+    height: auto;
+    max-height: 450px;
+    overflow: auto
+  }
+  
+  th,mat-header-cell{
+  padding:0px 14px !important;
+  border-right: 1px solid rgb(172, 170, 170);
+  }
+  td,mat-cell{
+    border-bottom:1px solid rgb(172, 170, 170);
+    border-top: 1px solid rgb(172, 170, 170);
+    /* border-right: 1px solid rgb(172, 170, 170);
+    border-left: 1px solid rgb(172, 170, 170); */
+  }
+  #trial {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .mat-row {
+    height: auto;
+  }
+  table{
+    font-size: 11px!important;
+    width:100%;
+  }
+  .mat-cell {
+    padding: 5px 5px 5px 5px;
+  }
+  .mat-header-cell{
+    color: black;
+  }
+  #trial td,
+  #customers th {
+    border: 1px solid rgb(0, 0, 0);
+    padding: 8px;
+  }
+  
+  #trial tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  #trial tr:hover {
+    background-color: #ddd;
+  }
+  
+  #trial th {
+    border: 1px solid rgb(0, 0, 0);
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+  }
+  
+  footer {
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+  }
+  
+  #trial tfoot>tr>td {
+    border: solid 1px white;
+    border-top: 1px solid black;
+  }
+  
+  /* hidden table */
+  #trial1 {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 50%;
+    border-spacing: 0px;
+  }
+  
+  #trial1 td,
+  #customers th {
+    padding: 2px;
+    /*  */
+    width:50%; 
+  
+  }
+  
+  #trial1 tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  #trial1 tr:hover {
+    background-color: #ddd;
+  }
+  
+  #trial1 th {
+    border: none;
+    border-bottom: 1px solid rgb(0, 0, 0) !important;
+    padding-right: 3px;
+    text-align: left;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+  }
+  
+  .mkSmall1 {
+    font-size: x-small;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  tfoot {
+    display: table-footer-group;
+    border: 0px white;
+  }
+  .fontStyle{
+    font-weight: 700;
+    font-size: 13px;
+  }
+  footer{
+    margin-left: 25px ; 
+    position:relative; 
+    bottom: 0px;
+  }
+  
+  @media print{footer{
+    margin-top: 25px !important; 
+    margin-left: 25px !important; 
+    position:fixed!important; 
+    bottom: 0px !important;
+  } }

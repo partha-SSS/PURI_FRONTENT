@@ -1,0 +1,105 @@
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="mattable" ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1 pull-right" (click)="downloadexcel()">Download Excel</button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3">
+   
+
+
+     <!-- material data table begins-->
+   
+     <mat-form-field appearance="outline">
+      <mat-label>Search Locker Details</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Ex. abc / 123">
+    </mat-form-field>
+    <div class="mat-elevation-z8" id="mattable">
+  <table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+    <!-- Position Column -->
+   <ng-container matColumnDef="mainHeader">
+       <th mat-header-cell colspan="6" *matHeaderCellDef>
+        <div class="justify-content-center" style="text-align:center">
+          <h4>{{ardbName}} ({{branchName}})</h4>
+          <h4>Run Date & Time : {{today}} </h4>
+          <h4> <u>Locker Should be Renewal </u></h4>
+        </div>
+       </th>
+   </ng-container>
+  
+    <!-- Name Column -->
+    <ng-container matColumnDef="agreement_no">
+   
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Agreement No </th>
+    
+      <td mat-cell *matCellDef="let element"> {{element.agreement_no}} </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="locker_id">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header style="padding-left: 7px;">Locker ID</th>
+    <td mat-cell *matCellDef="let element"> {{element.locker_id}} </td>
+    </ng-container>
+  
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="name">
+    
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Alocated to </th>
+     
+      <td mat-cell *matCellDef="let element" > {{element.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="rented_till">
+      
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> rented_till</th>
+    
+    
+    <td mat-cell *matCellDef="let element"> 
+      {{element.rented_till.substr(0,10) }}
+    </td>
+    
+  </ng-container>
+    <ng-container matColumnDef="cust_cd">
+      
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Customer Cd </th>
+     
+        <td mat-cell *matCellDef="let element" >{{element.cust_cd}}</td>
+    </ng-container>
+    <ng-container matColumnDef="phone">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone No </th> 
+      <td mat-cell *matCellDef="let element" > {{element.phone}}</td>
+    </ng-container>
+    
+    
+    
+    <tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+  </table>
+  <footer>
+    <small>
+      This report is generated through Synergic Banking
+     </small>
+   </footer>
+  </div>
+  <mat-paginator  showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100, this.reportData.length]" MatPaginator></mat-paginator>
+
+  
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="hiddenTab" ngxPrint>Print</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="mattable" ngxPrint>Print</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1 pull-right" (click)="downloadPDF()">Download PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1 pull-right" (click)="downloadexcel()">Download Excel</button>
+
+    </div>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>

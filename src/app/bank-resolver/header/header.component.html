@@ -1,0 +1,119 @@
+<div>
+  <header class="header_class">
+    <div class="wrapper">
+      <ul class="header_top">
+        <!-- <li><strong>ARDB Name: </strong>{{ardbName}}</li> -->
+        <li class="uppercase"><strong>ORGANIZATION: </strong>{{ardbName}}</li>
+        <li class="uppercase"><strong>BRANCH: </strong>{{sys?.BranchName}}</li>
+        <li><strong>FINANCIAL YEAR: </strong>{{currFinYear}}</li>
+        <li><strong>USER: </strong>{{sys?.UserId}}</li>
+        &nbsp; <li class="date"><strong>OPERATION DATE: <span style="color:#bf0808;font-size:large;">{{sys?.CurrentDate | date:'dd-MM-yyyy'}}</span></strong> </li>
+        <!-- &nbsp; <li class="date"><strong>Operation Date: </strong> {{currDt | date:'dd-MM-yyyy' }} </li> -->
+        <li><strong style="color: #bf0808;font-size: x-large;">{{currTm}}</strong> </li> 
+        <!-- CURRENT DATE & TIME:  -->
+      </ul>
+    </div>
+  </header>
+  <div class="row" >
+    <nav class="navbar navbar-expand-lg col-md-12 col-xl-12">
+      
+  <div class="myDivClass" [hidden]="hideMenuOnComplete">
+    <img src="./assets/images/logo11.png" class="logos">
+    <span *ngFor="let item of menuItems">
+      <!-- Handle branch node buttons here -->
+      <span *ngIf="item.childMenuConfigs && item.childMenuConfigs.length > 0">
+        <button [hidden]="item?.permission=='N'" mat-button class="btn" [matMenuTriggerFor]="menu?.childMenu"><mat-icon>{{item?.iconName}}</mat-icon>
+          {{item.menu_name}}
+        </button>
+         <!-- <mat-icon [hidden]="item?.permission=='N'"  style="padding-top: 10px;">expand_more</mat-icon> -->
+        <app-menu-item #menu [items]="item?.childMenuConfigs"></app-menu-item>
+        <!-- <label [hidden]="item?.permission=='N'"  class = "vertical"></label> -->
+      </span>
+      <!-- Leaf node buttons here -->
+      <span *ngIf="!item.childMenuConfigs || item.childMenuConfigs.length === 0">
+        <button mat-button [routerLink]="item.ref_page" [hidden]="item.permission=='N'">
+          {{item.displayName}}
+        </button>
+      </span>
+    </span>
+  </div> 
+  
+    <ul class="navbar-nav mr-auto"  *ngIf="hideMenuOnComplete && userType=='A' && brnCD=='101' ">
+      <li>
+        <label>&nbsp;&nbsp; Day has been closed, please initialize the day to start operation -> &nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <a routerLink="DA_DayInit"> <b>  Day Initialization </b></a>
+         <a routerLink="DA_YearOpn"   *ngIf="showOpenYear && userType=='A'"> <b>|  Year Open </b></a>
+      </li>
+    </ul>
+    <span class="example-spacer"></span>
+    <span><a class="nav-link" (click)="goToHome()">  <mat-icon style="padding-top: 13px;" class="hm">dashboard</mat-icon>Dashboard </a></span>
+    <span> <a class="nav-link"  (click)="openModal(template)">  <mat-icon style="padding-top: 13px;" class="lo">logout</mat-icon>Logout </a></span>
+        
+    
+       
+        <!-- <a class="nav-link"  (click)="openNewTab()">  <mat-icon class="lo">logout</mat-icon>PLLL </a> -->
+   </nav>
+</div>
+
+</div>
+<ng-template #Notice >
+  <div  class="text-center"><h2>Happy Bishwakarma Pujo</h2></div>
+  <div class="modal-body text-center" >
+    <p>Hello {{currUser}}....</p>
+    <br><br>
+    <button  type="button" class="btn btn-light" (click)="decline()" >Close</button>&nbsp;
+    
+  </div>
+</ng-template>
+<ng-template #template >
+  <div class="modal-body text-center" >
+    <p>Hello {{currUser}}, Do you want to logout?</p>
+    <button  type="button" class="btn btn-light" (click)="decline()" >No</button>&nbsp;
+    <button  type="button" class=" btn btn-primary" (click)="confirm()" >Yes</button>
+    
+  </div>
+</ng-template>
+<ng-template #PassValidity >
+  <div class="modal-body text-center" >
+    <h4>Hello {{currUser}}, Your Password was Expired with in {{withinExp==0?"Today":withinExp}} {{withinExp==1?"Day":withinExp==0?"":"Days"}}, Please Change Your Password. . .  </h4>
+    <hr>
+    <button *ngIf="!passchange" type="button" class="btn btn-light" (click)="decline()" >Ignore</button>&nbsp;
+    <button *ngIf="!passchange" type="button" class=" btn btn-primary" (click)="showChangePass()" >Change Now</button>
+    <div *ngIf="passchange" class="changePass">
+      <h4 *ngIf="combinationCheck" class="text-danger">Password must have at least 8 characters, one uppercase letter, and one number</h4>
+      <h4 *ngIf="equalityCheck" class="text-danger">Password and Confirm Password must be match.</h4>
+
+        <form [formGroup]="PassCH" autocomplete="chrome-off" >
+          <small for="password">New Password<span class="text-danger">*</span></small>
+          <div class="input-group">
+            <input [type]="show_button ? 'text' : 'password'" (keyup)="passCheck($event)" class="form-control form-control-sm " formControlName="Npassword" id="password"> 
+            <div class="input-group-append">
+             <button type="button" class=" btn btn-primary btn-sm" (click)="showPassword()">
+              <i [class]="show_eye ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
+             </button> 
+
+            </div>
+          </div>
+          
+            <small for="cPassword">Confirm Password<span class="text-danger">*</span></small>
+            <input type="password" class="form-control form-control-sm " (keyup)="CpassCheck($event)" formControlName="Cpassword" id="cPassword">
+            
+          <hr>
+              <button  type="button" class="btn btn-light" (click)="decline()" >Close</button>&nbsp;
+         
+            <button [disabled]="equalityCheck || combinationCheck || this.PassCH.controls.Npassword.errors ||this.PassCH.controls.Cpassword.errors "type="button" class=" btn btn-primary" (click)="saveNewPass()" >Change Now</button>
+        </form>
+          
+        </div>
+      </div>
+</ng-template>
+<div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+  <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+   'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+    <strong>{{showMsg.Message}}</strong>
+    <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>

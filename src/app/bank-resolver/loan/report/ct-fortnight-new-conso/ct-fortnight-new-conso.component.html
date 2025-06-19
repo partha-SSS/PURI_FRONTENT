@@ -1,0 +1,452 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="showAlert = false;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    
+   
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" 
+          class="btn btn-rounded btn-primary m-1" 
+          [useExistingCss]="true"
+          printSectionId="abc" 
+          ngxPrint>Print</button>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export to Excel</button>
+
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" id="abc">
+        
+     
+  
+
+    <table class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll"  id="table">
+      <thead>
+        <th colspan="10">
+          <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+            <h4>{{ardbName}} {{branchName}}</h4>
+            <h4>Run Date & Time : {{today}} </h4>
+            <h4> <u>CONSOLIDATED FORTNIGHTLY RETURN FROM {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} TO
+              {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}  (Rs. In Lakh) </u></h4>
+          </div>
+        </th>
+        
+      </thead>
+        <tbody *ngIf="reportData">
+          <th colspan="10"><h4><b>01).DEMAND OF THE FINANCIAL YEAR {{getFinancialYear(reportcriteria.controls.fromDate.value)}}</b></h4></th>
+
+    <!-- <th colspan="10"><h4><b>01).DEMAND OF THE FINANCIAL YEAR{{currFinYear}}</b></h4></th> -->
+    <tr>
+        <th style="text-align:center">Category of Demand (Principal)</th>
+        <th style="text-align:center">Farm Loan (Principal)</th>
+        <th style="text-align:center">Non Farm  (Principal)</th>
+        <th style="text-align:center">Rural Housing  (Principal)</th>
+        <th style="text-align:center"> S.H.G (Principal)</th>
+        <th style="text-align:center"> S.C.C.Y (Principal)</th>
+        <th style="text-align:center"> J.L.G (Principal)</th>
+        <th style="text-align:center"> Others (Principal)</th>
+        <th style="text-align:center"> Total demand this F.Y. (Principal)</th>
+        <th style="text-align:center"> Total demand previous F.Y. (Principal)</th>
+    </tr>
+  
+    <tr *ngFor="let row of reportData">
+      <td style="text-align:center">{{row.category?.substr(2,row.category.length+1)}}</td>
+      <td style="text-align:center">{{row.farm_loan  | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.non_farm | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.rural_housing | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.shg | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.sccy | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.jlg | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.others | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.total_demand_principal | number:'1.2-2'}}</td>
+      <td style="text-align:center">{{row.total_principal_demand_previous_year | number:'1.2-2'}}</td>
+    </tr>
+        </tbody>
+        <tbody *ngIf="reportData2">
+        <tr>
+            <th style="text-align:center">Category of Demand (Interest)</th>
+            <th style="text-align:center">Farm Loan (Interest)</th>
+            <th style="text-align:center">Non Farm  (Interest)</th>
+            <th style="text-align:center">Rural Housing  (Interest)</th>
+            <th style="text-align:center"> S.H.G (Interest)</th>
+            <th style="text-align:center"> S.C.C.Y (Interest)</th>
+            <th style="text-align:center"> J.L.G (Interest)</th>
+            <th style="text-align:center"> Others (Interest)</th>
+            <th style="text-align:center"> Total demand this F.Y. (Interest)</th>
+            <th style="text-align:center"> Total demand previous F.Y. (Interest)</th>
+        </tr>
+      
+        <tr *ngFor="let row of reportData2" [ngClass]="{'bold-row': row.category.includes('GRAND TOTAL')}">
+          <td style="text-align:center">{{row.category?.substr(2,row.category.length+1)}}</td>
+          <td style="text-align:center">{{row.farm_loan  | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.non_farm | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.rural_housing | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.shg | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.sccy | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.jlg | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.others | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.total_demand_interest | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.total_interest_demand_previous_year | number:'1.2-2'}}</td>
+        </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData3">
+        <th colspan="10"><h4><b>02).COLLECTION MADE DURING THE FORTNIGHT</b></h4></th>
+        <tr>
+            <th style="text-align:center">Category of Collection (Principal)</th>
+            <th style="text-align:center">Farm Loan (Principal)</th>
+            <th style="text-align:center">Non Farm  (Principal)</th>
+            <th style="text-align:center">Rural Housing  (Principal)</th>
+            <th style="text-align:center"> S.H.G (Principal)</th>
+            <th style="text-align:center"> S.C.C.Y (Principal)</th>
+            <th style="text-align:center"> J.L.G (Principal)</th>
+            <th style="text-align:center"> Others (Principal)</th>
+            <th style="text-align:center"> Total collection of principal upto the end of the period </th>
+            <th style="text-align:center"> Total principal collection during the period of previous F.Y. </th>
+        </tr>
+      
+        <tr *ngFor="let row of reportData3">
+          <td style="text-align:center">{{row.category?.substr(2,row.category.length+1)}}</td>
+          <td style="text-align:center">{{row.farm_loan  | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.non_farm | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.rural_housing | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.shg | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.sccy | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.jlg | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.others | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.total_collection_principal | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.total_principal_collection_previous_year | number:'1.2-2'}}</td>
+        </tr>
+        </tbody>
+        <tbody *ngIf="reportData4">
+        <tr>
+            <th style="text-align:center">Category of Collection (Interest)</th>
+            <th style="text-align:center">Farm Loan (Interest)</th>
+            <th style="text-align:center">Non Farm  (Interest)</th>
+            <th style="text-align:center">Rural Housing  (Interest)</th>
+            <th style="text-align:center"> S.H.G (Interest)</th>
+            <th style="text-align:center"> S.C.C.Y (Interest)</th>
+            <th style="text-align:center"> J.L.G (Interest)</th>
+            <th style="text-align:center"> Others (Interest)</th> 
+            <th style="text-align:center"> Total collection of Interest during the period</th>
+            <th style="text-align:center"> Total Interest collection during the period of previous F.Y. </th>
+        </tr>
+      
+        <tr *ngFor="let row of reportData4" [ngClass]="{'bold-row': row.category.includes('GRAND TOTAL')}">
+          <td style="text-align:center">{{row.category?.substr(2,row.category.length+1)}}</td>
+          <td style="text-align:center">{{row.farm_loan  | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.non_farm | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.rural_housing | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.shg | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.sccy | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.jlg | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.others | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.total_collection_interest | number:'1.2-2'}}</td>
+          <td style="text-align:center">{{row.total_interest_collection_previous_year | number:'1.2-2'}}</td>
+        </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData5">
+            <th colspan="10"><h4><b>03).PROGRESSIVE COLLECTION MADE UP TO END OF THE FORTNIGHT</b></h4></th>
+            <tr>
+                <th style="text-align:center">Category of Collection (Principal)</th>
+                <th style="text-align:center">Farm Loan (Principal)</th>
+                <th style="text-align:center">Non Farm  (Principal)</th>
+                <th style="text-align:center">Rural Housing  (Principal)</th>
+                <th style="text-align:center"> S.H.G (Principal)</th>
+                <th style="text-align:center"> S.C.C.Y (Principal)</th>
+                <th style="text-align:center"> J.L.G (Principal)</th>
+                <th style="text-align:center"> Others (Principal)</th>
+                <th style="text-align:center"> Total collection this F.Y. (Principal)</th>
+                <th style="text-align:center"> Total collection previous F.Y. (Principal)</th>
+            </tr>
+          
+            <tr *ngFor="let row of reportData5">
+              <td style="text-align:center">{{row.category?.substr(2,row.category.length+1)}}</td>
+              <td style="text-align:center">{{row.farm_loan  | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.non_farm | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.rural_housing | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.shg | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.sccy | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.jlg | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.others | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.total_collection_principal | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.total_principal_collection_previous_year | number:'1.2-2'}}</td>
+            </tr>
+        </tbody>
+        <tbody *ngIf="reportData6">
+           <tr>
+                <th style="text-align:center">Category of Collection (Interest)</th>
+                <th style="text-align:center">Farm Loan (Interest)</th>
+                <th style="text-align:center">Non Farm (Interest)</th>
+                <th style="text-align:center">Rural Housing (Interest)</th>
+                <th style="text-align:center"> S.H.G (Interest)</th>
+                <th style="text-align:center"> S.C.C.Y (Interest)</th>
+                <th style="text-align:center"> J.L.G (Interest)</th>
+                <th style="text-align:center"> Others (Interest)</th>
+                <th style="text-align:center"> Total collection this F.Y. (Interest)</th>
+                <th style="text-align:center"> Total collection previous F.Y. (Interest)</th>
+            </tr>
+          
+            <tr *ngFor="let row of reportData6" [ngClass]="{'bold-row': row.category.includes('GRAND TOTAL')}">
+              <td style="text-align:center">{{row.category?.substr(2,row.category.length+1)}}</td>
+              <td style="text-align:center">{{row.farm_loan  | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.non_farm | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.rural_housing | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.shg | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.sccy | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.jlg | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.others | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.total_collection_interest | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{row.total_interest_collection_previous_year | number:'1.2-2'}}</td>
+            </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData7">
+            <th colspan="10"><h4><b>04).TARGET OF LENDING FOR THE FINANCIAL YEAR.</b></h4></th>
+            <tr>
+                <th style="text-align:center">Category</th>
+                <th style="text-align:center">Farm Loan</th>
+                <th style="text-align:center">Non Farm</th>
+                <th style="text-align:center">Rural Housing</th>
+                <th style="text-align:center"> S.H.G</th>
+                <th style="text-align:center"> S.C.C.Y</th>
+                <th style="text-align:center"> J.L.G</th>
+                <th style="text-align:center"> Others</th>
+                <th style="text-align:center"> Total target of investment for the F.Y.</th>
+                <th style="text-align:center"> Target of investment in the previous F.Y.</th>
+            </tr>
+          
+            <tr >
+              <td style="text-align:center">Amount</td>
+              <td style="text-align:center">{{total.farm_loan | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.non_farm | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.rural_housing | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.shg | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.sccy | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.jlg | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.others | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.total_target_of_investment_for_the_year | number:'1.2-2'}}</td>
+              <td style="text-align:center">{{total.target_of_investment_in_the_previous_year | number:'1.2-2'}}</td>
+            </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData8">
+                <th colspan="10"><h4><b>05).LENDING  MADE DURING THE FORTNIGHT.</b></h4></th>
+                <tr>
+                    <th style="text-align:center">Category of Investment </th>
+                    <th style="text-align:center">Farm Loan </th>
+                    <th style="text-align:center">Non Farm  </th>
+                    <th style="text-align:center">Rural Housing  </th>
+                    <th style="text-align:center"> S.H.G </th>
+                    <th style="text-align:center"> S.C.C.Y </th>
+                    <th style="text-align:center"> J.L.G </th>
+                    <th style="text-align:center"> Others </th>
+                    <th style="text-align:center"> Total Investment made during the period</th>
+                    <th style="text-align:center"> Investment made during the corresponding period of the previous F.Y..</th>
+                </tr>
+              
+                <tr *ngFor="let row of reportData8">
+                  <td style="text-align:center">{{row.description?.substr(2,row.description.length+1)}}</td>
+                  <td style="text-align:center">{{row.farm_loan  }}</td>
+                  <td style="text-align:center">{{row.non_farm }}</td>
+                  <td style="text-align:center">{{row.rural_housing }}</td>
+                  <td style="text-align:center">{{row.shg }}</td>
+                  <td style="text-align:center">{{row.sccy }}</td>
+                  <td style="text-align:center">{{row.jlg }}</td>
+                  <td style="text-align:center">{{row.others }}</td>
+                  <td style="text-align:center">{{row.total_investment_in_fortnight }}</td>
+                  <td style="text-align:center">{{row.total_investment_in_fortnight_previous_year }}</td>
+                </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData9">
+                <th colspan="10"><h4><b>06).PROGRSSIVE TOTAL OF THE  LENDING  MADE UPTO THE END OF THE FORTNIGHT</b></h4></th>
+                <tr>
+                    <th style="text-align:center">Category of Investment </th>
+                    <th style="text-align:center">Farm Loan </th>
+                    <th style="text-align:center">Non Farm </th>
+                    <th style="text-align:center">Rural Housing  </th>
+                    <th style="text-align:center"> S.H.G </th>
+                    <th style="text-align:center"> S.C.C.Y </th>
+                    <th style="text-align:center"> J.L.G </th>
+                    <th style="text-align:center"> Others </th>
+                    <th style="text-align:center"> Total Investment made upto the end of the period</th>
+                    <th style="text-align:center"> Total Investment made during the corresponding period of the previous F.Y. </th>
+                </tr>
+              
+                <tr *ngFor="let row of reportData9">
+                  <td style="text-align:center">{{row.description?.substr(2,row.description.length+1)}}</td>
+                  <td style="text-align:center">{{row.farm_loan  }}</td>
+                  <td style="text-align:center">{{row.non_farm }}</td>
+                  <td style="text-align:center">{{row.rural_housing }}</td>
+                  <td style="text-align:center">{{row.shg }}</td>
+                  <td style="text-align:center">{{row.sccy }}</td>
+                  <td style="text-align:center">{{row.jlg }}</td>
+                  <td style="text-align:center">{{row.others }}</td>
+                  <td style="text-align:center">{{row.total_investment_till_date }}</td>
+                  <td style="text-align:center">{{row.total_investment_till_date_previous_year }}</td>
+                </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData10">
+            <th colspan="10"><h4><b>07).COLLECTION OF THE BANK & REMITTABLE AMOUNT TO WBSCARDB	</b></h4></th>
+            <tr>
+                <th colspan="4" style="text-align:center">Collection</th>
+                <th colspan="2" rowspan="4" style="text-align:center"></th>
+                <th colspan="4" style="text-align:center">Remittable Amount</th>
+                
+            </tr>
+          
+            <tr *ngFor="let row of reportData10">
+              <td colspan="2" style="text-align:center">{{row.collection_type?.substr(2,row.collection_type.length+1)}}</td>
+              <td colspan="2" style="text-align:center">{{row.collection_amount | number:'1.2-2'}}</td>
+              <!-- <td colspan="2" style="text-align:center"></td> -->
+              <td colspan="2" style="text-align:center">{{row.remittable_type}}</td>
+              <td colspan="2" style="text-align:center">{{row.remittable_amount | number:'1.2-2'}}</td>
+            </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData11">
+                <th colspan="10"><h4><b>08).REMITTANCE  MADE  TO  WBSCARDB</b></h4></th>
+                <tr>
+                    <th colspan="2" style="text-align:center">Previous Fortnight</th>
+                    <th colspan="3" style="text-align:center">During the Fortnight</th>
+                    <th colspan="2" style="text-align:center">Progressive</th>
+                    <th colspan="3" style="text-align:center">Shortfall in Remittance</th>
+                </tr>
+              
+                <tr *ngFor="let row of reportData11">
+                  <td colspan="2" style="text-align:center">{{row.previous_fortnight | number:'1.2-2'}}</td>
+                  <td colspan="3" style="text-align:center">{{row.during_fortnight | number:'1.2-2'}}</td>
+                  <td colspan="2" style="text-align:center">{{row.progressive | number:'1.2-2'}}</td>
+                  <td colspan="3" style="text-align:center">{{row.shortfall_remittance | number:'1.2-2'}}</td>
+                </tr>
+        </tbody><br><br><br>
+        <tbody *ngIf="reportData12">
+                <th colspan="10"><h4><b>09).FUND POSITION</b></h4></th>
+                <tr>
+                    <th colspan="2" rowspan="2" style="text-align:center">Cash in hand</th>
+                    <th colspan="6" style="text-align:center">Cash at Bank</th>
+                    <th colspan="2" rowspan="2" style="text-align:center">Total</th>
+                </tr>
+                <tr>
+                  <th colspan="3" style="text-align:center">S/B Account</th>
+                  <th colspan="3" style="text-align:center">Current Account</th>
+                </tr>
+              
+                <tr *ngFor="let row of reportData12">
+                  <td colspan="2" style="text-align:center">{{row.cash_in_hand | number:'1.2-2'}}</td>
+                  <td colspan="3" style="text-align:center">{{row.cash_at_bank_sb_ac | number:'1.2-2'}}</td>
+                  <td colspan="3" style="text-align:center">{{row.cash_at_bank_current_ac | number:'1.2-2'}}</td>
+                  <td colspan="2" style="text-align:center">{{row.total | number:'1.2-2'}}</td>
+                </tr>
+        </tbody><br><br><br>
+        <tbody>
+          <tr>
+            <th colspan="5" style="text-align: left;">.......................................Manager</th>
+            <td colspan="5" style="text-align: right;">Chief Executive Officer/ Dist. Manager</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="text-align: left;">.................................. Co-Op. A. R. D. Bank Ltd.</td>
+            <td colspan="5" style="text-align: right;">.............................Co-Op. A. R. D. Bank Ltd./</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: right;">.....Dist Office/ ....Branch of The WBSCARDB Ltd</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="text-align: left;">Memo No:.............</td>
+            <td colspan="5" style="text-align: right;">..............................:Date</td>
+        </tr>
+        
+        <tr>
+            <td colspan="10">Copy forwarded to :-</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: left;">01). Registrar of Co-operative Societies( West Bengal )</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: left;">02). Assistant Registrar of Co-Operative Societies, ................</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: left;">03). Joint Registrar of Co-Operative Societies ,.........................</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: left;">04). Managing Director, West Bengal State Co-operative Agriculture & Rural Development Bank Ltd., Kolkata</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: left;">06). D.D.M. National Bank For Agriculture & Rural Development, ...........</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: right;">Chief Executive Officer/ Dist. Manager</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="text-align: right;">.............Co-Op. A. R. D. Bank Ltd./  ............Dist Office/ ............Branch of The WBSCARDB Ltd</td>
+        </tr>
+        </tbody>
+      <tfoot style="text-align:left">
+        <tr>
+          <td colspan="10"> <small>
+            This report is generated through CFS-2022
+           </small> </td>
+        </tr> </tfoot>
+    </table>
+   
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" 
+          class="btn btn-rounded btn-primary m-1" 
+          [useExistingCss]="true"
+          printSectionId="mattable" 
+          ngxPrint>Print</button>
+            <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+</div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

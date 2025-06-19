@@ -1,0 +1,162 @@
+
+<loading *ngIf="isLoading"></loading>
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add New Locker</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <form [formGroup]="locker">
+      <div class="col-12">
+        <div class="form-row">
+          <div class="form-group col-4">
+            <small for="acc_type">Locker Type<span class="text-danger">*</span></small>
+              <select  style="border-radius: 1.25rem!important;"  class="form-control form-control-sm custom-scrollbar"  formControlName="l_type" >
+                  <option *ngFor="let l_type of locker_type" [value]="l_type.id">{{ l_type.type }}</option>
+                  </select>
+            </div>
+            <div class="form-group col-4">
+            <small for="acc_type">Locker ID<span class="text-danger">*</span></small>
+              <input type="text" style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="l_id">
+            </div>
+            <div class="form-group col-4">
+              <small for="acc_type">Locker Status<span class="text-danger">*</span></small>
+              <select  style="border-radius: 1.25rem!important;"   class="form-control form-control-sm custom-scrollbar" formControlName="l_status" >
+                  <option *ngFor="let l_type of locker_status" [value]="l_type.id">{{ l_type.type }}</option>
+                  </select>
+            </div>
+          </div>
+      </div>
+    </form>
+
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SaveLocker()">Save</button> &nbsp;
+    <button mat-raised-button class="btn btn-primary" (click)="clear()">Clear</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+   <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="getLockerAccess()">Retrive</button>
+     <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add Locker</button>-->
+
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-6 shadow mb-2 bg-white p-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Locker Access Details</h4>
+
+            <div class="table-responsive" class="scroll-when-long">
+                <div class="form-row">
+                    <div class="form-group col-3">
+                        <small for="acc_no">Agreement No</small>
+                        <input style="height:25px"(change)="getLockerOpeningTempData()"
+                           [(ngModel)]="tm_locker.agreement_no" type="text" [disabled]='disableAll'
+                          class="form-control form-control-sm text-capitalize" id="Agreement No" placeholder="Agreement No">
+                      </div>
+                      <div class="form-group col-2">
+                        <small for="acc_no">Locker ID</small>
+                        <input style="height:25px"
+                           [(ngModel)]="tm_locker.locker_id" type="text" disabled
+                          class="form-control form-control-sm text-capitalize" id="Locker IDl" placeholder="Locker ID">
+                        <!-- <input style="height:25px" disabled
+                           [(ngModel)]="locker_type" type="text"
+                          class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Locker type"> -->
+                      </div>
+                      <div class="form-group col-4">
+                        <small for="acc_no">Customer Name</small>
+                        <input style="height:25px"
+                           [(ngModel)]="tm_locker.name" type="text"
+                          class="form-control form-control-sm text-capitalize" id="Customer Name" placeholder="Customer Name">
+                        <!-- <input style="height:25px" disabled
+                           [(ngModel)]="locker_status" type="text"
+                          class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Locker Status"> -->
+                      </div>
+                      <div class="form-group col-3">
+                        <small for="acc_no">Rented Till</small>
+                        <input style="height:25px"
+                           [(ngModel)]="tm_locker.rented_till" type="date" disabled
+                          class="form-control form-control-sm text-capitalize" id="Rented Till" placeholder="Rented Till">
+                      </div>
+
+                      <div class="form-group col-4">
+                        <small for="acc_no">Handling Authority</small>
+                        <input  class="form-control form-control-sm" type="text" [(ngModel)]="handling_authority">
+                      </div>
+                      <div class="form-group col-8">
+
+                        <small for="acc_no">Access By</small>
+                        <input  class="form-control form-control-sm" type="text" [(ngModel)]="remarks">
+                      </div>
+                      <div class="form-group col-4">
+                        <small for="acc_no">Locker In Time</small>
+
+                        <input  class="form-control form-control-sm" [readOnly]="true" type="text" [(ngModel)]="inTime">
+                      </div>
+                      <div class="form-group col-4">
+                        <small for="acc_no">Locker Out Time</small>
+                        <input  class="form-control form-control-sm" [readOnly]="true" type="text" [(ngModel)]="outTime">
+
+                      </div>
+                      <div class="form-group col-4">
+                        <small for="acc_no">Locker Access</small><br>
+                        <label class="switch switch-green">
+                            <input type="checkbox" class="switch-input" [checked]="lockerInOutStatus=='Y'" (change)="updateLockerAccess($event.target.checked,tm_locker)">
+                            <span class="switch-label" data-on="In" data-off="Out"></span>
+                            <span class="switch-handle"></span>
+                          </label>
+                      </div>
+
+                  </div>
+            </div>
+
+
+          </div>
+
+        </div>
+      </div>
+        </div>
+  </div>
+
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+   <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="getLockerAccess()">Retrive</button>
+
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add Locker</button>
+
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>

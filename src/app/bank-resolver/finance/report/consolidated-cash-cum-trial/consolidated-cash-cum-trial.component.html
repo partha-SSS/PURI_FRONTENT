@@ -1,0 +1,435 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button  type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="fromDate">From Date</label>
+            <div class="input-group">
+              <!-- <input id="fromDate" class="form-control" placeholder="yyyy-mm-dd" name="fd" [ngModel]="fromdate  | date:'yyyy-dd-MM' " formControlName="fromDate" id="fd" type="date" > -->
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label for="toDate">To Date</label>
+            <div class="input-group">
+              <!-- <input id="toDate" class="form-control" placeholder="yyyy-mm-dd" name="td" [ngModel]="todate  | date:'yyyy-dd-MM' " formControlName="toDate" id="td" type="date"> -->
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="todate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer clearfix">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportPDFTitle()">Download PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as CSV</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="mattable" ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+      </div>
+    </div>
+    <!-- <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3"> -->
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+      
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Search Cash Cum Trial</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. abc/123" #input>
+      </mat-form-field>
+      
+      <div class="mat-elevation-z8" id="mattable">
+        
+        <table mat-table [dataSource]="dataSource" matSort>
+      
+          <!-- ID Column -->
+          <ng-container matColumnDef="acc_cd">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Acc CD </th>
+            <td mat-cell *matCellDef="let row"> {{row.acc_cd}} </td>
+          </ng-container>
+      
+          <!-- Progress Column -->
+          <ng-container matColumnDef="acc_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 350px!important;" > Account Name </th>
+            <td mat-cell *matCellDef="let row" style="width: 350px!important;"> {{row.acc_name}} </td>
+          </ng-container>
+      
+          <!-- Name Column -->
+          <ng-container matColumnDef="opng_dr">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Opening Debit	 </th>
+            <td mat-cell *matCellDef="let row"> {{row.opng_dr| currency:"INR"}} </td>
+          </ng-container>
+      
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="opng_cr">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Opening Credit	 </th>
+            <td mat-cell *matCellDef="let row"> {{row.opng_cr| currency:"INR"}} </td>
+          </ng-container>
+      
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="dr">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Dr During Period	 </th>
+            <td mat-cell *matCellDef="let row"> {{row.dr| currency:"INR"}} </td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="cr">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cr During Period	 </th>
+            <td mat-cell *matCellDef="let row"> {{row.cr| currency:"INR"}} </td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="clos_dr">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Closing Debit	 </th>
+            <td mat-cell *matCellDef="let row"> {{row.clos_dr| currency:"INR"}} </td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="clos_cr">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Closing Credit	 </th>
+            <td mat-cell *matCellDef="let row"> {{row.clos_cr| currency:"INR"}} </td>
+          </ng-container>
+          <!-- Header column -->
+        <ng-container matColumnDef="Header">
+          <th mat-header-cell *matHeaderCellDef colspan="12">
+            <div class="justify-content-center" style="text-align:center">
+              <br><h4>{{ardbName}} ({{branchName}})</h4>
+              
+              <h4>Run Date & Time : {{today}} </h4>
+              <h4> <u>Consolidated Cash Cum Trial from {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} to  {{todate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+           </div>
+          </th>
+        </ng-container>
+          <!-- Footer column -->
+        <ng-container matColumnDef="Total">
+          <td mat-footer-cell *matFooterCellDef colspan="2" >
+            <b>Total</b>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Opening_Debit">
+          <td mat-footer-cell *matFooterCellDef colspan="" >
+            <b>{{crSum | currency:"INR"}}</b>
+          </td>
+         </ng-container>
+         <ng-container matColumnDef="Opening_Credit">
+          <td mat-footer-cell *matFooterCellDef colspan="" >
+           <b>{{drSum | currency:"INR"}}</b>
+          </td>
+         </ng-container>
+         
+        <ng-container matColumnDef="Dr_During_Period">
+          <td mat-footer-cell *matFooterCellDef colspan="" >
+            <b>{{crSum | currency:"INR"}}</b>
+          </td>
+         </ng-container>
+         <ng-container matColumnDef="Cr_During_Period">
+          <td mat-footer-cell *matFooterCellDef colspan="" >
+           <b>{{drSum | currency:"INR"}}</b>
+          </td>
+         </ng-container>
+        
+        <ng-container matColumnDef="Closing_Debit">
+          <td mat-footer-cell *matFooterCellDef colspan="" >
+            <b>{{crSum | currency:"INR"}}</b>
+          </td>
+         </ng-container>
+         <ng-container matColumnDef="Closing_Credit">
+          <td mat-footer-cell *matFooterCellDef colspan="" >
+           <b>{{drSum | currency:"INR"}}</b>
+          </td>
+         </ng-container>
+         <ng-container matColumnDef="blankSpace">
+          <td mat-footer-cell *matFooterCellDef colspan="8" >
+            <b></b>
+          </td>
+        </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="['Header']"
+            class="example-second-header-row">
+          </tr>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-footer-row *matFooterRowDef="['Total','Opening_Debit', 'Opening_Credit','Dr_During_Period','Cr_During_Period','Closing_Debit','Closing_Credit']" class="example-second-footer-row"></tr>
+          <tr mat-footer-row *matFooterRowDef="['blankSpace']" class="example-second-footer-row"></tr>
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+          </tr>
+          
+        </table>
+        <footer>
+          <small>
+            This report is generated through Synergic Banking
+           </small> 
+          </footer>
+      </div>
+      <!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[5, 10, 25, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+  
+      <!-- <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+        [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+        (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+      <table class="p-3" id="trial" hidden>
+        <tr *ngIf="reportData">
+          <!-- <th></th> -->
+          <th>Acc CD</th>
+          <th>Account Name</th>
+          <th style="text-align: right;">Opening Debit</th>
+          <th style="text-align: right;">Opening Credit</th>
+          <th style="text-align: right;">Dr During Period</th>
+          <th style="text-align: right;">Cr During Period</th>
+          <th style="text-align: right;">Closing Debit</th>
+          <th style="text-align: right;">Closing Credit</th>
+        </tr>
+        <tbody *ngFor="let i of pagedItems; let itr=index;">
+          <tr>
+            <td>{{i.acc_cd}}</td>
+            <td>{{i.acc_name}}</td>
+            <td style="text-align: right;">{{i.opng_dr | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{i.opng_cr | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{i.dr | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{i.cr | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{i.clos_dr | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{i.clos_cr | number : '1.2-2'}}</td>
+          </tr>
+          <tr style="font-weight:700;" *ngIf="lastOne == i.acc_cd">
+  
+            <td colspan="2">Total: </td>
+            <td style="text-align: right;">{{opdrSumOne | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{opcrSumOne | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{crSumOne | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{drSumOne | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clsdrSumOne | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clscrSumOne | number : '1.2-2'}}</td>
+          </tr>
+          <tr style="font-weight:700;" *ngIf="lastTwo == i.acc_cd">
+  
+            <td colspan="2">Total: </td>
+            <td style="text-align: right;">{{opdrSumTwo | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{opcrSumTwo | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{crSumTwo | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{drSumTwo | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clsdrSumTwo | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clscrSumTwo | number : '1.2-2'}}</td>
+          </tr>
+          <tr style="font-weight:700;" *ngIf="lastThree == i.acc_cd">
+  
+            <td colspan="2">Total: </td>
+            <td style="text-align: right;">{{opdrSumThree | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{opcrSumThree | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{crSumThree | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{drSumThree | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clsdrSumThree | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clscrSumThree | number : '1.2-2'}}</td>
+          </tr>
+          <tr style="font-weight:700;" *ngIf="lastFour == i.acc_cd">
+  
+            <td colspan="2">Total: </td>
+            <td style="text-align: right;">{{opdrSumFour | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{opcrSumFour | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{crSumFour | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{drSumFour | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clsdrSumFour | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clscrSumFour | number : '1.2-2'}}</td>
+          </tr>
+          <tr style="font-weight:700;" *ngIf="lastAccCD == i.acc_cd">
+  
+            <td colspan="2">Grand total: </td>
+            <td style="text-align: right;">{{opdrSum | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{opcrSum | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{crSum | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{drSum | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clsdrSum | number : '1.2-2'}}</td>
+            <td style="text-align: right;">{{clscrSum | number : '1.2-2'}}</td>
+          </tr>
+  
+  
+        </tbody>
+        <tfoot style="text-align:center">
+          <tr>
+            <td colspan="3"> <small>
+              This report is generated through Synergic Banking
+             </small> </td>
+          </tr>
+          
+         </tfoot>
+      </table>
+      <div hidden id="hiddenTab" class="allButFooter">
+        <div class="justify-content-center" style="text-align:center">
+          <h4>{{ardbName}} {{branchName}}</h4>
+  
+          <h4>Run Date & Time : {{today}} </h4> <br>
+          <h4> <u> Cash cum Trial from {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} to {{todate.toDateString()| date:
+              'dd/MM/yyyy'}} </u></h4>
+  
+        </div>
+        <table class="p-3" id="trial1" class="mkSmall">
+          <thead>
+  
+            <tr *ngIf="reportData">
+              <!-- <th></th> -->
+              <th>Acc CD</th>
+              <th>Account Name</th>
+              <th style="text-align: right;">Opening Debit</th>
+              <th style="text-align: right;">Opening Credit</th>
+              <th style="text-align: right;">Dr During Period</th>
+              <th style="text-align: right;">Cr During Period</th>
+              <th style="text-align: right;">Closing Debit</th>
+              <th style="text-align: right;">Closing Credit</th>
+            </tr>
+          </thead>
+  
+          <tbody *ngFor="let i of reportData; let itr=index;">
+  
+            <tr>
+              <td>{{i.acc_cd}}</td>
+              <td>{{i.acc_name}}</td>
+              <td style="text-align: right;">{{i.opng_dr | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{i.opng_cr | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{i.dr | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{i.cr | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{i.clos_dr | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{i.clos_cr | number : '1.2-2'}}</td>
+            </tr>
+            <tr style="font-weight:700;" *ngIf="lastOne == i.acc_cd">
+  
+              <td colspan="2">Total: </td>
+              <td style="text-align: right;">{{opdrSumOne | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{opcrSumOne | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{crSumOne | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{drSumOne | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clsdrSumOne | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clscrSumOne | number : '1.2-2'}}</td>
+            </tr>
+            <tr style="font-weight:700;" *ngIf="lastTwo == i.acc_cd">
+  
+              <td colspan="2">Total: </td>
+              <td style="text-align: right;">{{opdrSumTwo | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{opcrSumTwo | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{crSumTwo | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{drSumTwo | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clsdrSumTwo | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clscrSumTwo | number : '1.2-2'}}</td>
+            </tr>
+            <tr style="font-weight:700;" *ngIf="lastThree == i.acc_cd">
+  
+              <td colspan="2">Total: </td>
+              <td style="text-align: right;">{{opdrSumThree | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{opcrSumThree | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{crSumThree | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{drSumThree | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clsdrSumThree | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clscrSumThree | number : '1.2-2'}}</td>
+            </tr>
+            <tr style="font-weight:700;" *ngIf="lastFour == i.acc_cd">
+  
+              <td colspan="2">Total: </td>
+              <td style="text-align: right;">{{opdrSumFour | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{opcrSumFour | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{crSumFour | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{drSumFour | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clsdrSumFour | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clscrSumFour | number : '1.2-2'}}</td>
+            </tr>
+            <tr style="font-weight:700;" *ngIf="lastAccCD == i.acc_cd">
+  
+              <td colspan="2">Grand total: </td>
+              <td style="text-align: right;">{{opdrSum | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{opcrSum | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{crSum | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{drSum | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clsdrSum | number : '1.2-2'}}</td>
+              <td style="text-align: right;">{{clscrSum | number : '1.2-2'}}</td>
+            </tr>
+  
+  
+          </tbody>
+  
+          <tfoot>
+      <!-- <tr>
+        <td colspan="5" style="border:0px;">
+         <small>
+          This report is generated through Synergic Banking
+         </small> 
+        </td>
+      </tr> -->
+     
+        <tr> 
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         </tr>
+         <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         </tr>
+    </tfoot>
+      </table>
+      
+        <!-- <br><br><br><br>
+    <small>This report is generated through Synergic Banking</small> -->
+           <footer>
+            <small>
+              This report is generated through Synergic Banking
+             </small> 
+           </footer>
+      </div>
+      <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+    </div>
+    <!-- <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3">
+       <div style="text-align: center;"><strong> Synergic Banking </strong>  </div>
+       <div style="text-align: center;"><b> Branch: Main Branch</b></div>
+       <div style="text-align: center;"><b> Branch Code: 101</b></div>
+       <div style="text-align: center;"><b> Run Date: {{dt}}</b></div>
+  <wbr-pivot #CashCumTrial [toolbar]="false"
+            [width]="'100%'"
+            [height]="500"
+            (ready)="onPivotReady($event)"
+            (reportcomplete)="onReportComplete()">
+  </wbr-pivot>
+  </div> -->
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportPDFTitle()">Download PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as CSV</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="mattable" ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+      </div>
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

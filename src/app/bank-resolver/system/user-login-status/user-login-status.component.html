@@ -1,0 +1,62 @@
+
+<form [formGroup]="form" style="width:50%; margin-left: 25%;">
+    <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3" style="margin-left :23px !important;">
+        <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+         'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+          <strong>{{showMsg.Message}}</strong>
+          <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    <div class="card">
+        <div class="form-group col-12" style="text-align:center;">
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="refreshScreen()" style="margin-top:20px; margin-right:20px;">Refresh</button> &nbsp;
+            <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-sm" [disabled]="filterUser?.length==0" (click)="updateLoginStatus()" style="margin-top:20px;margin-right:20px;">Update Login Status</button>&nbsp;
+            <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()" style="margin-top:20px; margin-right:20px;">Close</button> &nbsp;
+        </div>
+          <!-- <div class="row" style="margin-left:25px;">
+            <div class="column coll-4">
+              <b>User ID</b>
+            </div>
+            <div class="column coll-4">
+              <b>Login Status</b>
+            </div>
+          </div> -->
+          <div class="suggestions border p-2 " style="width:100%;">
+            <table id="customers1">
+              <tr>
+                <th> User ID</th>
+                <th> User Name</th>
+                <th>Login Status</th>
+              </tr>
+              <tbody  *ngFor="let title of filterUser let i=index;" >
+                <tr>
+                  <td>
+                    <option>{{title.user_id}}</option>
+                  </td>
+                  <td>
+                    <option>{{title.ardb_cd}}</option>
+                  </td>
+                  <td>
+                    <input id="toggle" type="checkbox" [checked]="filterUser.login_status=='Y'?'true':'false'" [value]="title.login_status" (change)="onChange(title.login_status, $event.target.checked,i)" />
+                  </td>
+                </tr>
+               
+              </tbody>
+              
+            </table>
+            </div>
+
+      <!-- <div class="form-row" *ngFor="let title of filterUser let i=index;" style="padding-left:30px; margin-bottom: 20px;">
+          <div class="col-4" style="margin-top:35px;">
+            <option>{{title.user_id}}</option>
+          </div>
+          <div class="col-6" style="text-align:center;margin-top:25px;">
+              <input id="toggle" type="checkbox" [checked]="filterUser.login_status=='Y'?'true':'false'" [value]="title.login_status" (change)="onChange(title.login_status, $event.target.checked,i)" />
+           </div>
+           
+      </div> -->
+      
+     </div>
+  </form>

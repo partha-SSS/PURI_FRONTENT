@@ -1,0 +1,126 @@
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center">
+  <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="modifyData()">Modify</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData()">Save</button>
+ 
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+
+    <div *ngIf="showAlert" [ngClass]="alertMsgType=='SUCCESS'? 'alert alert-success alert-dismissible fade show' : 'alert alert-danger alert-dismissible fade show' " role="alert">
+      <strong>{{alertMsgType}}: </strong>
+      {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlertMsg()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <h1></h1>
+    <h4 class="customHeader">Lien Account Lock/Unlock</h4>
+
+    <div class="form-row">
+
+      <div class="form-group col-2">
+        <small for="trans_type">Account Type</small> <br>
+        <select
+          style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+          [disabled]="operationType != 'R' || disabledAll" [(ngModel)]="tm_depositall.acc_type_cd" (change)="setAccountType($event.target.value)"
+          id="account_type" class="form-control form-control-sm">
+          <option [value]="tm_depositall.acc_type_cd" selected>
+            {{tm_depositall.acc_type_cd}}-{{tm_depositall.acc_type_desc}}
+          </option>
+          <option *ngFor="let l of accountTypeList" [value]="l.acc_type_cd">{{l.acc_type_cd}}-{{l.acc_type_desc}}
+          </option>
+        </select>
+      </div>
+      <div class="form-group col-2">
+        <small for="loaun_id">Loan ID</small>
+        <input style="height:25px"
+          [disabled]="tm_depositall.loan_id == undefined || tm_depositall.loan_id == null || operationType != 'R' || disabledAll" type="text"
+          [(ngModel)]="tm_depositall.loan_id" 
+          class="form-control form-control-sm text-capitalize" id="loan_id" placeholder="Loan ID">
+      </div>
+      <div class="form-group col-2">
+        <small for="acc_no">Account Number</small>
+        <div class="input-group">
+        
+        <input style="height:25px"
+          [disabled]="tm_depositall.acc_type_cd == undefined || tm_depositall.acc_type_cd == null || operationType != 'R' " type="text"
+          [(ngModel)]="tm_depositall.acc_num"  class="form-control form-control-sm " id="acc_no" placeholder="Account Number">
+          <button class="btn btn-primary btn-sm" style="font-size:x-small" (click)="suggestCustomerCr()"><i class="fa fa-search"></i></button>
+   
+        </div>
+        <div class="suggestions border p-2" *ngIf="suggestedCustomerCr">
+          <!-- <strong> [ Customer Cd / Phone ] Name / Gurdian Name </strong>
+          <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomerCr"
+            (click)="getAccountStatus(cust.acc_num)">
+            {{'[' + cust.acc_num + ' / '
+            + ((null === cust.phone) ? '' : cust.phone) +'] '
+            + cust.cust_name  +'/'+ cust.guardian_name}} -->
+          <!-- </p> -->
+          <table id="customers1">
+            <tr>
+              <th> Customer Code / Phone</th>
+              <th> Name /Guardian Name</th>
+            </tr>
+            <tbody *ngFor="let cust of suggestedCustomerCr" >
+              <tr  (click)="getAccountStatus(cust.acc_num)">
+                <td>
+                  {{cust.acc_num}}  {{((null === cust.phone) ? '' : ' / '+ cust.phone)}}
+                </td>
+                <td>
+                  {{cust.cust_name +(null === cust.guardian_name ? '' : ' / '+ cust.guardian_name)}}
+      
+                </td>
+              </tr>
+             
+            </tbody>
+            
+          </table>
+        </div>
+        <div class="suggestions border p-2" style="width: 200%; font-size: small;"
+        *ngIf="showNoResult">
+       <strong class="text-danger">" {{tm_deposit.cust_name}} " does not match with any customer</strong>
+        </div> 
+        </div>
+
+      <div class="form-group col-4">
+        <small for="cust_name">Customer Name</small>
+        <input style="height:25px" [disabled]="true" [(ngModel)]="tm_depositall.cust_name" type="text"
+          class="form-control form-control-sm text-capitalize" id="cust_name" placeholder="Customer Name">
+      </div>
+
+      <div class="form-group col-2">
+        <small for="trans_type">Lock Mode</small> <br>
+        <select
+          style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+          [disabled]="operationType != 'U'" [(ngModel)]="tm_depositall.lock_mode" (change)="setLockUnlockMode($event.target.value)"
+          id="account_type" class="form-control form-control-sm">
+          <option [value]="tm_depositall.lock_mode" selected>{{tm_depositall.lock_mode}}-{{tm_depositall.lock_mode_desc}}</option>
+          <option *ngFor="let l of LockUnlockList" [value]="l.lockMode">{{l.lockMode}}-{{l.lockModeDesc}}
+          </option>
+        </select>
+      </div>
+
+
+    </div>
+  </div>
+
+  <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="modifyData()">Modify</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+    
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData()">Save</button>
+  </div>
+
+<loading *ngIf="isLoading"></loading>
+
+
+

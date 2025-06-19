@@ -1,0 +1,161 @@
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <ng-template #buttonDiv>
+    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isNew"
+          (click)="new()">New</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isNew"
+          (click)="retrieve()">Retrieve</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" 
+          (click)="saveuser()">Save</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isApprove"
+          (click)="openModal(Appconfirm)">Approve</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isClear"
+          (click)="clearuser()">Clear</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isDel"
+          (click)="deleteuser()">Delete</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()"
+          style="position: absolute;right: 10px;">Close</button>
+      </div>
+    </div>
+  </ng-template>
+  <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+  <ng-container *ngTemplateOutlet="messageDiv"></ng-container>
+  <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 shadow-lg mb-4 bg-white p-3 ml-2">
+    <!-- <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3"> -->
+    <ng-template #messageDiv>
+    <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3"
+      style="margin-left:4%;">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+  </ng-template>
+<!-- </div> -->
+    <h6 class="customHeader">Agent Transaction Details</h6>
+    <form [formGroup]="agentFrm" autocomplete="chrome-off">
+      <div class="form-row">
+      
+        <div class="form-group  col-6" style="margin-bottom: 0%;">
+          <small for="agent_cd">Block CD</small>
+          <select name="agent_cd" id="agent_cd" class="form-control" formControlName="agent_cd" (change)="retrieveData()">
+            <option value="" selected>Choose</option>
+            <option *ngFor="let i of blocks" [value]="i.block_cd">{{i.block_name}}</option>
+          </select>
+        </div>
+        <div class="form-group col-6" style="margin-bottom: 0%;">
+          <small for="trans_dt">Trans Date</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control"
+              formControlName="trans_dt" bsDatepicker
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" [disabled]="disTransBtn" type="button"
+                (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="form-group col-4" style="margin-bottom: 0%;">
+          <small for="trans_cd">Trans CD</small>
+          <div class="input-group">
+            <input type="text" style="height:30px;" class="form-control" formControlName="trans_cd">
+          </div>
+        </div> -->
+        <!-- <div class="form-group col-4" style="margin-bottom: 0%;">
+          <small for="agent_name">Agent Code</small>
+          <input type="text" class="form-control form-control-sm text-capitalize" formControlName="agent_name"
+            id="agent_name">
+        </div> -->
+        <!-- <div class="form-group  col-4">
+          <small for="trans_type">Trans Type</small>
+          <input type="text" (input)="clearSuggestedCust()" class="form-control form-control-sm text-capitalize"
+            formControlName="trans_type" id="trans_type">
+        </div>
+        <div class="form-group col-4">
+          <small for="trans_amt">Trans Amt</small>
+          <input type="text" style="height:30px;" class="form-control" formControlName="trans_amt">
+        </div> -->
+      </div>
+    </form><br>
+    <h6 class="customHeader">Transaction Details</h6>
+    <div [ngClass]="transData?'transDet':''">
+    <div *ngFor="let t of transData; let i=index;">
+      <div class="form-row">
+        <div class="form-group  col-1">
+          <small for="loan_id">SL NO.</small>
+          <input type="text" [readonly]="true" [value]="i+1" class="form-control form-control-sm text-capitalize"
+             id="loan_id">
+        </div>
+        <div class="form-group  col-2">
+          <small for="loan_id">Loan Id</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.loan_id" class="form-control form-control-sm text-capitalize"
+             id="loan_id">
+        </div>
+        <div class="form-group col-2">
+          <small for="party_name">Customer Name</small>
+          <input type="text" [(ngModel)]="t.party_name" [readonly]="true" class="form-control form-control-sm text-capitalize" 
+            id="party_name">
+        </div>
+        <div class="form-group col-1">
+          <small for="curr_prn_recov">Cur Prn Recov</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.curr_prn_recov" style="height:30px;" id="curr_prn_recov" class="form-control" >
+        </div>
+        <div class="form-group col-1">
+          <small for="curr_prn_recov">Ovd Prn Recov</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.ovd_prn_recov" style="height:30px;" id="curr_prn_recov" class="form-control" >
+        </div>
+        <div class="form-group col-1">
+          <small for="curr_prn_recov">Adv Prn Recov</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.adv_prn_recov" style="height:30px;" id="curr_prn_recov" class="form-control" >
+        </div>
+        <div class="form-group col-1">
+          <small for="curr_intt_recov">Cur Intt Recov</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.curr_intt_recov" style="height:30px;" id="curr_intt_recov" class="form-control" >
+        </div>
+        <div class="form-group col-1">
+          <small for="ovd_prn_recov">Ovd Intt Recov</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.ovd_prn_recov" style="height:30px;" id="ovd_prn_recov" class="form-control" >
+        </div>
+        <div class="form-group col-1">
+          <small for="penal_intt_recov">Pnl Intt Recov</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.penal_intt_recov" style="height:30px;" id="penal_intt_recov" class="form-control" >
+        </div>
+        <div class="form-group col-1">
+          <small for="penal_intt_recov">Total Recov</small>
+          <input type="text" [readonly]="true" [(ngModel)]="t.recov_amt" style="height:30px;" id="penal_intt_recov" class="form-control" >
+        </div>
+      </div>
+    </div>
+    <div *ngIf="transData" class="form-row">
+      <div class="form-group col-5 text-center"> Total Amount:</div>
+      <div class="form-group col-1"><input type="text" [readonly]="true" style="height:30px;" class="form-control" [value]="tot_cur_prn"></div>
+      <div class="form-group col-1"><input type="text" [readonly]="true" style="height:30px;" class="form-control" [value]="tot_ovd_prn"></div>
+      <div class="form-group col-1"><input type="text" [readonly]="true" style="height:30px;" class="form-control" [value]="tot_adv_prn"></div>
+      <div class="form-group col-1"><input type="text" [readonly]="true" style="height:30px;" class="form-control" [value]="tot_cur_intt"></div>
+      <div class="form-group col-1"><input type="text" [readonly]="true" style="height:30px;" class="form-control" [value]="tot_ovd_intt"></div>
+      <div class="form-group col-1"><input type="text" [readonly]="true" style="height:30px;" class="form-control" [value]="tot_pnl_intt"></div>
+      <div class="form-group col-1"><input type="text" [readonly]="true" style="height:30px;" class="form-control" [value]="totAmt"></div>
+    </div>
+  </div>
+    
+  </div>
+  <ng-container *ngTemplateOutlet="messageDiv"></ng-container>
+  <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+</div>
+<loading *ngIf="isLoading"></loading>
+<ng-template #Appconfirm >
+  <div class="modal-body text-center" >
+    <p>'Are you sure, you want to <b style="color: rgb(8, 148, 55);">APPROVE</b> this Transaction</p>
+    <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+    <button mat-raised-button type="button" class=" btn btn-primary" (click)="approve()" >Yes</button>
+    
+  </div>
+</ng-template>

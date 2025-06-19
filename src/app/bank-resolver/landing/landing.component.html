@@ -1,0 +1,53 @@
+<loading *ngIf="isLoading"></loading>
+<div>
+  <!--  -->
+
+  <div class="wrapper">
+   
+<div class="wrapperWhite">
+ 
+  
+  <!-- <img src="./assets/images/cfsgreen.png"  class="log4"> -->
+  <!-- <img src="./assets/images/bgCus1.jpg" > -->
+  <marquee behavior="scroll" direction="left" scrollamount="12"><h1 style="color: rgb(231, 4, 4)!important;">{{ marqueeText }}</h1></marquee>
+  <!-- <h1 [style.color]="randomNumberColor"> -->
+  <div class="row" style="margin:1px;">
+    <div class="col-12">
+      <img src="./assets/images/dashboard/bag.png" class="logo1">
+    </div>
+   
+  </div>
+
+<!-- <h1>&nbsp;</h1><br>
+<h1>&nbsp;</h1><br>
+<h1>&nbsp;</h1><br>
+<h1>&nbsp;</h1><br>
+<h1>&nbsp;</h1><br> -->
+
+
+
+
+  </div>
+
+</div>
+<ng-template #template >
+  <div class="modal-body text-center" >
+    <div id="container">
+      <div id="success-box">
+        <div class="dot"></div>
+        <div class="dot two"></div>
+        <div class="face">
+          <div class="eye"></div>
+          <div class="eye right"></div>
+          <div class="mouth happy"></div>
+        </div>
+        <div class="shadow scale"></div>
+        <div class="message"><h1 class="alert">Success!</h1><p>Hello {{currUser}}, everything is working.</p></div>
+        <button class="button-box" (click)="closeL2L()"><h1 class="green">continue</h1></button>
+      </div>
+      
+    </div>
+   
+    
+  </div>
+</ng-template>

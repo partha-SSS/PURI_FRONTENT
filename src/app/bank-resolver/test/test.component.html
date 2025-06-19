@@ -1,0 +1,53 @@
+     <div>
+              <section *ngFor="let t1 of tm_denominationList; let i=index">
+                <div class="form-row">
+                  <div class="form-group col-5">
+                    <small>Rupees</small> <br>
+                    <select
+                      class="form-control form-control-sm" (change)="setDenomination($event.target.value, i)">
+                      <option value="t1.value" [readonly]="true" selected>{{t1.rupees_desc}}</option>
+                      <option [value]="l.value" *ngFor="let l of denominationList">{{l.rupees}}</option>
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-3">
+                    <small for="deno_count">Count</small>
+                    <input [(ngModel)]="t1.count" type="text"
+                      class="form-control form-control-sm text-capitalize" (change)="calculateTotalDenomination(i)"
+                      id="deno_count" placeholder="Count">
+                  </div>
+
+                  <div class="form-group col-4">
+                    <small for="deno_total">Total</small>
+                    <input [(ngModel)]="t1.total" type="text"
+                      class="form-control form-control-sm text-capitalize" id="deno_total" placeholder="Total">
+                  </div>
+                </div>
+              </section>
+
+
+              <div class="form-row">
+                <div class="form-group col-8" style="text-align: right;">
+                  <label class="form-check-label"> <small> Total</small> </label>
+                </div>
+
+                <div class="form-group col-4">
+                  <input [(ngModel)]='denominationGrandTotal' [readonly]="true" type="text"
+                    class="form-control form-control-sm text-capitalize" id="total" placeholder="Total">
+                </div>
+              </div>
+
+              <div class="text-right mb-3">
+                <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm  mr-1"
+                  (click)="addDenomination()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </button>
+
+                <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm"
+                  (click)="removeDenomination()">
+                  <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                </button>
+              </div>
+
+      </div>

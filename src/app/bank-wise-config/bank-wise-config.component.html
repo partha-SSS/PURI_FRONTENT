@@ -1,0 +1,42 @@
+<div class="container">
+
+  <table class="table ml-5 mb-0" style="width:800px;">
+      <tr class="divc3">
+        <td style="width: 15%;">
+          <button type="button" class="btn btn-primary" (click)="navigateBack()">
+            <i class="fa fa-arrow-circle-left fa-1x "></i></button>
+        </td>
+        <td style="width: 45%; text-align: center;">
+          <h4>Bank-wise Configuration
+            </h4>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+
+  <table class="table ml-5 mt-0" style="width:800px;">
+
+    <tr class="divc5">
+      <td class="text" style="width: 25%"><b>Bank Name</b></td>
+      <td class="text" style="width: 50%"><b>Description</b></td>
+      <td class="text" style="width: 15%"><b>Menu Config</b></td>
+    </tr>
+    <tr class="divc4"></tr>
+
+    <tr *ngFor="let t of bnkConfigList" class="divc3">
+      <td>
+        <strong>
+        <section>{{t.bank_name}}</section>
+      </strong>
+      </td>
+      <td> {{t.bank_desc}} </td>
+
+      <td>
+        <button type="button" class="btn btn-primary btn-sm ml-3"
+          (click)="navBankConfig(t.bank_name , t.bank_desc, t.bank_config_id)">
+          <i class="fa fa-arrow-circle-right fa-x "></i></button>
+      </td>
+    </tr>
+    <tr class="divc4"></tr>
+  </table>
+</div>

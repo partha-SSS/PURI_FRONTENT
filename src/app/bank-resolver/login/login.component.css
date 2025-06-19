@@ -1,0 +1,118 @@
+/* Main layout */
+.main-wrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-content {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 1px 1px 3px 3px rgb(142 189 0);
+    overflow: hidden;
+    width: 100%;
+    max-width: 960px;
+    display: flex
+;
+    flex-wrap: wrap;
+    z-index: 1;
+
+}
+
+/* Company info (left side on large screens) */
+.company__info {
+  background-color: #044800;
+  color: #fbff06;
+  padding: 2em;
+  text-align: center;
+}
+.company_title {
+  margin-top: 1rem;
+}
+.log2 {
+  width: 80%;
+  max-width: 200px;
+}
+
+/* Login form */
+.login_form {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 0 20px 20px 0;
+}
+
+.inner-content {
+  background-color: #f9f9f9;
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+/* Form elements */
+.form__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #8ebd00;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.form__input:focus {
+  border-color: #8ebd00;
+  box-shadow: 0 0 5px rgb(142 189 0);
+  outline: none;
+}
+
+.btn {
+  background-color: #8ebd00;
+  color: #044800;
+  border: 1px solid #044800;
+  font-weight: bold;
+  padding: 0.75rem;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #044800;
+  color: #8ebd00;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .company__info {
+    display: none !important;
+  }
+
+  .login_form {
+    border-radius: 20px;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+}
+.logo-animated {
+  width: 150px; /* or any suitable size */
+  height: 150px;
+  border-radius: 50%; /* fully rounded */
+  /* border: 4px solid #fff; */
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); */
+  /* animation: rotateLogo 4s linear infinite; */
+  /* transition: transform 0.3s ease; */
+  object-fit: cover;
+}
+
+/* Animation keyframes */
+@keyframes rotateLogo {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.logo-animated:hover {
+  /* animation-play-state: paused; */
+}

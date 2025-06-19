@@ -1,0 +1,17 @@
+@media print{
+    #fastPageGhatal{
+        page-break-after: avoid!important;
+        page-break-before: avoid!important;
+        font-size:large!important;
+        
+    }
+    
+    
+    
+    #fastPageGhatal,p{font-weight: 600!important;}
+}
+#fastPageGhatal{
+    font-weight: 600!important;
+}p{
+    font-size:large!important
+}

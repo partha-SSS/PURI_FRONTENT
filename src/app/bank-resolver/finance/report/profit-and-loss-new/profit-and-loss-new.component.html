@@ -1,0 +1,172 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+  <button type="button" 
+  class="btn btn-rounded btn-primary m-1" 
+  [useExistingCss]="true"
+  printSectionId="hiddenTab" 
+  ngxPrint>Print</button>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+ </div>
+</div>
+<div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+  
+ <!-- <pagination style="float:right;"
+ [totalItems]="reportData?.length"  
+ [itemsPerPage]="itemsPerPage"
+ [boundaryLinks]="true"
+ [directionLinks]="true"
+ [maxSize]="5"
+ [(ngModel)]="currentPage"
+ name="currentPage"
+ (pageChanged)="pageChanged($event)"
+ (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+
+ <div  *ngIf="reportData" id="hiddenTab">
+  <div class="justify-content-center" style="text-align:center">
+    <h4>{{ardbName}} <br>{{branchName}}</h4>
+
+    <h4>Run Date & Time : {{today}} </h4> 
+    <h4> <u> Profit and Loss A/C as on  {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+ </div>
+  
+  <h1 class="justify-content-center">REVENUE</h1>
+  <table  class="mat-elevation-z8">
+    <ng-container *ngFor="let group of groupedrevenueData">
+      <thead style="padding-left: 4%;">
+        <tr>
+          <th colspan="5" class="group-header">{{ group.schedule_desc_cr }}</th>
+        </tr>
+        <tr>
+          <th>Account Code</th>
+          <th>Account Name</th>
+          <th  style="text-align: right;">Current Yr Balance</th>
+          <th style="text-align: right;">Previous Yr Balance</th>
+        </tr>
+      </thead>
+      <tbody style="padding-left: 4%;">
+        <tr *ngFor="let item of group.items">
+          <td>{{ item.cr_acc_cd }}</td>
+          <td>{{ item.cr_acc_desc }}</td>
+          <td style="text-align: right;">{{(item.cr_amount>0?item.cr_amount:item.cr_amount|abs) | number: '1.2-2' }} </td>
+          <td style="text-align: right;">{{(item.prev_cr_amount>0?item.prev_cr_amount:item.prev_cr_amount|abs) | number: '1.2-2' }}</td>
+        </tr>
+        <tr class="subtotal-row">
+          <td colspan="2"><strong>TOTAL FOR {{ group.schedule_desc_cr }} :</strong></td>
+          <td style="text-align: right;">{{ (group.subtotal.cr_amount>0?group.subtotal.cr_amount:group.subtotal.cr_amount|abs) | number: '1.2-2' }}</td>
+          <td style="text-align: right;">{{ (group.subtotal.prev_cr_amount>0?group.subtotal.prev_cr_amount:group.subtotal.prev_cr_amount|abs) | number: '1.2-2' }} </td>
+        </tr>
+      </tbody>
+    </ng-container>
+    <tfoot  style="padding-left: 4%;">
+      <tr class="grand-total-row">
+        <td  colspan="2"><strong>TOTAL FOR REVENUE :</strong></td>
+        <td  style="text-align: right;">{{ (totalRevenue.cr_amount>0?totalRevenue.cr_amount:totalRevenue.cr_amount|abs) | number: '1.2-2' }} </td>
+        <td  style="text-align: right;">{{ (totalRevenue.prev_cr_amount>0?totalRevenue.prev_cr_amount:totalRevenue.prev_cr_amount|abs) | number: '1.2-2' }} </td>
+    </tr>
+    </tfoot>
+  </table><br><br>
+    <h1 class="justify-content-center">EXPENSES</h1>
+    <table  class="mat-elevation-z8">
+      <ng-container *ngFor="let group of groupedexpenseData">
+        <thead  style="padding-left: 4%;">
+          <tr>
+            <th colspan="5" class="group-header">{{ group.schedule_desc_dr }}</th>
+          </tr>
+          <tr>
+            <th>Account Code</th>
+            <th>Account Name</th>
+            <th style="text-align: right;">Current Balance</th>
+            <th style="text-align: right;">Previous Balance</th>
+            
+          </tr>
+        </thead>
+        <tbody  style="padding-left: 4%;">
+          <tr *ngFor="let item of group.items">
+            <td>{{ item.dr_acc_cd }}</td>
+            <td>{{ item.dr_acc_desc }}</td>
+            <td  style="text-align: right;">{{(item.dr_amount>0?item.dr_amount:item.dr_amount|abs) | number: '1.2-2' }} </td>
+            <td  style="text-align: right;">{{(item.prev_dr_amount>0?item.prev_dr_amount:item.prev_dr_amount|abs) | number: '1.2-2' }}</td>
+
+            
+          </tr>
+          <tr class="subtotal-row">
+            <td  colspan="2"><strong>TOTAL FOR {{ group.schedule_desc_dr }} :</strong></td>
+            <td  style="text-align: right;">{{ (group.subtotal.dr_amount>0?group.subtotal.dr_amount:group.subtotal.dr_amount|abs) | number: '1.2-2' }} </td>
+            <td  style="text-align: right;">{{ (group.subtotal.prev_dr_amount>0?group.subtotal.prev_dr_amount:group.subtotal.prev_dr_amount|abs) | number: '1.2-2' }} </td>
+
+          </tr>
+        </tbody>
+      </ng-container>
+      <tfoot  style="padding-left: 4%;">
+        <tr class="grand-total-row">
+          <td  colspan="2"><strong>TOTAL FOR EXPENSES :</strong></td>
+          <td style="text-align: right;">{{ (totalExpense.dr_amount>0?totalExpense.dr_amount:totalExpense.dr_amount|abs) | number: '1.2-2' }} </td>
+          <td style="text-align: right;">{{ (totalExpense.prev_dr_amount>0?totalExpense.prev_dr_amount:totalExpense.prev_dr_amount|abs) | number: '1.2-2' }}</td>
+
+        </tr>
+      </tfoot>
+    </table>
+  
+  
+  
+</div>
+
+ 
+ 
+
+<div>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+ <button type="button" 
+ class="btn btn-rounded btn-primary m-1" 
+ [useExistingCss]="true"
+ printSectionId="hiddenTab" 
+ ngxPrint>Print</button>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+</div>
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

@@ -1,0 +1,212 @@
+<!-- <ng-template #content2 let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <h3>Print fast page with header?&nbsp;&nbsp;&nbsp;
+            <input type="radio" formControlName="yes" value="yes">
+            <label for="yes">YES</label>
+            <input type="radio"  formControlName="no" value="no">
+            <label for="no">NO</label>
+          </h3>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="showFastPage()" [useExistingCss]="true"
+      printSectionId={{printID}} ngxPrint >Print</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template> -->
+  
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 shadow-sm mb-4 bg-white p-3" style="text-align: center;">
+    <p>Click print button for print passbook fastpage</p>
+    <button mat-raised-button class="btn btn-primary"  
+    printSectionId={{printID}} ngxPrint [useExistingCss]="true">Print FastPage</button> &nbsp;
+  </div>
+<div id="fastPage" style="font-family: Verdana, Geneva, Tahoma, sans-serif;" >
+    <div style="margin-top: 64%; " *ngIf="sys.ardbCD=='23'">&nbsp;</div>
+    <br>
+    <div class="form-row" style="margin-left: 10%;">
+        <p style="width: 40%;font-size: 18px;" >A/C No:  <b>{{paddingACC?paddingACC:''}}{{suggestedCustomer[0]?.acc_num}}</b> </p>
+        <p style="text-align: right;width: 20%;font-size: 18px;"><b *ngIf="IFSC">IFSC: {{IFSC}}</b></p>
+        <p style="text-align: right;width: 30%;font-size: 18px;"><b>CIF:  {{masterModel?.tmdeposit.cust_cd}}</b></p>
+    </div>
+      <div class="form-row" style="margin-left: 10%;">
+          <p style="width: 60%;font-size: 18px;">Name:  <b>{{suggestedCustomer[0]?.cust_name}}</b></p>
+          <p style="text-align: right;width: 30%;">Branch: <b>  {{branchName}}</b></p>
+     </div>
+    <div class="form-row" style="margin-left: 10%;" >
+      <p style="width: 70%;">Guardian Name:  {{suggestedCustomer[0]?.guardian_name}} </p>
+    </div>
+    <div class="form-row"style="margin-left: 10%;"> 
+      <p style="width: 70%;">Joint Holder's Name:   {{joinHold}}</p>
+    </div>
+    <div class="form-row"style="margin-left: 10%;"> 
+      <p style="width: 60%;">Address:  {{suggestedCustomer[0]?.present_address}}</p>
+    </div>
+     <div class="form-row"style="margin-left: 10%;"> 
+            <p style="width: 35%;">Occupation:  {{custDtls.occupation}} </p>
+            <p style="width: 30%;">Mode of Operation:  {{oprn_instr_desc}} </p>
+    </div>
+    <div class="form-row"style="margin-left: 10%;"> 
+            <p style="width: 35%;">Contact No: <b>{{suggestedCustomer[0]?.phone}}</b></p>
+            <p style="width: 30%;">Nominee Registered:  {{masterModel?.tdnominee?.length>0?"YES":"NO"}}</p>
+    </div>
+    <div class="form-row"style="margin-left: 10%;"> 
+            <p style="width: 50%;">Date of Opening: <b>{{masterModel?.tmdeposit?.opening_dt?.substr(0,10)}} </b></p>
+            <p style="width: 40%; text-align: right;"><b> Authorised Signatory</b></p>
+    </div>
+  </div>
+ 
+  <div id="fastPageGhatal" style="font-family:Arial, Helvetica, ui-sans-serif;" hidden>
+    <div style="margin-top: 49%; ">&nbsp;</div>
+    <div class="form-row" style="margin-left: 10%;">
+        <div ><b>A/C No:  </b> {{suggestedCustomer[0].acc_num}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>CIF:  </b>{{masterModel.tmdeposit.cust_cd}}</div>
+      </div>
+      <div class="form-row" style="margin-left: 10%;padding-top: 5px;">
+          <div ><b>Branch Name:  </b> {{branchName}}</div>
+      </div>
+     <div class="form-row" style="margin-left: 10%;padding-top: 5px;">
+      <div ><b>Full Name: </b>{{suggestedCustomer[0].cust_name}}</div>
+     </div>
+      <div class="form-row" style="margin-left: 10%;padding-top: 5px;" >
+      <div><b>Guardian Name:  </b>{{suggestedCustomer[0].guardian_name}} </div>
+    </div>
+    <div class="form-row"style="margin-left: 10%;padding-top: 5px;"> 
+      <div><b>Joint Holder's Name:  </b> {{joinHold}}</div>
+    </div>
+    <div class="form-row"style="margin-left: 10%;padding-top: 5px;"> 
+      <div><b>Address:  </b>{{suggestedCustomer[0].present_address}}</div>
+    </div>
+    <br>
+    <br>
+    <div style="border:1px solid grey; padding: 10px;">
+        <div class="form-row" style="padding-left: 3%;">
+            <div><b>Occupation:  </b>{{custDtls.occupation}} </div>
+        </div>
+        <div class="form-row" style="padding-left: 3%;">
+          <div><b>Mode of Operation:  </b>{{oprn_instr_desc}} </div>
+      </div>
+        <div class="form-row" style="padding-left: 3%;padding-top: 5px;">
+            <div><b>Contact No:  </b>{{suggestedCustomer[0].phone}}</div>
+        </div>
+        <div class="form-row" style="padding-left: 3%;padding-top: 5px;">
+          <div><b>Issue Date:  </b>{{curDay}}</div>
+         </div>
+        <div class="form-row" style="padding-left: 70%;padding-top: 10px;">
+          <div style="text-align: right; padding-right: 10px;"><b>Branch Manager / Authorised Signatory</b></div>
+        </div>
+    </div>
+  </div>
+  <div id="fastPageRD" *ngIf="sys.ardbCD!='7'" style="width: 60%;padding-left: 3% " hidden>
+    <div style="padding: 10px;">
+      <div style="margin-top: 58%; ">&nbsp;</div>
+      <div class="form-row">
+          <div style="width: 40%;"><b>A/C No:  {{suggestedCustomer[0].acc_num}}</b></div>
+          <div style="text-align: right;width: 20%;"><b>CIF:  {{masterModel.tmdeposit.cust_cd}}</b></div>
+      </div>
+        <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 40%;"><b>Name:  </b>{{suggestedCustomer[0].cust_name}}</div>
+          <div style="text-align: right;width: 20%;"><b>Branch:  </b>{{branchName}}</div>
+
+       </div>
+        <div class="form-row" style="padding-top: 5px;" >
+        <div style="width: 60%;"><b>Guardian Name:  </b>{{suggestedCustomer[0].guardian_name}} </div>
+      </div>
+      <div class="form-row"style="padding-top: 5px;"> 
+        <div style="width: 60%;"><b>Joint Holder's Name:  </b> {{joinHold}}</div>
+      </div>
+      <div class="form-row"style="padding-top: 5px;"> 
+        <div style="width: 60%;"><b>Address:  </b>{{suggestedCustomer[0].present_address}}</div>
+      </div>
+      <br><br>
+    </div>
+      <div style="padding: 10px;">
+          <div class="form-row">
+              <div style="width: 40%;"><b>Inst Amt/Month:  {{masterModel.tmdeposit.instl_amt | number : '1.2-2'}}</b> </div>
+              <div style="width: 20%;text-align: right;"><b>No of Inst:  {{masterModel.tmdeposit.instl_no}}(Month)</b> </div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 40%;"><b>Opening Dt:  </b>{{masterModel.tmdeposit.opening_dt.substr(0,10)}} </div>
+            <div style="width: 20%;text-align: right;"><b>Rate of Intt:  {{masterModel.tmdeposit.intt_rt}}%</b> </div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 40%;"><b>Maturity Dt:  </b>{{masterModel.tmdeposit.mat_dt.substr(0,10)}} </div>
+            <div style="width: 20%;text-align: right;"><b>Maturity Amt:  {{RDmatValue | number : '1.2-2'}}</b></div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;" >
+            <div style="width: 40%;"><b>SI After Maturity:  </b>{{afterMatInstraction==1?'Auto Close':afterMatInstraction==2?'Auto Renew':'None'}} </div>
+            <div style="width: 20%;text-align: right;"><b>Nominee Exist: </b> {{masterModel.tdnominee.length>0?'Yes':'No'}}</div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;" >
+            <div style="width: 40%;"><b>SI Debited From:  </b>{{standingIns}} </div>
+            <div style="width: 20%;text-align: right;">&nbsp;</div>
+          </div>
+          <div class="form-row" style="padding-left: 42%;padding-top:10%;">
+            <div><b>Authorised Signatory</b></div>
+          </div>
+      </div>
+    
+  </div>
+  <div id="fastPageRD" *ngIf="sys.ardbCD=='7'" style="width: 100%;padding-left: 3% " hidden>
+    <div style="padding: 10px;">
+      <div style="margin-top: 15%; ">&nbsp;</div>
+      <div class="form-row">
+          <div style="width: 60%;"><b>A/C No:  {{suggestedCustomer[0].acc_num}}</b></div>
+          <div style="text-align: right;width: 30%;"><b>CIF:  {{masterModel.tmdeposit.cust_cd}}</b></div>
+      </div>
+        <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 60%;"><b>Name:  </b>{{suggestedCustomer[0].cust_name}}</div>
+          <div style="text-align: right;width: 30%;"><b>Branch:  </b>{{branchName}}</div>
+
+       </div>
+        <div class="form-row" style="padding-top: 5px;" >
+        <div style="width: 900%;"><b>Guardian Name:  </b>{{suggestedCustomer[0].guardian_name}} </div>
+      </div>
+      <div class="form-row"style="padding-top: 5px;"> 
+        <div style="width: 90%;"><b>Joint Holder's Name:  </b> {{joinHold}}</div>
+      </div>
+      <div class="form-row"style="padding-top: 5px;"> 
+        <div style="width: 90%;"><b>Address:  </b>{{suggestedCustomer[0].present_address}}</div>
+      </div>
+      <br><br>
+    </div>
+      <div style="padding: 10px;">
+          <div class="form-row">
+              <div style="width: 60%;"><b>Inst Amt/Month:  {{masterModel.tmdeposit.instl_amt | number : '1.2-2'}}</b> </div>
+              <div style="width: 30%;text-align: right;"><b>No of Inst:  {{masterModel.tmdeposit.instl_no}}(Month)</b> </div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 60%;"><b>Opening Dt:  </b>{{masterModel.tmdeposit.opening_dt.substr(0,10)}} </div>
+            <div style="width: 30%;text-align: right;"><b>Rate of Intt:  {{masterModel.tmdeposit.intt_rt}}%</b> </div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 60%;"><b>Maturity Dt:  </b>{{masterModel.tmdeposit.mat_dt.substr(0,10)}} </div>
+            <div style="width: 30%;text-align: right;"><b>Maturity Amt:  {{RDmatValue | number : '1.2-2'}}</b></div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;" >
+            <div style="width: 60%;"><b>SI Debited From:  </b>{{standingIns}} </div>
+            <div style="width: 30%;text-align: right;">&nbsp;</div>
+          </div>
+          <div class="form-row" style="padding-left: 42%;padding-top:10%;">
+            <div><b>Authorised Signatory</b></div>
+          </div>
+      </div>
+    
+  </div>
+
+
+

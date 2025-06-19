@@ -1,0 +1,372 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="form-group col-3">
+            <small for="acc_type_cd"><i class="fa fa-star text-danger" aria-hidden="true"></i> Account Type</small>
+            <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+              (change)="onAccountTypeChange()">
+              <option disabled>Choose</option>
+              <option [value]="1">1 - Saving Deposit</option>
+              <option [value]="6">6 - Recurring Deposit</option>
+              <option [value]="7">7 - Share</option>
+              <option [value]="8">8 - Flexi</option>
+            </select>
+          </div>
+          <div class="col-9">
+            <small for="acct_num"> <i class="fa fa-star text-danger" aria-hidden="true"></i> Search Name/Cust
+              code/Phone</small>
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                placeholder="Enter Acc# / Customer Name / Phone number" (input)="onChangeNull()" name="x-field-1"
+                autocomplete="new-field-1">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+  
+            <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.acc_num}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+              *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+              <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any
+                customer</strong>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="showWait">Please wait...</div>
+          <div class="col-6">
+            <small for="fromDate"><i class="fa fa-star text-danger" aria-hidden="true"></i> From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate"><i class="fa fa-star text-danger" aria-hidden="true"></i> To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Back</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="{{printID}}" ngxPrint (click)="printCall()">Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button"  (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_contai_PassBookFastPage']" >Print Fast Page</button>
+   <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" 
+   printSectionId="contai_head" ngxPrint >Header Print </button>
+      </div>
+    </div>
+    <div *ngIf="showAlert" class="alert alert-success alert-dismissible fade show" role="alert" style="width: 67%;">
+      <strong>Msg,</strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3" *ngIf="shoFastPage">
+      
+      <app-fast-page [accNum]="accNum" [accType]="accType"></app-fast-page>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+      <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+        <h4>{{ardbName}} {{branchName}}</h4>
+  
+        <h4>Run Date & Time : {{today}} </h4> <br>
+        <h4> <u> Passbook from {{reportcriteria.controls.fromDate.value?.toDateString()| date: 'dd/MM/yyyy'}} to {{
+            this.reportcriteria.controls.toDate.value?.toDateString()| date: 'dd/MM/yyyy'}}</u></h4>
+      </div>
+      <table style="text-align:left;margin-left: 30%;" *ngIf="reportData">
+        <tr>
+          <th>A/C No. {{cAcc}}</th>
+        </tr>
+        <tr>
+          <th>Name: {{cName}}</th>
+        </tr>
+        <tr>
+          <th>Present Address: {{cAddress}}</th>
+        </tr>
+      </table>
+      <!-- <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+        [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+        (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+      <table class="p-3" id="trial">
+        <tr *ngIf="reportData">
+          <!-- <th></th> -->
+          <th *ngIf="accType=='6'">Instl No</th>
+          <th>Trans Dt</th>
+          <th *ngIf="accType=='6'">Month/Year</th>
+          <th *ngIf="accType!='6'">Particulars</th>
+          <th *ngIf="accType!='6'">Instrument</th>
+          <th *ngIf="accType!='6'" style="text-align:right;">Withdrawal</th>
+          <th *ngIf="accType!='6'" style="text-align:right;">Deposit</th>
+          <th *ngIf="accType=='6'">Instl Amount</th>
+          <th style="text-align:right;">Balance</th>
+  
+  
+        </tr>
+        <tbody *ngFor="let i of reportData; let itr=index;">
+          
+          <tr>
+            <td  *ngIf="accType=='6'">{{i.instrument_num}}</td>
+            <td >{{i.trans_dt.substr(0,10)}}</td>
+            <td  *ngIf="accType=='6'">{{i.ardb_cd}}</td>
+            <td *ngIf="accType!='6'">{{i.particulars}}</td>
+            <td *ngIf="accType!='6'">{{i.instrument_num}}</td>
+            <td  style="text-align:right;" *ngIf="accType!='6'">
+              {{i.trans_type=='W'?i.amount:0 | number : '1.2-2'}}
+             </td>
+             <td  style="text-align:right;" *ngIf="accType!='6'">
+             {{i.trans_type=='D'?i.amount:0 | number : '1.2-2'}}
+             </td>
+            <td  style="text-align:right;" *ngIf="accType=='6'">{{i.amount | number : '1.2-2'}}</td>
+  
+            <td style="text-align: right;">{{i.balance | number : '1.2-2'}}</td>
+  
+          </tr>
+          
+  
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5"> <small>
+              This report is generated through CFS-2022
+             </small> </td>
+          </tr>
+          
+         </tfoot>
+
+    
+      </table>
+      <div id="hiddenTabRD" hidden>
+        <br><br>
+        <table style="width: 90%;font-size: large;" class="mkSmallRD">
+          <tbody *ngFor="let i of printData; let itr=index;">
+            <tr *ngIf="i.balance==null">
+              <td style="margin-top: 30px;">&nbsp;</td>
+             </tr>
+            <tr>
+              <td style="width: 15%; padding-left: 5%;">{{i.instrument_num}}</td>
+              <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
+              <td  style="width:35%; padding-left: 5%;"> {{i.ardb_cd}}</td>
+              <td style="text-align: right;">{{i.amount| number : '1.2-2'}}</td>
+              <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
+  
+  
+              <!-- <td style="text-align:right">{{i.balance | number : '1.2-2'}}</td> -->
+            </tr>
+            <!-- <tr style="font-weight:700;" *ngIf="itr == reportData.length-1">
+     
+        <td colspan="3" style="text-align: right;font-weight: 700;">Total: </td>
+        <td style="text-align: right;font-weight: 700;">{{opdrSum | number : '1.2-2'}}</td>
+        <td style="text-align: right;font-weight: 700;">{{opcrSum | number : '1.2-2'}}</td>
+        
+      </tr> -->
+            <!-- <tr *ngIf="i.cust_cd==lastcustcd">
+       <td colspan="8" style="text-align:right;font-weight:800">Total</td>
+       <td colspan="8" style="text-align:right;font-weight:800">{{opdrSum | number : '1.2-2'}}</td>
+      </tr> -->
+  
+          </tbody>
+          
+  
+        </table>
+        <!-- <br><br><br><br>
+  <small>This report is generated through CFS-2022</small> -->
+      </div>
+      <div id="hiddenTab" hidden>
+        <br><br>
+        <table  class="mkSmallG">
+          <tbody *ngFor="let i of printData; let itr=index;">
+            <tr *ngIf="i.trans_type==null">
+             <td style="margin-top: 26px;">&nbsp;</td>
+            </tr>
+            <tr *ngIf="i.trans_type!==null">
+              <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
+              <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
+              
+              <td  style="width: 12%; text-align: right; padding-right:3%;">
+                {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
+               </td>
+               <td style="text-align: right;">
+               {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
+               </td>
+             <td style="text-align: right; padding-right: 6%;">{{i.balance | number : '1.2-2'}}</td>
+              </tr>
+            
+  
+          </tbody>
+          
+  
+        </table>
+       </div>
+      <div id="hiddenTabGhatal" hidden>
+        <br><br>
+        <!-- <table  class="mkSmallG" style=" margin: 37px 50px 0px 50px;">
+          <tbody *ngFor="let i of printDataGhatal; let itr=index;">
+            <tr *ngIf="i.trans_type==null">
+             <td style="margin-top: 30px;">&nbsp;</td>
+            </tr>
+            <tr *ngIf="i.trans_type!==null">
+              <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
+              <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
+              
+              <td  style="width: 11%; text-align: right; padding-right:2%;">
+                {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
+               </td>
+               <td style="text-align: right; width: 14%;">
+               {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
+               </td>
+              <td style="text-align: right; padding-right: 7%;width: 25%;">{{i.balance | number : '1.2-2'}}</td>
+  
+            </tr>
+            
+  
+          </tbody>
+          
+  
+        </table> -->
+        <table  class="mkSmall" >
+          <tbody *ngFor="let i of printDataGhatal; let itr=index;">
+            <tr *ngIf="i.trans_type==null">
+             <td style="margin-top: 26px;">&nbsp;</td>
+            </tr>
+            <tr *ngIf="i.trans_type!==null">
+              <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
+              <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
+              
+              <td  style="width: 12%; text-align: right; padding-right:3%;">
+                {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
+               </td>
+               <td style="text-align: right;">
+               {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
+               </td>
+             <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
+              </tr>
+            
+  
+          </tbody>
+          
+  
+        </table>
+        </div>
+      <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+    </div>
+    
+  
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Back</button>
+        <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="{{printID}}" ngxPrint (click)="printCall()">Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button" (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_contai_PassBookFastPage']" >Print Fast Page</button>
+   <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" 
+   printSectionId="contai_head" ngxPrint >Header Print </button>
+      </div>
+    </div>
+  </div>
+  <ng-template #nextpage let-modal data-keyboard="false" data-backdrop="false">
+   
+    <div class="modal-body">
+      <p>Previous page print successfully! Click on <b>'Print'</b> button for print rest of transaction,</p>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <ng-template #fullpageUpdate let-modal data-keyboard="false" data-backdrop="false">
+   
+    <div class="modal-body">
+      <p>Last update in this passbook complated with full page, Insert new blank page and click <b>'Print'</b> </p>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <ng-template #UpdateSuccess let-modal data-keyboard="false" data-backdrop="false">
+   
+    <div class="modal-body">
+      <h4 style="color: darkgreen;"><b>{{cName}}</b> Passbook updated successfully....</h4>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <loading *ngIf="isLoading"></loading>
+  
+  <div id="contai_head" style="margin: 100px 100px 100px 100px; background-color: white;" hidden>
+    <!-- <div > -->
+      <table style="width: 100%; margin-top: 15px;border-bottom: 1px solid;">
+        <tr >
+          <td style="text-align: left; padding-left: 5%;">Trans Dt</td>
+          <td style="text-align: center;">Particulars</td>
+          
+          <td  style="text-align:right"> Withdrawal </td>
+           <td style="text-align: right;">Deposit</td>
+         <td style="text-align: right; padding-right: 5%;">Balance</td>
+        </tr>
+      </table>
+   <!-- </div> -->
+  </div>

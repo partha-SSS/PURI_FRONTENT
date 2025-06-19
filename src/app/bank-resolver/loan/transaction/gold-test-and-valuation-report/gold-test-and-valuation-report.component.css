@@ -1,0 +1,114 @@
+small {
+    font-size: 70%;
+    font-weight: 500;
+  }
+  
+  .suggestions2{
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    z-index: 1;
+    width: 250px;
+    height: auto;
+    max-height: 300px;
+    overflow: auto;
+    font-size: x-small;
+    margin-top:20%;
+  }
+  #customers2 {
+    
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: small;
+  }
+  #customers2 td, #customers2 th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    
+  }
+  #customers2 tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #customers2 tr:hover {background-color: #aeeea6; cursor: pointer;}
+  
+  #customers2 th {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    background-color: #34723A;
+    color: white;
+    font-size:small
+  }
+  .suggestions{
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    z-index: 100;
+    width: 400px;
+    height: auto;
+    max-height: 300px;
+    overflow: auto;
+    font-size: x-small;
+  }
+  #customers1 {
+    
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: small;
+  }
+  
+  #customers1 td, #customers1 th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    
+  }
+  
+  #customers1 tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #customers1 tr:hover {background-color: #aeeea6; cursor: pointer;}
+  
+  #customers1 th {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    background-color: #34723A;
+    color: white;
+    font-size:small
+  }
+  
+  .mat-icon {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    line-height: 20px;
+  
+    padding: 0 6px 0 6px;
+    margin: 6px 8px 6px 8px;
+    min-width: 88px;
+    border-radius: 3px;
+  }
+  
+  .scroll-style {
+    max-height: 45vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  #tbl.table, th, td {
+    border: 2px solid #34723A;
+    padding: 8px;
+    /* border-collapse: collapse; */
+    /* border: 1px solid black; */
+  }
+  .amountToWord{
+    font-family: 'cursive';
+    font-size: large;
+    margin-top: 18px;
+    text-transform: uppercase; 
+    color:rgb(0, 0, 0);
+  }
+  /* #printTable{
+    margin-left: 20%;
+  } */
+  @media print{body{
+    margin-left: 25px !important; 
+    
+  } }

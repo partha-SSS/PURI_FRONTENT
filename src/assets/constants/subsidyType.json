@@ -1,0 +1,78 @@
+[
+    {
+        "sub_desc": "DIC",
+        "sub_id": 10611
+    },
+    {
+        "sub_desc": "CADA",
+        "sub_id": 10612
+    },
+    {
+        "sub_desc": "BSKP",
+        "sub_id": 10613
+    },
+    {
+        "sub_desc": "DRDA",
+        "sub_id": 10614
+    },
+    {
+        "sub_desc": "FFDA",
+        "sub_id": 10615
+    },
+    {
+        "sub_desc": "Computer",
+        "sub_id": 10617
+    },
+    {
+        "sub_desc": "Interest Subsidy From Govt.",
+        "sub_id": 10618
+    },
+    {
+        "sub_desc": "DD Sericulture",
+        "sub_id": 10619
+    },
+    {
+        "sub_desc": "WB SC/ST & F. Corpn",
+        "sub_id": 10620
+    },
+    {
+        "sub_desc": "On Farm Water Management",
+        "sub_id": 10621
+    },
+    {
+        "sub_desc": "SGSY",
+        "sub_id": 10622
+    },
+    {
+        "sub_desc": "Rural Godown",
+        "sub_id": 10650
+    },
+    {
+        "sub_desc": "Margin Money From WB SC/ST Dev.",
+        "sub_id": 10416
+    },
+    {
+        "sub_desc": "Margin Money For Loan",
+        "sub_id": 10417
+    },
+    {
+        "sub_desc": "Margin Money From KVIB",
+        "sub_id": 10420
+    },
+    {
+        "sub_desc": "Margin money For PMEGP From KVIB/DIC",
+        "sub_id": 10422
+    },
+    {
+        "sub_desc": "Venture Capital fund from NABARD",
+        "sub_id": 10624
+    },
+    {
+        "sub_desc": "DEDS Subsidy",
+        "sub_id": 10626
+    },
+    {
+        "sub_desc": "Poultry Subsidy From NABARD",
+        "sub_id": 10627
+    }
+]

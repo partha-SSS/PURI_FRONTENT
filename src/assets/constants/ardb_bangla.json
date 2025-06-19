@@ -1,0 +1,147 @@
+[
+    {
+      "ardB_CD": "1",
+      "name": "South 24 Parganas ARDB Ltd.",
+      "dist_code": 304.0,
+      "trans":"দক্ষিণ ২৪ পরগনা"
+    },
+    {
+      "ardB_CD": "2",
+      "name": "Contai ARDB Ltd.",
+      "dist_code": 19.0,
+      "trans":"কন্টাই"
+    },
+        
+    {
+      "ardB_CD": "3",
+      "name": "Tamluk ARDB Ltd.",
+      "dist_code": 317.0,
+      "trans":"তমলুক"
+    },
+    {
+      "ardB_CD": "4",
+      "name": "Ghatal ARDB Ltd.",
+      "dist_code": 318.0,
+      "trans": "ঘাটাল"
+    },
+    {
+      "ardB_CD": "5",
+      "name": "Jhargram ARDB Ltd.",
+      "dist_code": 703.0,
+      "trans": "ঝাড়গ্রাম"
+    },
+    {
+      "ardB_CD": "6",
+      "name": "Midnapore ARDB Ltd.",
+      "dist_code": 318.0,
+      "trans": "মেদিনীপুর"
+    },
+    {
+      "ardB_CD": "7",
+      "name": "Alipurduar ARDB Ltd.",
+      "dist_code": 664.0,
+      "trans": "আলিপুরদুয়ার"
+    },
+    {
+      "ardB_CD": "8",
+      "name": "Jalpaiguri ARDB Ltd.",
+      "dist_code": 314.0,
+      "trans": "জলপাইগুড়ি"
+    },
+    {
+      "ardB_CD": "9",
+      "name": "Coochbehar ARDB Ltd.",
+      "dist_code": 308.0,
+      "trans": "কুচবিহার"
+    },
+    {
+      "ardB_CD": "10",
+      "name": "Dakshin Dinajpur ARDB Ltd.",
+      "dist_code": 310.0,
+      "trans": "দক্ষিণ দিনাজপুর"
+    },
+    {
+      "ardB_CD": "11",
+      "name": "Raiganj ARDB Ltd.",
+      "dist_code": 311.0,
+      "trans": "রায়গঞ্জ"
+    },
+    {
+      "ardB_CD": "12",
+      "name": "Malda ARDB Ltd.",
+      "dist_code": 316.0,
+      "trans": "মালদা"
+    },
+    {
+      "ardB_CD": "15",
+      "name": "North 24 Parganas ARDB Ltd.",
+      "dist_code": 303.0,
+      "trans": "উত্তর ২৪ পরগনা"
+    },
+    {
+      "ardB_CD": "16",
+      "name": "Kandi ARDB Ltd.",
+      "dist_code": 319.0,
+      "trans": "কান্দি"
+    },
+    {
+      "ardB_CD": "17",
+      "name": "Murshidabad ARDB Ltd.",
+      "dist_code": 319.0,
+      "trans": "মুর্শিদাবাদ"
+    },
+    {
+      "ardB_CD": "18",
+      "name": "Hooghly ARDB Ltd.",
+      "dist_code": 312.0,
+      "trans": "হুগলি"
+    },
+    {
+      "ardB_CD": "19",
+      "name": "Arambagh ARDB Ltd.",
+      "dist_code": 312.0,
+      "trans": "আরামবাঘ"
+    },
+    {
+      "ardB_CD": "20",
+      "name": "Birbhum ARDB Ltd.",
+      "dist_code": 307.0,
+      "trans": "বীরভূম"
+    },
+    {
+      "ardB_CD": "21",
+      "name": "Rampurhat ARDB Ltd.",
+      "dist_code": 307.0,
+      "trans": "রামপুরহাট"
+    },
+    {
+      "ardB_CD": "22",
+      "name": "Bankura ARDB Ltd.",
+      "dist_code": 305.0,
+      "trans": "বাঁকুড়া"
+    },
+    {
+      "ardB_CD": "23",
+      "name": "Howrah ARDB Ltd.",
+      "dist_code": 313.0,
+      "trans": "হাওড়া"
+    },
+    {
+      "ardB_CD": "24",
+      "name": "Nadia ARDB Ltd.",
+      "dist_code": 320.0,
+      "trans": "নদীয়া"
+    },
+    {
+      "ardB_CD": "25",
+      "name": "Katwa-Kalna ARDB Ltd.",
+      "dist_code": 306.0,
+      "trans": "কাটোয়া - কালনা"
+    },
+    {
+      "ardB_CD": "26",
+      "name": "Burdwan ARDB Ltd.",
+      "dist_code": 704.0,
+      "trans": "বর্ধমান"
+    }
+  ]

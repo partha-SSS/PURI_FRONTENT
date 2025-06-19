@@ -1,0 +1,32 @@
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('../../assets/fonts/fontawesome-webfont.eot?v=4.7.0');
+  src: url('../../assets/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'),
+  url('../../assets/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2'),
+  url('../../assets/fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'),
+  url('../../assets/fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'),
+  url('../../assets/fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+.fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.sticky-footer{background-color: #8ebd00; text-align: center; color: #044800;}
+.sticky-footer a{color: #044800; text-decoration: underline;}
+.sticky-footer a:hover{text-decoration: none;}
+
+
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  /* background-color: yellow; */
+  /* padding: 50px; */
+  /* font-size: 20px; */
+}

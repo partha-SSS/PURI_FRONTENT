@@ -1,0 +1,223 @@
+
+<loading *ngIf="isLoading"></loading>
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add New Locker</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+   
+    <!-- <form [formGroup]="locker">
+      <div class="col-12">
+        <div class="form-row">
+          <div class="form-group col-4">
+            <small for="acc_type">Locker Type<span class="text-danger">*</span></small>
+              <select  style="border-radius: 1.25rem!important;"  class="form-control form-control-sm custom-scrollbar"  formControlName="l_type" >
+                  <option *ngFor="let l_type of letterType" [selected]="l_type.id">{{ l_type.type }}</option>
+                  </select>
+            </div>
+            <div class="form-group col-4">
+            <small for="acc_type">Effective From<span class="text-danger">*</span></small>
+              <input type="date" style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="eff_date">
+            </div>
+            <div class="form-group col-4">
+              <small for="acc_type">Locker Rent<span class="text-danger">*</span></small>
+              <input type="number" style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="l_rate">
+
+            </div>
+          </div>
+      </div>
+    </form> -->
+    
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SaveLocker()">Save</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button> -->
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add Locker</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" *ngIf="editMode" (click)="SaveLocker()">Update</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" *ngIf="newMode" (click)="SaveLocker()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="accDtlsFrm.reset()">Reset</button>
+  </div>
+</div>
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-12 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <form [formGroup]="accDtlsFrm">
+        <div class="row">
+          <div class="col-8">
+            <h4 class="customHeader">Loan Details</h4>
+            <div class="form-row">
+              <div class="form-group col-6">
+                <small for="acct_num">Search by Loan ID / Customer Name / Phone number
+                </small>
+                  <div class="input-group">
+                  <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                  name="x-field-1" autocomplete="new-field-1"
+                  (input)="clearSuggestedCust()">
+                  <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+                </div>
+                </div>
+    
+                <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+                  <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                    <thead>
+                      <tr>
+                        <th scope="col">Acc#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Outstanding</th>
+                        <th scope="col">Guardian Name</th>
+                        <th scope="col">Address</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                        <td scope="row">{{cust.loan_id}}</td>
+                        <td>{{cust.cust_name}}</td>
+                        <td style="text-align: center;">{{cust.phone}}</td>
+                        <td>{{cust.guardian_name}}</td>
+                        <td>{{cust.present_address}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+                  *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)"> -->
+                  <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+                  *ngIf="shownoresult">
+                  <strong class="text-danger">" {{this.fd.acct_num.value}} " does not match with any customer</strong>
+                </div>
+              </div>
+              
+              <div class="form-group col-6">
+                <small for="cust_name">Party Name</small>
+               
+                <input type="text" class="form-control form-control-sm" formControlName="cust_name" id="cust_name"
+                  placeholder="Name" [readonly]="true">
+               
+              </div>
+              <div class="form-group col-6">
+                <small for="intt_recev">Intt Receivable</small>
+                <input type="text" class="form-control form-control-sm" formControlName="intt_recev" id="intt_recev"
+                  [readonly]="true">
+              </div>
+              <div class="form-group col-6">
+                <small for="cheque_facility_flag">Total Principal</small>
+                
+                <input type="text" class="form-control form-control-sm" formControlName="principal" id="principal"
+                  [readonly]="true">
+              </div>
+
+              <div class="form-group col-4">
+                <small for="constitution_cd">Current Interest</small>
+                <input type="text" class="form-control form-control-sm" formControlName="curr_intt" id="curr_intt"
+                  [readonly]="true">
+              </div>
+              <div class="form-group col-2">
+                <small for="curr_intt_rate">Interest Rate</small>
+                <input type="text" class="form-control form-control-sm" formControlName="curr_intt_rate"
+                  id="curr_intt_rate" [readonly]="true">
+              </div>
+              <div class="form-group col-6">
+                <small for="acc_close_dt">Current Principal</small>
+                <input type="text" class="form-control form-control-sm" formControlName="curr_principal"
+                  id="curr_principal" [readonly]="true">
+              </div>
+
+              <div class="form-group col-4">
+                <small for="clr_bal">Overdue Interest</small>
+                <input type="text" class="form-control form-control-sm" formControlName="ovd_intt" id="ovd_intt"
+                  [readonly]="true">
+              </div>
+              <div class="form-group col-2" hidden>
+                <small for="ovd_intt_rate">Ovd Interest Rt</small>
+                <input type="text" class="form-control form-control-sm" formControlName="ovd_intt_rate"
+                  id="ovd_intt_rate" [readonly]="true">
+              </div>
+              <div class="form-group col-6">
+                <small for="oprn_instr_cd">Overdue Principal</small>
+                <input type="text" class="form-control form-control-sm" formControlName="ovd_principal"
+                  id="ovd_principal" [readonly]="true">
+              </div>
+              <div class="form-group col-2">
+                <small for="loan_status">Loan Status</small>
+                <input type="text" class="form-control form-control-sm" [style.color]="getTextColor()" formControlName="loan_status"  id="loan_status"
+                  [readonly]="true">
+              </div>
+              
+            </div>
+            
+          </div>
+          <div class="col-4">
+            <h4 class="customHeader">Letter Charges Entry</h4>
+            <div class="form-group col-12">
+              <small for="acc_type">Letter Type<span class="text-danger">*</span></small>
+                <select    class="form-control form-control-sm custom-scrollbar"  formControlName="letter_type" >
+                    <option *ngFor="let l_type of letterType" [value]="l_type.id">{{ l_type.type }}</option>
+                    </select>
+              </div>
+              <div class="form-group col-12">
+                <small for="acc_type">Count<span class="text-danger">*</span></small>
+                <input type="text" class="form-control form-control-sm" formControlName="letter_count" 
+                 >
+              </div>
+              <div class="form-group col-12">
+                <small for="acc_type">Date<span class="text-danger">*</span></small>
+                  <input type="date"  class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="send_date">
+                </div>
+                <div class="form-group col-12">
+                  <small for="acc_type">Amount<span class="text-danger">*</span></small>
+                  <input type="number"  class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="letter_amount" >
+    
+                </div>
+          </div>
+      
+         
+        </div>
+      </form> 
+      </div>
+        </div>
+  </div>
+
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button> -->
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add Locker</button> -->
+
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" *ngIf="editMode" (click)="SaveLocker()">Update</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" *ngIf="newMode" (click)="SaveLocker()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="accDtlsFrm.reset()">Reset</button>
+
+  </div>
+</div>

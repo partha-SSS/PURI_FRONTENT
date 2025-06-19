@@ -1,0 +1,84 @@
+
+  
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 shadow-sm mb-4 bg-white p-3" style="text-align: center;">
+    <p>Click print button for print passbook fastpage</p>
+    <button mat-raised-button class="btn btn-primary"  
+    printSectionId="fastPage" ngxPrint [useExistingCss]="true">Print FastPage</button> &nbsp;
+  </div>
+<!-- 
+<div id="fastPage" style="font-family:Arial, Helvetica, ui-sans-serif;font-size:14px;" >
+    <div style="margin-top: 50%; " >&nbsp;</div>
+    <div class="form-row" style="margin-left: 3%;">
+      <div class="form-group col-6"><b>A/C No:  </b>{{suggestedCustomer[0].acc_num}}</div>     
+      <div class="form-group col-6"><b>CIF:  </b>{{masterModel.tmdeposit.cust_cd}}</div>     
+    </div>
+     <div class="form-row" style="margin-left: 3%;padding-top: 5px;" >
+      <div class="form-group col-6"><b>Name:  </b>{{suggestedCustomer[0].cust_name}}</div>
+      <div class="form-group col-6"><b>Branch:  </b> {{branchName}}</div>
+    </div>
+      <div class="form-row" style="margin-left: 3%;padding-top: 5px;" >
+      <div><b>Guardian Name:  </b>{{suggestedCustomer[0].guardian_name}} </div>
+    </div>
+    <div class="form-row"style="margin-left: 3%;padding-top: 5px;"> 
+      <div><b>Joint Holder's Name:  </b> {{joinHold}}</div>
+    </div>
+    <div class="form-row"style="margin-left: 3%;padding-top: 5px;"> 
+      <div><b>Address:  </b>{{suggestedCustomer[0].present_address}}</div>
+    </div>
+    <div>
+        <div class="form-row" style="padding-left: 3%;">
+            <div style="width: 90%;"><b>Occupation:  </b>{{custDtls.occupation}} </div>
+        </div>
+        <div class="form-row" style="padding-left: 3%;padding-top: 5px;">
+            <div style="width:90%;"><b>Contact No:  </b>{{suggestedCustomer[0].phone}}</div>
+        </div>
+        <div class="form-row" style="padding-left: 3%;padding-top: 5px;">
+            <div style="width:90%;"><b>Mode of Operation:</b>{{oprn_instr_desc}}</div>
+        </div>
+        <div class="form-row" style="padding-left: 3%;padding-top: 5px;">
+          <div style="width: 100%;"><b>Issue Date:  </b>{{curDay}}</div>
+          <div style="text-align: right;width: 100%;"><b>Branch Manager / Authorised Signatory</b></div>
+        </div>
+    </div>
+  </div> -->
+ 
+
+  <div id="fastPage" style="font-family:Arial, Helvetica, ui-sans-serif;font-size:22px;" hidden>
+    <div style="margin-top: 50%; ">&nbsp;</div>
+    
+    <div class="form-row" style="padding-left: 10%;">
+        <div style="width: 30%;"><b style="font-size: x-large;">A/C No: {{suggestedCustomer[0].acc_num}} </b></div>
+        <div style="text-align: right;width: 30%;"><b style="font-size: x-large;">Branch: {{branchName}} </b> </div>
+        <div style="text-align: right;width: 30%;"><b style="font-size: x-large;">CIF:  {{custCD}}</b></div>
+    </div>
+      <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+          <div style="width: 60%;"><b style="font-size: x-large;">Name:  {{this.custDtls?.cust_name}}</b></div>
+          <div style="width: 30%;text-align: right;"><b style="font-size: x-large;">Phone No:  {{custDtls?.phone?custDtls.phone:'N/A'}}</b></div>
+     </div>
+     <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+      <div style="width: 50%;"><b style="font-size: x-large;">Mode of Operation: {{oprn_instr_desc?oprn_instr_desc:'N/A'}}</b></div>
+      <div style="width: 40%;text-align: right;"><b style="font-size: x-large;">Occupation:  {{custDtls?.occupation?custDtls.occupation:'N/A'}} </b></div>
+     </div>
+     <div class="form-row" style="padding-left: 10%;padding-top: 5px;" >
+      <div><b style="font-size: x-large;">Joint Holder's Name:  {{joinHold?joinHold:'N/A'}}</b> </div>
+    </div>
+      <div class="form-row" style="padding-left: 10%;padding-top: 5px;" >
+      <div><b style="font-size: x-large;">Guardian Name:  {{custDtls?.guardian_name?custDtls.guardian_name:'N/A'}}</b></div>
+    </div>
+    
+    <div class="form-row"style="padding-left: 10%;padding-top: 5px;"> 
+      <div><b style="font-size: x-large;">Address:  {{this.custDtls?.present_address}}</b></div>
+    </div>
+    
+    
+    <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+      <div style="width: 40%;"><b style="font-size: x-large;">Issue Date: {{curDay}} </b></div>
+      <div style="width: 50%;text-align: right;"><b style="font-size: x-large;">Branch Manager / Authorised Signatory</b></div>
+    </div>
+    
+   
+    </div>
+ 
+ 
+  
+

@@ -1,0 +1,84 @@
+
+.column {
+    float: left;
+    width: 50%;
+  }
+
+        
+      /* Specify the background color to be
+      shown when checkbox is checked */
+      input[type=checkbox]:hover {
+       cursor: pointer;
+      }
+    
+     input[type=checkbox] {
+      height: 30px !important;
+      appearance:none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding: 7px;
+      background-color: rgb(255, 255, 255);
+      box-shadow: 0 1px 2px rgb(248, 6, 6);
+      border-radius:50%;
+   }
+   input[type=checkbox]:checked {
+      background-color: #ffffff!important;;
+      box-shadow: 0 1px 2px rgb(4, 119, 4)!important;;
+   }
+   input[type=checkbox]:checked:after {
+      content:'✔';
+      color: #044800;
+      font-weight: 700;
+   }
+   input[type=checkbox]::after {
+    
+    content:"X";
+    color: red;
+    font-weight: 700;
+ }
+
+
+ .suggestions{
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  /*  */
+  position: relative;
+  background-color: rgb(255, 255, 255);
+  z-index: 99;
+  width: 200px;
+  height: auto;
+  max-height: 300px;
+  overflow: auto;
+  /*  */
+  border: 1px solid #ddd;
+  padding: 20px !important;
+}
+#customers1 {
+  text-align: center !important;
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: small;
+}
+
+#customers1 td, #customers1 th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center !important;
+  
+}
+
+#customers1 tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers1 tr:hover {background-color: #aeeea6;}
+
+#customers1 th {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  text-align: left;
+  background-color: #044800;
+  color: white;
+  font-size:small
+}
+        
+      

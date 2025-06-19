@@ -1,0 +1,7 @@
+.suggestions{
+  position: absolute;
+  background-color: white;
+  margin-left: 3%;
+  z-index: 1;
+  font-size: x-small;
+}

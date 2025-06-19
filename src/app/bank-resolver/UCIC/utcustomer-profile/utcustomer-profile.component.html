@@ -1,0 +1,789 @@
+
+<ng-template #buttonDiv> 
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClearClick()">New</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onRetrieveClick()">Retrieve</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="!enableModifyAndDel"
+      (click)="onModifyClick()">Modify</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="f.cust_type.value ==='' || f.first_name.value ===''
+      || f.guardian_name.value ===''" (click)="openModal(kycContent)">Kyc</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="f.cust_type.value ==='' || f.first_name.value ===''
+      || f.guardian_name.value ===''" (click)="openUploadModal(UploadImg)">Upload Document</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="f.cust_type.value ==='' || f.first_name.value ===''
+      || f.guardian_name.value ===''" (click)="openModal2(netWorth)">NetWorth Statement</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClearClick()">Clear</button>
+    
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="!enableModifyAndDel"
+      (click)="onDelClick()">Delete</button> -->
+      <button mat-raised-button type="button" #saveBtn class="btn btn-primary btn-sm ml-1 mr-1" (click)="onSaveClick()" [disabled]="f.cust_type.value ==='' || f.first_name.value ===''
+    || f.guardian_name.value ==='' || _isDisabled ">Save</button>
+  </div>
+</div>
+</ng-template>
+<ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div *ngIf="showMsgs && showMsgs.length > 0" class="col-12">
+      <div *ngFor="let showMsg of showMsgs">
+        <div *ngIf="showMsg.Show" class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+        'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+         <strong >{{showMsg.Message}}</strong>
+         <button type="button" class="close" data-dismiss="alert" (click)="RemoveMessage(showMsg)" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+      </div>
+    </div>
+    <h4 class="customHeader">Customer Personal Details:</h4>
+    <form [formGroup]="custMstrFrm">
+      <div class="form-row">
+        <div class="form-group col-1">
+          <small for="cust_cd">Customer ID</small>
+          <input type="text" class="form-control form-control-sm text-capitalize" formControlName="cust_cd" id="cust_cd"
+            placeholder="Customer ID">
+        </div>
+        <div class="form-group col-2">
+
+          <small for="cust_name" *ngIf="!retrieveClicked">Name</small>
+          <small for="cust_name" *ngIf="retrieveClicked">Search name code phone</small>
+          <!-- <input [(ngModel)]="suggestedCustomer"
+          [typeahead]="states"
+          class="form-control"> -->
+          <div class="input-group">
+            <input type="text" class="form-control form-control-sm mkUpper"  autocomplete="chrome-off" formControlName="cust_name"
+            id="cust_name" placeholder="Name" (input)="onChangeName()">
+        <div class="input-group-append">
+        <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" style="font-size:x-small" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+
+        </div>    
+          </div>
+       
+<ng-container>
+  <div class="suggestions border p-2 " style="width: 150%;"
+  *ngIf="suggestedCustomer && suggestedCustomer!=null">
+
+
+      <!-- <strong> [ Customer Cd / Phone ] Name </strong>
+      <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+        (click)="SelectCustomer(cust)">{{'[' + cust.cust_cd + ' / '
+        + ((null === cust.phone) ? '' : cust.phone) +'] '
+        + cust.cust_name}}
+      </p> -->
+       
+    <table id="customers1">
+      <tr>
+        <th> Customer Code / Phone</th>
+        <th> Name</th>
+        <th>Guardian Name</th>
+        <th> Address</th>
+      </tr>
+      <tbody *ngFor="let cust of suggestedCustomer" >
+        <tr  (click)="SelectCustomer(cust)">
+          <td>
+            {{cust.cust_cd}}  {{((null === cust.phone) ? '' : ' / '+ cust.phone)}}
+          </td>
+          <td>
+            {{cust.cust_name}}
+          </td>
+          <td>
+            {{cust.guardian_name}}
+          </td>
+          <td>
+            {{cust.permanent_address}}
+          </td>
+        </tr>
+       
+      </tbody>
+      
+    </table>
+    </div>
+</ng-container>
+        
+          <div class="suggestions border p-2 " style="width: 200%; font-size: small;"
+          *ngIf="showNoResult">
+         <strong class="text-danger">" {{this.f.cust_name.value}} " does not match with any customer</strong>
+          </div> 
+          <!-- <input type="text" class="form-control form-control-sm"  autocomplete="chrome-off" formControlName="cust_name"
+            id="cust_name" placeholder="Name" [readonly]="true" (input)="suggestCustomer()" (focusout)="hide()">
+          <div class="suggestions border p-2" style="width: 150%;"
+            *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+            <strong> [ Customer Cd / Phone ] Name </strong>
+            <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+              (click)="SelectCustomer(cust)">{{'[' + cust.cust_cd + ' / '
+              + ((null === cust.phone) ? '' : cust.phone) +'] '
+              + cust.cust_name}}</p>
+          </div>
+          <div class="suggestions border p-2" style="width: 200%; font-size: small;"
+          *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+          <strong class="text-danger">" {{this.f.cust_name.value}} " does not match with any customer</strong>
+          </div> -->
+        </div>
+        <div class="form-group col-1">
+          <small for="cust_type">Customer Type <span class="text-danger">*</span></small>
+          <select id="cust_type" class="form-control form-control-sm" formControlName="cust_type" (change)="changeCustType($event)">
+            <option selected [readonly]="true">Choose...</option>
+            <option value="M">Member</option>
+            <option value="N">Nominal Member</option>
+            <option value="C">Customer</option>
+            <option value="O">Organization</option>
+          </select>
+        </div>
+        <div class="form-group col-1">
+          <small for="title">Title<span class="text-danger">*</span></small>
+          <select id="title" class="form-control form-control-sm" formControlName="title">
+            <option *ngIf="titles" [readonly]="true">Choose</option>
+            <option *ngFor="let title of titles" [value]="title.title_code">{{title.title}}</option>
+          </select>
+        </div>
+        <div class="form-group col-2">
+          <small for="first_name">First Name <span class="text-danger">*</span></small>
+          <input type="text" class="form-control form-control-sm mkUpper" formControlName="first_name"
+            id="first_name" placeholder="First Name" (input)="onNameChange()" autocomplete="chrome-off">
+        </div>
+        <div class="form-group col-2">
+          <small for="middle_name">Middle Name</small>
+          <input type="text" class="form-control form-control-sm mkUpper" formControlName="middle_name"
+            id="middle_name" placeholder="Middle Name" (input)="onNameChange()" autocomplete="chrome-off">
+        </div>
+        <div class="form-group col-2">
+          <small for="last_name">Last Name <span class="text-danger">*</span></small>
+          <input type="text" class="form-control form-control-sm mkUpper" formControlName="last_name"
+            id="last_name" placeholder="Last Name" (input)="onNameChange()" autocomplete="chrome-off">
+        </div>
+        <div class="form-group col-1">
+          <small for="old_cust_cd">Member ID </small>
+          <input type="text" class="form-control form-control-sm mkUpper" formControlName="old_cust_cd"
+            id="old_cust_cd"  autocomplete="chrome-off">
+        </div>
+      </div> <!-- form group row end -->
+      <div class="form-row" >
+        <div class="form-group col-3" *ngIf="!organizationMode">
+          <small for="father_name">Father Name <span class="text-danger">*</span></small>
+          <input type="text" class="form-control form-control-sm mkUpper" (change)="getGuardian()" formControlName="father_name"
+            id="father_name" placeholder="Father Name">
+        </div>
+        <div class="form-group col-3">
+          <small for="guardian_name">Guardian Name <span class="text-danger">*</span></small>
+          <input type="text" class="form-control form-control-sm mkUpper" formControlName="guardian_name"
+            id="guardian_name" placeholder="Guardian Name">
+        </div>
+        <!-- <div class="form-group col-1">
+          <small for="sex">Guardian Relation <span class="text-danger"></span></small>
+          <select id="lbr_status" class="form-control form-control-sm" formControlName="lbr_status">
+            <option value="" selected [readonly]="true">Choose</option>
+            <option *ngFor="let rel of lbr_status" value="{{rel.val}}">{{rel.val}}</option>
+           
+          </select>
+        </div> -->
+        <div class="form-group col-1">
+          <small for="lbr_status">Guardian Relation</small>
+          <select id="lbr_status" class="form-control form-control-sm" formControlName="lbr">
+            <option value="" selected [readonly]="true">Choose</option>
+            <option *ngFor="let lbr of lbr_status" value="{{lbr.val}}">{{lbr.val}}</option>
+           
+          </select>
+        </div>
+        <div class="form-group col-2" *ngIf="!organizationMode">
+          <small for="dt_of_birth">Date Of Birth <span class="text-danger">*</span></small>
+          <!-- <input type="date" class="form-control form-control-sm" (change)="onDobChange()" formControlName="dt_of_birth" id="dt_of_birth"
+            placeholder="Date of Birth"> -->
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenDOBdp"
+              (bsValueChange)="onDobChange($event)" [readonly]="true" formControlName="dt_of_birth" id="dt_of_birth">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="isOpenDOBdp = !isOpenDOBdp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-1" *ngIf="!organizationMode">
+          <small for="age">Age</small>
+          <input type="number" class="form-control form-control-sm" formControlName="age" id="age" [readonly]="true"
+            placeholder="Age">
+        </div>
+        <div class="form-group col-1" *ngIf="!organizationMode">
+          <small for="sex">Sex <span class="text-danger">*</span></small>
+          <select id="sex" class="form-control form-control-sm" formControlName="sex">
+            <option selected [readonly]="true">Choose...</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+            <option value="O">Others</option>
+          </select>
+        </div>
+        <div class="form-group col-1" *ngIf="!organizationMode">
+          <small for="marital_status">Marital Status</small>
+          <select id="marital_status" class="form-control form-control-sm" formControlName="marital_status">
+            <option selected [readonly]="true">Choose...</option>
+            <option value="Married">Married</option>
+            <option value="Single">Single</option>
+            <option value="O">Others</option>
+          </select>
+        </div>
+        
+        <div class="form-group col-2">
+          <small for="catg_cd">Category <span class="text-danger">*</span></small>
+          <select id="catg_cd" class="form-control form-control-sm" formControlName="catg_cd">
+            <option *ngIf="categories">Choose</option>
+            <option *ngFor="let category of categories" [value]="category.catg_cd" >{{category.catg_desc}}</option>
+          </select>
+        </div>
+        <div class="form-group col-1">
+          <small for="community">Community <span class="text-danger">*</span></small>
+          <select id="community" class="form-control form-control-sm" formControlName="community">
+            <option selected [readonly]="true">Choose...</option>
+            <option value="1">Hindu</option>
+            <option value="2">Muslim</option>
+            <option value="3">Others</option>
+          </select>
+        </div>
+        <div class="form-group col-1">
+          <small for="caste">Caste <span class="text-danger">*</span></small>
+          <select id="caste" class="form-control form-control-sm" formControlName="caste">
+            <option selected [readonly]="true">Choose...</option>
+            <option value="1">General</option>
+            <option value="2">SC</option>
+            <option value="3">ST</option>
+            <option value="4">OBC</option>
+          </select>
+        </div>
+        <div class="form-group col-1">
+          <small for="nationality">Nationality <span class="text-danger">*</span></small>
+          <select id="nationality" class="form-control form-control-sm" formControlName="nationality">
+            <option selected [readonly]="true">Choose...</option>
+            <option value="INDIAN">Indian</option>
+            <option value="Chinese">Chinese</option>
+            <option value="BANGLADESHI">Bangladeshi</option>
+            <option value="NEPALESE">Nepalese</option>
+            <option value="PAKISTANI">Pakistani</option>
+            <option value="SRI LANKAN">Sri Lankan</option>
+            <option value="AUSTRALIAN">Australian</option>
+            <option value="FRENCH">French</option>
+            <option value="GERMAN">German</option>
+            <option value="ITALIAN">Italian</option>
+            <option value="AMERICAN ">American </option>
+            <option value="BRITISH">British</option>
+            <option value="SAUDI">Saudi</option>
+            <option value="PORTUGUESE">Portuguese</option>
+            <option value="MALAYSIAN">Malaysian</option>
+            <option value="MEXICAN">Mexican</option>
+          </select>
+        </div>
+        <div class="form-group col-2">
+          <small for="phone">Email</small>
+          <input type="email" class="form-control form-control-sm" formControlName="email_id" id="email_id"
+            placeholder="Email">
+        </div>
+        <div class="form-group col-2">
+          <small for="phone">Phone Number <span class="text-danger">*</span> </small>
+          <input type="tel" class="form-control form-control-sm" formControlName="phone" id="phone"
+            placeholder="Phone Number" maxlength="12">
+        </div>
+        <div class="form-group col-1 mt-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="sms_flag" [attr.checked]="this.f.sms_flag.value=='Y'" formControlName="sms_flag">
+            <small class="form-check-small" for="sms_flag">
+              SMS
+            </small>
+          </div>
+        </div>
+      </div><!-- form group row end -->
+      <!-- <hr> -->
+      <h4 class="customHeader">Correspondence Details:</h4>
+      <div class="form-row">
+        <div class="form-group col-2">
+          <small for="state">State</small>
+          <select id="state" class="form-control form-control-sm"  formControlName="state">
+            <option *ngIf="states" [readonly]="true">Choose</option>
+            <option *ngFor="let state of states" [value]="state.state_cd">{{state.state_name}}</option>
+          </select>
+        </div>
+        <div class="form-group col-2">
+          <small for="dist">District</small>
+          <select id="dist" class="form-control form-control-sm"  formControlName="dist">
+            <option *ngIf="districts" >Choose</option>
+            <option *ngFor="let district of districts" [value]="district.dist_cd">{{district.dist_name}}</option>
+          </select>
+        </div>
+        <div class="form-group col-2">
+          <small for="state">Block</small>
+          <select id="state" class="form-control form-control-sm"  formControlName="block_cd">
+            <option *ngIf="blocks" [readonly]="true">Choose</option>
+            <option *ngFor="let state of blocks" [value]="state.block_cd">{{state.block_name}}</option>
+          </select>
+        </div>
+        <div class="form-group col-1">
+          <small for="pin">Pin Code</small>
+          <input type="text" class="form-control form-control-sm"
+          formControlName="pin" id="pin" maxlength="6" (input)="onPininput($event)" placeholder="Pin code">
+        </div>
+        <!-- <div class="form-group col-1" hidden>
+          <small for="vill_cd">vill cd</small>
+          <input type="text" class="form-control form-control-sm"
+          formControlName="vill_cd" id="vill_cd" placeholder="vill cd">
+        </div>
+        <div class="form-group col-2">
+          <small for="vill_name">Village <span class="text-danger">*</span> </small>
+          <input type="text" class="form-control form-control-sm"
+          formControlName="vill_name"   (keyup)="onshow($event)" placeholder="Village"> -->
+          <!-- <select id="vill_cd" class="form-control form-control-sm" formControlName="vill_cd"
+            (change)="onVillageChnage($event.target.value)">
+            <option *ngIf="villages" [readonly]="true">Choose</option>
+            <option *ngFor="let village of villages" [value]="village.vill_cd">{{village.vill_name}}</option>
+          </select> 
+        </div>-->
+        <!-- <ng-container>
+          <div class="suggestions border p-2 " style="width: 40%; top: 40%; left: 42%;"
+          *ngIf="showHideVill">
+               
+            <table id="customers1">
+              <tr>
+                <th> Village Name</th>
+                <th> Service Area Name</th>
+                <th>Block Name</th>
+              </tr>
+              <tbody *ngFor="let village of villages1" >
+                <tr  (click)="onVillageChnage(village.vill_cd,village.service_area_cd,village.block_cd)">
+                  <td>
+                    {{village.vill_name}}
+                  </td>
+                  <td>
+                    {{village.service_area_name}}
+                  </td>
+                  <td>
+                    {{village.block_name}}
+                  </td>
+                </tr>
+               
+              </tbody>
+              
+            </table>
+            </div>
+        </ng-container> -->
+        <!-- <div class="form-group col-2">
+          <small for="service_area_cd">G.P <span class="text-danger">*</span> </small>
+          <input  type="text" class="form-control form-control-sm d-none" formControlName="service_area_cd"
+            id="service_area_cd">
+          <input [readonly]="true" type="text" class="form-control form-control-sm" formControlName="service_area_cd_desc"
+            id="service_area_cd_desc">
+        </div> -->
+        <!-- <div class="form-group col-2">
+          <small for="block_cd">Block <span class="text-danger">*</span> </small>
+          
+          <input type="text" class="form-control form-control-sm d-none" formControlName="block_cd" id="block_cd">
+          <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="block_cd_desc" id="block_cd_desc">
+        </div> -->
+        <div class="form-group col-1">
+          <small for="occupation">Occupation</small>
+          <select id="occupation" class="form-control form-control-sm" formControlName="occupation">
+            <option value="Farmer">Farmer</option>
+            <option value="Service">Service</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Student">Student</option>
+            <option value="Self_Employee">Self Employee</option>
+            <option value="Bussiness">Bussiness</option>
+            <option value="Housewife">Housewife</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+      </div> <!-- form group row end -->
+      <div class="form-row">
+        <div class="form-group col-12">
+          <small for="present_address">Present Address <span class="text-danger">*</span> </small>
+          <input type="text" class="form-control form-control-sm mkUpper" id="present_address" formControlName="present_address" (keyup)="setPerAdd($event)"
+            placeholder="Address">
+        </div>
+      </div> <!-- form group row end -->
+      <div class="form-row">
+        <div class="form-group col-12">
+          <small for="permanent_address">Permanent Address <span class="text-danger">*</span> </small>
+          <input type="text" class="form-control form-control-sm mkUpper" id="permanent_address" formControlName="permanent_address"
+            placeholder="Address">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-12">
+          <small for="office_address">Office Address </small>
+          <input type="text" class="form-control form-control-sm mkUpper" id="office_address" formControlName="office_address"
+            placeholder="Address">
+        </div>
+      </div>
+      <div class="form-row">
+        <!-- <div class="form-group col-2">
+          <small for="pan">PAN</small>
+          <input type="text" class="form-control form-control-sm text-uppercase" id="pan" formControlName="pan"
+            placeholder="PAN Number" maxlength="10">
+        </div> -->
+        <div class="form-group col-1">
+          <small for="farmer_type">Farmer Type</small>
+          <select id="farmer_type" class="form-control form-control-sm" formControlName="farmer_type">
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="B">Big</option>
+          </select>
+        </div>
+        
+        <div class="form-group col-1 mt-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="is_weaker" [attr.checked]="this.f.is_weaker.value=='Y'" formControlName="is_weaker">
+            <small class="form-check-small" for="is_weaker">
+              Is weaker
+            </small>
+          </div>
+        </div>
+        <div class="form-group col-1">
+          <small for="email">Ledger No</small>
+          <input type="text" class="form-control form-control-sm" id="ldgr" placeholder="Ledger Number" formControlName="email">
+        </div>
+        <div class="form-group col-2">
+          <small for="monthly_income">Monthly Income</small>
+          <input type="number" class="form-control form-control-sm" id="monthly_income" formControlName="monthly_income"
+            placeholder="Monthly income">
+        </div>
+        
+        <div class="form-group col-2">
+          <small for="date_of_death">Date Of Death</small>
+          <div class="input-group">
+            <input type="text"  (bsValueChange)="onDodChange($event)" placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenDODdp"
+              formControlName="date_of_death" id="date_of_death">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="changeDt()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-2">
+          <small for="status">Customer Status</small>
+          <select id="status" class="form-control form-control-sm" formControlName="status" >
+            <option value="A">Active</option>
+            <option value="D">Death</option>
+          </select>
+        </div>
+      </div> <!-- form group row end -->
+
+      <!-- <hr> -->
+      <div class="form-row">
+      <div class="form-group col-6">
+      <h4 class="customHeader">Share Nominee Details(Only for Members)</h4>
+      <div class="form-row">
+        <div class="form-group col-8">
+          <small for="nominee">Nominee Name</small>
+          <input type="text" class="form-control form-control-sm text-capitalize" formControlName="nominee" id="nominee"
+            placeholder="Nominee Name">
+           
+        </div>
+        <div class="form-group col-4">
+          <small for="nom_relation">Nominee Relation</small>
+          <!-- <input type="text" class="form-control form-control-sm text-capitalize" formControlName="nom_relation"
+            id="nom_relation" placeholder="Nominee Relation"> -->
+            <select id="nom_relation" class="form-control form-control-sm" formControlName="nom_relation">
+              <option value="" selected [readonly]="true">Choose</option>
+              <option *ngFor="let rel of relStatus" value="{{rel.val}}">{{rel.val}}</option>
+             
+            </select>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="form-group col-6">
+      <h4 class="customHeader">Credit Score Details</h4>
+      <div class="form-row">
+        <div class="form-group col-4">
+          <small for="credit_agency">Credit Agency</small>
+          <!-- <input type="text" class="form-control form-control-sm text-capitalize" formControlName="nom_relation"
+            id="nom_relation" placeholder="Nominee Relation"> -->
+            <select id="credit_agency" class="form-control form-control-sm" formControlName="credit_agency">
+              <option value="" selected [readonly]="true">Choose</option>
+              <option value="Experian">Experian</option>
+              <option value="Equifax">Equifax</option>
+              <option value="TransUnion CIBIL">TransUnion CIBIL</option>
+             </select>
+        </div>
+        <div class="form-group col-4">
+          <small for="credit_score">Credit Score</small>
+          <input type="text" class="form-control form-control-sm text-capitalize" formControlName="credit_score" id="credit_score"
+            placeholder="Credit Score">
+           
+        </div>
+        <div class="form-group col-4">
+          <small for="credit_score_dt">Credit Score Date</small>
+          <div class="input-group">
+            <input type="text"   placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="CreditScoreDT"
+              formControlName="credit_score_dt" id="credit_score_dt">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="changeCreditDt()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+         </div>
+        </div>
+      </div>
+    </div>
+      <!-- form group row end -->
+      <!-- <hr>  -->
+      <h4 class="customHeader">Customer ID Proof Details</h4>
+      <div class="form-row" >
+        <div class="form-group col-2" *ngIf="!organizationMode">
+          <small for="pan_status">PAN STATUS<span class="text-danger">*</span></small><br><br>
+          <mat-radio-group aria-label="Select an option" formControlName="pan_status">
+            <mat-radio-button value="P" style="margin-left: 16px;">PAN</mat-radio-button>
+            <mat-radio-button value="F" style="margin-left: 16px;">From 60</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <div class="form-group col-2" *ngIf="!organizationMode">
+          <small for="pan">PAN<span class="text-danger">*</span></small>
+          <input type="text" #pan class="form-control form-control-sm " id="pan" formControlName="pan"  (change)="CheckExistance('PAN')"
+            placeholder="PAN Number" maxlength="10">
+        </div>
+        <div class="form-group col-2" *ngIf="!organizationMode">
+          <small for="aadhar">AADHAR<span class="text-danger">*</span></small>
+          <input type="text" #aadhar class="form-control form-control-sm " id="aadhar" formControlName="aadhar"  (change)="CheckExistance('AAD')"
+            placeholder="Aadhar Number" maxlength="12">
+        </div>
+
+        <div class="form-group col-1">
+          <small for="kyc_photo_type">Photo ID Type</small>
+          <!--  -->
+          <select id="kyc_photo_type" class="form-control form-control-sm" formControlName="kyc_photo_type" (change)="setNull('PIN')">
+            <option *ngIf="KYCTypes" [readonly]="true">Choose</option>
+            <option *ngFor="let KYCType of KYCTypes" [value]="KYCType.kyc_type">{{KYCType.kyc_desc}}</option>
+          </select>
+        </div>
+        <div class="form-group col-2">
+          <small for="kyc_photo_no">Photo ID Number</small>
+          <input type="text" #kycPhotoNo class="form-control form-control-sm" formControlName="kyc_photo_no" (keypress)="noSpecialChars($event,'PIN')" (change)="CheckExistance('PIN')"
+            id="kyc_photo_no" placeholder="Photo ID Number"  [maxlength]="f.kyc_photo_type.value=='P'?'10':f.kyc_photo_type.value=='G'?'12':''">
+        </div>
+        <!-- <div class="form-group col-2">
+          <small for="PhotoId">Upload Photo ID</small>
+          <input [disabled]="f.cust_cd.value === '' || f.cust_cd.value === 0" type="file"
+            class="form-control-file form-control-sm" id="PhotoId">
+        </div> -->
+        <div class="form-group col-1">
+          <small for="kyc_address_type">Address ID Type</small>
+          <select id="kyc_address_type" class="form-control form-control-sm" formControlName="kyc_address_type" (change)="setNull('AIN')">
+            <option *ngIf="KYCTypes" [readonly]="true">Choose</option>
+            <option *ngFor="let KYCType of KYCTypes" [value]="KYCType.kyc_type">{{KYCType.kyc_desc}}</option>
+          </select>
+        </div>
+        <div class="form-group col-2">
+          <small for="kyc_address_no">Address ID Number</small>
+          <input type="text" #kycAddressNo class="form-control form-control-sm" formControlName="kyc_address_no" id="kyc_address_no" (keypress)="noSpecialChars($event,'AIN')" (focusout)="CheckExistance('AIN')"
+            placeholder="Address Id Number " [maxlength] = "f.kyc_address_type.value == 'G' ? '12' : f.kyc_address_type.value == 'P' ? '10' : ''">
+        </div>
+        <!-- <div class="form-group col-2">
+          <small for="addressID">Upload Address ID</small>
+          <input [disabled]="f.cust_cd.value === '' || f.cust_cd.value === 0" type="file"
+            class="form-control-file form-control-sm" id="addressID">
+        </div> -->
+      </div> <!-- form group row end -->
+      <div class="form-row">
+      </div> <!-- form group row end -->
+    </form>
+    <div *ngIf="showMsgs && showMsgs.length > 0" class="col-12">
+      <div *ngFor="let showMsg of showMsgs">
+        <div *ngIf="showMsg.Show" class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+        'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+         <strong >{{showMsg.Message}}</strong>
+         <button type="button" class="close" data-dismiss="alert" (click)="RemoveMessage(showMsg)" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClearClick()">New</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onRetrieveClick()">Retrieve</button>
+   
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="f.cust_type.value ==='' || f.first_name.value ===''
+    || f.guardian_name.value ===''" (click)="openModal(kycContent)">Kyc</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="f.cust_type.value ==='' || f.first_name.value ===''
+    || f.guardian_name.value ===''" (click)="openUploadModal(UploadImg)">Upload Document</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClearClick()">Clear</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onSaveClick()" [disabled]="f.cust_type.value ==='' || f.first_name.value ===''
+    || f.guardian_name.value ===''">Save</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+   
+  </div>
+</div> -->
+<ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+
+<ng-template #kycContent>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">KYC details
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-kyc></app-kyc>
+  </div>
+</ng-template>
+
+<ng-template #UploadImg>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Upload's Section
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-danger" role="alert" *ngIf="errMessage.length > 1">
+          {{errMessage}}
+        </div>
+        <div class="alert alert-success" role="alert" *ngFor="let msg of sucessMsgs">
+          {{msg}}
+        </div>
+      </div>
+      <div class="col-6">
+        <figure class="figure" *ngIf="PHOTO">
+          <img src="{{PHOTO?.img_cont}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block">
+          <figcaption class="figure-caption">Picture</figcaption>
+        </figure>
+        <div class="form-group">
+          <small for="PhotoId">Upload Picture</small>
+          <input (change)="handleFileInput($event.target.files, 'PHOTO')" type="file"
+            class="form-control-file form-control-sm" id="photo" accept="image/*">
+        </div>
+
+      </div>
+      <div class="col-6">
+        <figure class="figure" *ngIf="SIGNATURE">
+          <!-- <img src="{{SIGNATURE}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block"> -->
+          <img src="{{SIGNATURE?.img_cont}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block">
+          <figcaption class="figure-caption">Signature</figcaption>
+        </figure>
+        <div class="form-group">
+          <small for="PhotoId">Upload Signature</small>
+          <input (change)="handleFileInput($event.target.files, 'SIGNATURE')" type="file"
+            class="form-control-file form-control-sm" id="signature" accept="image/*">
+        </div>
+
+      </div>
+      <hr>
+      <div class="col-6">
+        <figure class="figure" *ngIf="ADDRESS">
+          <!-- <img src="{{ADDRESS}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block"> -->
+          <img src="{{ADDRESS?.img_cont}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block">
+          <figcaption class="figure-caption">Photo ID</figcaption>
+        </figure>
+        <div class="form-group">
+          <small for="PhotoId">Upload Photo ID</small>
+          <input (change)="handleFileInput($event.target.files, 'ADDRESS')" type="file"
+            class="form-control-file form-control-sm" id="address" accept="image/*">
+        </div>
+
+      </div>
+      <div class="col-6">
+        <figure class="figure" *ngIf="KYC">
+          <!-- <img src="{{KYC}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block"> -->
+          <img src="{{KYC?.img_cont}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block">
+          <figcaption class="figure-caption">Address ID</figcaption>
+        </figure>
+        <div class="form-group">
+          <small for="PhotoId">Upload Address ID Document</small>
+          <input (change)="handleFileInput($event.target.files, 'KYC')" type="file"
+            class="form-control-file form-control-sm" id="kyc" accept="image/*">
+        </div>
+
+      </div>
+      <div class="col-12">
+        <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onSaveImgClick()"
+          [disabled]="disableImageSave">Save</button>
+        <button mat-raised-button type="button" class="btn btn-light btn-sm ml-1 mr-1 float-right"
+          (click)="modalRef.hide()">Cancel</button>
+
+      </div>
+    </div>
+
+  </div>
+</ng-template>
+<ng-template #netWorth>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left customHeader">NetWorth Statement details #UCIC: {{this.selectedCustomer.cust_cd}}({{this.selectedCustomer.cust_name}})
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+    <div class="row" >
+      <div class="col-4">
+        <table id="trialbalance">
+            <tr>
+              <th>Acc Type</th>
+              <th>Acc Num</th>
+              <th style="text-align:right">Balance</th>
+              <th >Status</th>
+            </tr>
+              <tbody *ngFor="let i of reportData3; let itr=index;" >
+            <tr>
+              <!-- <td> {{i.acc_type_cd}}</td> -->
+              <td *ngIf="i.acc_type_cd==1">Savings Deposit</td>
+              <td *ngIf="i.acc_type_cd==2">Fixed Deposit</td>
+              <td *ngIf="i.acc_type_cd==3">DBS</td>
+              <td *ngIf="i.acc_type_cd==4">Cash Certificate</td>
+              <td *ngIf="i.acc_type_cd==5">Monthly Income Scheme</td>
+              <td *ngIf="i.acc_type_cd==6">Recurring Deposit</td>
+              <td *ngIf="i.acc_type_cd==7">Share Account</td>
+              <td *ngIf="i.acc_type_cd==8">Flexi Deposit</td>
+              <td *ngIf="i.acc_type_cd==9">Loan Suspense</td>
+              <td *ngIf="i.acc_type_cd==11">DSP</td>
+              <td>{{i.acc_num}}</td>
+              <td style="text-align:right">{{i.clr_bal | INRCurrency }}</td>
+              <td *ngIf="i.acc_status=='O'">Open</td>
+              <td *ngIf="i.acc_status=='C'">Closed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-8">
+        <table id="trialbalance">
+          <tr>
+            <th>Loan ID</th>
+            <th  style="text-align:right">Curr Prn</th>
+            <th  style="text-align:right">Ovd Prn</th>
+            <th style="text-align:right">Curr Intt</th>
+            <th style="text-align:right">Ovd Intt</th>
+            <th style="text-align:right">Penal Intt</th>
+            <th style="text-align:right">Total Outstanding</th>
+          </tr>
+            <tbody *ngFor="let i of reportData2; let itr=index;"> 
+          <tr>
+            <td>{{i.loan_id}}</td>
+            <td style="text-align:right">{{i.curr_prn | INRCurrency}}</td>
+            <td style="text-align:right">{{i.ovd_prn  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.curr_intt  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.ovd_intt  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.penal_intt  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn  | INRCurrency}}</td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+    
+    </div>
+  </div>
+</ng-template>

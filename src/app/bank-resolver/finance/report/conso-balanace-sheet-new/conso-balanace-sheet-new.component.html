@@ -1,0 +1,348 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+  <button type="button" 
+  class="btn btn-rounded btn-primary m-1" 
+  [useExistingCss]="true"
+  printSectionId="hiddenTab" 
+  ngxPrint>Print</button>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="Format1()">Main Format</button>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="Format2()">Second Format</button>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="branchWise()">Branch Wise</button>
+  <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+ </div>
+</div>
+<div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+  
+ <!-- <pagination style="float:right;"
+ [totalItems]="reportData?.length"  
+ [itemsPerPage]="itemsPerPage"
+ [boundaryLinks]="true"
+ [directionLinks]="true"
+ [maxSize]="6"
+ [(ngModel)]="currentPage"
+ name="currentPage"
+ (pageChanged)="pageChanged($event)"
+ (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+
+ <div  id="hiddenTab">
+  <div  *ngIf="branchWisedata" >
+  
+  <div class="justify-content-center" style="text-align:center">
+    <h4>{{ardbName}} <br>{{branchName}}</h4>
+
+    <h4>Run Date & Time : {{today}} </h4> 
+    <h4> <u>Consolidated Balance sheet as on  {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+ </div>
+  
+  <h1 class="justify-content-center">LIABILITIES</h1>
+  <table  class="mat-elevation-z8">
+    <ng-container *ngFor="let group of groupedLiabilitiesBranchWise">
+      <thead>
+        <tr>
+          <th colspan="7" class="group-header">{{ group.schedule_desc }}</th>
+        </tr>
+        <tr>
+          <th>Account Code</th>
+          <th>Account Name</th>
+          <th>Branch Name</th>
+          <th class="text-right">Open Balance</th>
+          <th class="text-right">Credit Amount</th>
+          <th class="text-right">Debit Amount</th>
+          <th class="text-right">Close Balance</th>
+        </tr>
+      </thead>
+  
+      <tbody>
+        <ng-container *ngFor="let item of group.items">
+          <!-- Account Code Level Rows -->
+          <tr *ngFor="let branch of item.branch_items">
+            <td>{{ branch.acc_cd }}</td>
+            <td>{{ branch.acc_name }}</td>
+            <td>{{ branch.brn_name }}</td>
+            <td class="text-right">{{ (branch.open_bal|abs) | number: '1.2-2' }} {{branch.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+            <td class="text-right">{{ (branch.cr_amt|abs) | number: '1.2-2' }} {{branch.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+            <td class="text-right">{{ (branch.dr_amt|abs) | number: '1.2-2' }} {{branch.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+            <td class="text-right">{{ (branch.close_bal|abs) | number: '1.2-2' }} {{branch.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+          </tr>
+  
+          <!-- Subtotal Row for Account Code -->
+          <tr class="subtotal-row">
+            <td colspan="3"><strong>Total for {{ item.acc_name }}:</strong></td>
+            <td class="text-right">{{ (item.acc_cd_total.open_bal|abs) | number: '1.2-2' }} {{item.acc_cd_total.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+            <td class="text-right">{{ (item.acc_cd_total.cr_amt|abs) | number: '1.2-2' }} {{item.acc_cd_total.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+            <td class="text-right">{{ (item.acc_cd_total.dr_amt|abs) | number: '1.2-2' }} {{item.acc_cd_total.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+            <td class="text-right">{{ (item.acc_cd_total.close_bal|abs) | number: '1.2-2' }} {{item.acc_cd_total.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+          </tr>
+         
+        </ng-container>
+      </tbody>
+      <tr class="subtotal-row">
+        <td colspan="3"><strong>TOTAL FOR {{ group.schedule_desc }} :</strong></td>
+        <td style="text-align: right;">{{ (group.subtotal.open_bal>0?group.subtotal.open_bal:group.subtotal.open_bal|abs) | number: '1.2-2' }} {{group.subtotal.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+         <td style="text-align: right;">{{ (group.subtotal.cr_amt>0?group.subtotal.cr_amt:group.subtotal.cr_amt|abs) | number: '1.2-2' }} {{group.subtotal.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+         <td style="text-align: right;">{{ (group.subtotal.dr_amt>0?group.subtotal.dr_amt:group.subtotal.dr_amt|abs) | number: '1.2-2' }} {{group.subtotal.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+         <td style="text-align: right;">{{ (group.subtotal.close_bal>0?group.subtotal.close_bal:group.subtotal.close_bal|abs) | number: '1.2-2' }} {{group.subtotal.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+       </tr>
+    </ng-container>
+    <tfoot  style="padding-left: 4%;">
+      <tr class="grand-total-row">
+       <td colspan="3"><strong>TOTAL FOR LIABILITIES :</strong></td>
+        <td  *ngIf="format2" style="text-align: right;">{{ (liabilitiesTotal.close_bal>0?liabilitiesTotal.close_bal:liabilitiesTotal.close_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.close_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+        <td  *ngIf="format2" style="text-align: right;">{{ (liabilitiesTotal.open_bal>0?liabilitiesTotal.open_bal:liabilitiesTotal.open_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.open_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+
+        <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.open_bal>0?liabilitiesTotal.open_bal:liabilitiesTotal.open_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.open_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+        <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.cr_amt>0?liabilitiesTotal.cr_amt:liabilitiesTotal.cr_amt|abs) | number: '1.2-2' }}  {{liabilitiesTotal.cr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+        <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.dr_amt>0?liabilitiesTotal.dr_amt:liabilitiesTotal.dr_amt|abs) | number: '1.2-2' }}  {{liabilitiesTotal.dr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+        <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.close_bal>0?liabilitiesTotal.close_bal:liabilitiesTotal.close_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.close_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+      </tr>
+    </tfoot>
+  </table><br><br>
+    <h1 class="justify-content-center">ASSETS</h1>
+    <table  class="mat-elevation-z8">
+      <ng-container *ngFor="let group of groupedAssetsBranchWise">
+        <thead>
+          <tr>
+            <th colspan="7" class="group-header">{{ group.schedule_desc }}</th>
+          </tr>
+          <tr>
+            <th>Account Code</th>
+            <th>Account Name</th>
+            <th>Branch Name</th>
+            <th class="text-right">Open Balance</th>
+            <th class="text-right">Credit Amount</th>
+            <th class="text-right">Debit Amount</th>
+            <th class="text-right">Close Balance</th>
+          </tr>
+        </thead>
+    
+        <tbody>
+          <ng-container *ngFor="let item of group.items">
+            <!-- Account Code Level Rows -->
+            <tr *ngFor="let branch of item.branch_items">
+              <td>{{ branch.acc_cd }}</td>
+              <td>{{ branch.acc_name }}</td>
+              <td>{{ branch.brn_name }}</td>
+              <td class="text-right">{{ (branch.open_bal|abs) | number: '1.2-2' }} {{branch.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+              <td class="text-right">{{ (branch.cr_amt|abs) | number: '1.2-2' }} {{branch.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td class="text-right">{{ (branch.dr_amt|abs) | number: '1.2-2' }} {{branch.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td class="text-right">{{ (branch.close_bal|abs) | number: '1.2-2' }} {{branch.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+            </tr>
+    
+            <!-- Subtotal Row for Account Code -->
+            <tr class="subtotal-row">
+              <td colspan="3"><strong>Total for {{ item.acc_name }}:</strong></td>
+              <td class="text-right">{{ (item.acc_cd_total.open_bal|abs) | number: '1.2-2' }} {{item.acc_cd_total.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+              <td class="text-right">{{ (item.acc_cd_total.cr_amt|abs) | number: '1.2-2' }} {{item.acc_cd_total.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td class="text-right">{{ (item.acc_cd_total.dr_amt|abs) | number: '1.2-2' }} {{item.acc_cd_total.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td class="text-right">{{ (item.acc_cd_total.close_bal|abs) | number: '1.2-2' }} {{item.acc_cd_total.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+            </tr>
+           
+          </ng-container>
+        </tbody>
+        <tr class="subtotal-row">
+          <td colspan="3"><strong>TOTAL FOR {{ group.schedule_desc }} :</strong></td>
+          <td style="text-align: right;">{{ (group.subtotal.open_bal>0?group.subtotal.open_bal:group.subtotal.open_bal|abs) | number: '1.2-2' }} {{group.subtotal.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+           <td style="text-align: right;">{{ (group.subtotal.cr_amt>0?group.subtotal.cr_amt:group.subtotal.cr_amt|abs) | number: '1.2-2' }} {{group.subtotal.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+           <td style="text-align: right;">{{ (group.subtotal.dr_amt>0?group.subtotal.dr_amt:group.subtotal.dr_amt|abs) | number: '1.2-2' }} {{group.subtotal.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+           <td style="text-align: right;">{{ (group.subtotal.close_bal>0?group.subtotal.close_bal:group.subtotal.close_bal|abs) | number: '1.2-2' }} {{group.subtotal.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+         </tr>
+      </ng-container>
+      <tfoot  style="padding-left: 4%;">
+        <tr class="grand-total-row">
+          <td colspan="3"><strong>TOTAL FOR ASSETS :</strong></td>
+          <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.open_bal>0?assetsTotal.open_bal:assetsTotal.open_bal|abs) | number: '1.2-2' }} {{assetsTotal.open_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+          <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.cr_amt>0?assetsTotal.cr_amt:assetsTotal.cr_amt|abs) | number: '1.2-2' }}  {{assetsTotal.cr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+          <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.dr_amt>0?assetsTotal.dr_amt:assetsTotal.dr_amt|abs) | number: '1.2-2' }}  {{assetsTotal.dr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+          <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.close_bal>0?assetsTotal.close_bal:assetsTotal.close_bal|abs) | number: '1.2-2' }} {{assetsTotal.close_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+        </tr>
+      </tfoot>
+    </table>
+    </div>
+    <div  *ngIf="!branchWisedata" >
+      <div class="justify-content-center" style="text-align:center">
+        <h4>{{ardbName}} <br>{{branchName}}</h4>
+    
+        <h4>Run Date & Time : {{today}} </h4> 
+        <h4> <u>Consolidated Balance sheet as on  {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+     </div>
+      
+      <h1 class="justify-content-center">LIABILITIES</h1>
+      <table  class="mat-elevation-z8">
+        <ng-container *ngFor="let group of groupedLiabilities">
+          <thead style="padding-left: 4%;">
+            <tr>
+              <th colspan="6" class="group-header">{{ group.schedule_desc }}</th>
+            </tr>
+            <tr>
+             <th>Account Code</th>
+              <th>Account Name</th>
+              <th *ngIf="format2" style="text-align: right;">Current Balance</th>
+              <th *ngIf="format2" style="text-align: right;">Previous Balance</th>
+    
+              <th *ngIf="!format2" style="text-align: right;">Open Balance</th>
+              <th *ngIf="!format2" style="text-align: right;">Credit Amount</th>
+              <th *ngIf="!format2" style="text-align: right;">Debit Amount</th>
+              <th *ngIf="!format2" style="text-align: right;">Close Balance</th>
+            </tr>
+          </thead>
+          <tbody style="padding-left: 4%;">
+            <tr *ngFor="let item of group.items">
+              <td>{{ item.acc_cd }}</td>
+              <td>{{ item.acc_name }}</td>
+              <td *ngIf="format2" style="text-align: right;">{{(item.close_bal>0?item.close_bal:item.close_bal|abs) | number: '1.2-2' }} {{item.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="format2" style="text-align: right;">{{(item.open_bal>0?item.open_bal:item.open_bal|abs) | number: '1.2-2' }} {{item.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+    
+              <td *ngIf="!format2" style="text-align: right;">{{(item.open_bal>0?item.open_bal:item.open_bal|abs) | number: '1.2-2' }} {{item.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{(item.cr_amt>0?item.cr_amt:item.cr_amt|abs) | number: '1.2-2' }} {{item.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{(item.dr_amt>0?item.dr_amt:item.dr_amt|abs) | number: '1.2-2' }} {{item.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{(item.close_bal>0?item.close_bal:item.close_bal|abs) | number: '1.2-2' }} {{item.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+            </tr>
+            <tr class="subtotal-row">
+             <td colspan="2"><strong>TOTAL FOR {{ group.schedule_desc }} :</strong></td>
+              <td *ngIf="format2" style="text-align: right;">{{ (group.subtotal.close_bal>0?group.subtotal.close_bal:group.subtotal.close_bal|abs) | number: '1.2-2' }} {{group.subtotal.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="format2" style="text-align: right;">{{ (group.subtotal.open_bal>0?group.subtotal.open_bal:group.subtotal.open_bal|abs) | number: '1.2-2' }} {{group.subtotal.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+    
+              <td *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.open_bal>0?group.subtotal.open_bal:group.subtotal.open_bal|abs) | number: '1.2-2' }} {{group.subtotal.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.cr_amt>0?group.subtotal.cr_amt:group.subtotal.cr_amt|abs) | number: '1.2-2' }} {{group.subtotal.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.dr_amt>0?group.subtotal.dr_amt:group.subtotal.dr_amt|abs) | number: '1.2-2' }} {{group.subtotal.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.close_bal>0?group.subtotal.close_bal:group.subtotal.close_bal|abs) | number: '1.2-2' }} {{group.subtotal.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+            </tr>
+          </tbody>
+        </ng-container>
+        <tfoot  style="padding-left: 4%;">
+          <tr class="grand-total-row">
+           <td colspan="2"><strong>TOTAL FOR LIABILITIES :</strong></td>
+            <td  *ngIf="format2" style="text-align: right;">{{ (liabilitiesTotal.close_bal>0?liabilitiesTotal.close_bal:liabilitiesTotal.close_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.close_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+            <td  *ngIf="format2" style="text-align: right;">{{ (liabilitiesTotal.open_bal>0?liabilitiesTotal.open_bal:liabilitiesTotal.open_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.open_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+    
+            <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.open_bal>0?liabilitiesTotal.open_bal:liabilitiesTotal.open_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.open_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+            <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.cr_amt>0?liabilitiesTotal.cr_amt:liabilitiesTotal.cr_amt|abs) | number: '1.2-2' }}  {{liabilitiesTotal.cr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+            <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.dr_amt>0?liabilitiesTotal.dr_amt:liabilitiesTotal.dr_amt|abs) | number: '1.2-2' }}  {{liabilitiesTotal.dr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+            <td  *ngIf="!format2" style="text-align: right;">{{ (liabilitiesTotal.close_bal>0?liabilitiesTotal.close_bal:liabilitiesTotal.close_bal|abs) | number: '1.2-2' }} {{liabilitiesTotal.close_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+          </tr>
+        </tfoot>
+      </table><br><br>
+        <h1 class="justify-content-center">ASSETS</h1>
+        <table  class="mat-elevation-z8">
+          <ng-container *ngFor="let group of groupedAssets">
+            <thead  style="padding-left: 4%;">
+              <tr>
+                <th colspan="6" class="group-header">{{ group.schedule_desc }}</th>
+              </tr>
+              <tr>
+               <th>Account Code</th>
+                <th>Account Name</th>
+                <th *ngIf="format2" style="text-align: right;">Current Balance</th>
+                <th *ngIf="format2" style="text-align: right;">Previous Balance</th>
+                <th *ngIf="!format2" style="text-align: right;">Open Balance</th>
+                <th *ngIf="!format2" style="text-align: right;">Credit Amount</th>
+                <th *ngIf="!format2" style="text-align: right;">Debit Amount</th>
+                <th *ngIf="!format2" style="text-align: right;">Close Balance</th>
+              </tr>
+            </thead>
+            <tbody  style="padding-left: 4%;">
+              <tr *ngFor="let item of group.items">
+              <td>{{ item.acc_cd }}</td>
+                <td>{{ item.acc_name }}</td>
+                <td  *ngIf="format2" style="text-align: right;">{{(item.close_bal>0?item.close_bal:item.close_bal|abs) | number: '1.2-2' }} {{item.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="format2" style="text-align: right;">{{(item.open_bal>0?item.open_bal:item.open_bal|abs) | number: '1.2-2' }} {{item.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+    
+                <td  *ngIf="!format2" style="text-align: right;">{{(item.open_bal>0?item.open_bal:item.open_bal|abs) | number: '1.2-2' }} {{item.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="!format2" style="text-align: right;">{{(item.cr_amt>0?item.cr_amt:item.cr_amt|abs) | number: '1.2-2' }} {{item.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="!format2" style="text-align: right;">{{(item.dr_amt>0?item.dr_amt:item.dr_amt|abs) | number: '1.2-2' }} {{item.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="!format2" style="text-align: right;">{{(item.close_bal>0?item.close_bal:item.close_bal|abs) | number: '1.2-2' }} {{item.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+              </tr>
+              <tr class="subtotal-row">
+                <td  colspan="2"><strong>TOTAL FOR {{ group.schedule_desc }} :</strong></td>
+                <td  *ngIf="format2" style="text-align: right;">{{ (group.subtotal.close_bal>0?group.subtotal.close_bal:group.subtotal.close_bal|abs) | number: '1.2-2' }} {{group.subtotal.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="format2" style="text-align: right;">{{ (group.subtotal.open_bal>0?group.subtotal.open_bal:group.subtotal.open_bal|abs) | number: '1.2-2' }} {{group.subtotal.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+    
+                <td  *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.open_bal>0?group.subtotal.open_bal:group.subtotal.open_bal|abs) | number: '1.2-2' }} {{group.subtotal.open_bal>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.cr_amt>0?group.subtotal.cr_amt:group.subtotal.cr_amt|abs) | number: '1.2-2' }} {{group.subtotal.cr_amt>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.dr_amt>0?group.subtotal.dr_amt:group.subtotal.dr_amt|abs) | number: '1.2-2' }} {{group.subtotal.dr_amt>0? 'Dr.' : 'Cr.'}}</td>
+                <td  *ngIf="!format2" style="text-align: right;">{{ (group.subtotal.close_bal>0?group.subtotal.close_bal:group.subtotal.close_bal|abs) | number: '1.2-2' }} {{group.subtotal.close_bal>0? 'Dr.' : 'Cr.'}}</td>
+              </tr>
+            </tbody>
+          </ng-container>
+          <tfoot  style="padding-left: 4%;">
+            <tr class="grand-total-row">
+              <td  colspan="2"><strong>TOTAL FOR ASSETS :</strong></td>
+              <td *ngIf="format2" style="text-align: right;">{{ (assetsTotal.close_bal>0?assetsTotal.close_bal:assetsTotal.close_bal|abs) | number: '1.2-2' }} {{assetsTotal.close_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="format2" style="text-align: right;">{{ (assetsTotal.open_bal>0?assetsTotal.open_bal:assetsTotal.open_bal|abs) | number: '1.2-2' }} {{assetsTotal.open_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+    
+              <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.open_bal>0?assetsTotal.open_bal:assetsTotal.open_bal|abs) | number: '1.2-2' }} {{assetsTotal.open_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.cr_amt>0?assetsTotal.cr_amt:assetsTotal.cr_amt|abs) | number: '1.2-2' }}  {{assetsTotal.cr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.dr_amt>0?assetsTotal.dr_amt:assetsTotal.dr_amt|abs) | number: '1.2-2' }}  {{assetsTotal.dr_amt > 0 ? 'Dr.' : 'Cr.'}}</td>
+              <td *ngIf="!format2" style="text-align: right;">{{ (assetsTotal.close_bal>0?assetsTotal.close_bal:assetsTotal.close_bal|abs) | number: '1.2-2' }} {{assetsTotal.close_bal > 0 ? 'Dr.' : 'Cr.'}}</td>
+            </tr>
+          </tfoot>
+        </table>
+      
+  
+</div>
+</div>
+
+ 
+ 
+
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+    <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+    <button type="button" 
+    class="btn btn-rounded btn-primary m-1" 
+    [useExistingCss]="true"
+    printSectionId="hiddenTab" 
+    ngxPrint>Print</button>
+    <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+    <button type="button" class="btn btn-rounded btn-primary m-1" (click)="Format1()">Main Format</button>
+    <button type="button" class="btn btn-rounded btn-primary m-1" (click)="Format2()">Second Format</button>
+    <button type="button" class="btn btn-rounded btn-primary m-1" (click)="branchWise()">Branch Wise</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+   </div>
+  </div>
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

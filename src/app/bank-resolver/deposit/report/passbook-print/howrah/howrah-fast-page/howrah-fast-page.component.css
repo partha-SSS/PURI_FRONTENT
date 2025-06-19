@@ -1,0 +1,13 @@
+@media print{
+    #fastPage{
+        font-weight: 600!important;
+        font-size: 16px;
+        line-height: 0.8;
+    }
+    
+    #fastPage,p{font-weight: 600!important;font-size:16px!important;line-height: 0.8;}
+}
+p{
+    font-size:16px!important;
+    line-height: 0.8;
+}

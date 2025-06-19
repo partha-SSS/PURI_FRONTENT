@@ -1,0 +1,994 @@
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center">
+
+  <ng-template #buttonDiv>
+    <div
+      class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="newAccount()">New</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="modifyData()">Modify</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="openModal(Delconfirm)">Delete</button>
+      
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData()" >Save</button>
+
+    </div>
+  </ng-template>
+
+  <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+
+
+  <div class="container col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-3">
+
+    <!-- <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{alertMsgType}}: </strong>
+    {{alertMsg}}
+    <button mat-raised-button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlertMsg()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div> -->
+    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-7 border-right">
+        <h1></h1>
+        <h4 class="customHeader">Locker Opening</h4>
+        <!-- <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3"> -->
+
+        <div class="form-row">
+            <div class="form-group col-3">
+                <small for="cust_code">UCIC</small>
+                <input style="height:25px" type="text" class="form-control form-control-sm text-capitalize"
+                  [(ngModel)]="tm_locker.cust_cd" id="cust_code" placeholder="Customer Code" [disabled]="operationType == 'I' || operationType == 'U'">
+              </div>
+          <div class="form-group col-6">
+            <small for="cust_name">Customer Name</small>
+            <div class="input-group">
+        
+            <input style="height:25px" type="text" [disabled]='disableCustomerName'
+              class="form-control form-control-sm text-capitalize" id="cust_name" placeholder="Customer Name"
+              [(ngModel)]="tm_locker.name" (input)="onChangeNull()" name="x-field-1"
+              autocomplete="new-field-1">
+            <div class="input-group-append">
+        <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" style="font-size:x-small" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+
+            </div>
+            </div>
+            <div class="suggestions border p-2" *ngIf="suggestedCustomer">
+              <!-- <strong> [ Customer Cd / Phone ] Name / Gurdian Name </strong>
+              <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+                (click)="setCustDtls(cust.cust_cd)">
+                {{'[' + cust.cust_cd + ' / '
+                + ((null === cust.phone) ? '' : cust.phone) +'] '
+                + cust.cust_name  +'/'+ cust.guardian_name}}
+              </p> -->
+              <table id="customers1">
+                <tr>
+                  <th> Customer Code / Phone</th>
+                  <th> Name</th>
+                  <th>Guardian Name</th>
+                <th>Permanent Address</th>
+                </tr>
+                <tbody *ngFor="let cust of suggestedCustomer" >
+                  <tr  (click)="setCustDtls(cust.cust_cd)">
+                    <td>
+                      {{cust.cust_cd}}  {{((null === cust.phone) ? '' : ' / '+ cust.phone)}}
+                    </td>
+                    <td>
+                      {{cust.cust_name}}
+          
+                    </td>
+                    <td>
+                      {{cust.guardian_name}}
+                    </td>
+                    <td>
+                      {{cust.permanent_address}}
+                    </td>
+                  </tr>
+                 
+                </tbody>
+                
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 200%; font-size: small;"
+          *ngIf="showNoResult">
+         <strong class="text-danger">" {{tm_locker.name}} " does not match with any customer</strong>
+          </div> 
+          </div>
+
+          <div class="form-group col-3">
+            <small for="cust_type">Opening Date</small>
+            <input style="height:25px"  type="date" class="form-control form-control-sm text-capitalize"
+              id="cust_type" [(ngModel)]="tm_locker.agreement_dt" placeholder="Opening Date">
+          </div>
+        </div>
+
+        
+
+        <div class="form-row">
+            <div class="form-group col-3">
+                <small >Agreement No</small>
+                <div class="input-group">
+                  <input type="text" [disabled]='disableAccountTypeAndNo' class="form-control form-control-sm "
+                  id="agreement_no" placeholder="Enter Agreement Number" style="height:25px"
+                  [(ngModel)]="tm_locker.agreement_no" autocomplete="new-field-1">
+                 <div class="input-group-append">
+                         <button class="btn btn-primary btn-sm"  style="font-size:x-small" (click)="suggestLockerCustomer()"><i class="fa fa-search"></i></button>
+    
+                 </div>
+                </div>
+                <!-- <input style="height:25px"  type="text" class="form-control form-control-sm text-capitalize" [disabled]='disableAccountTypeAndNo'
+                  (change)="GetUnapprovedLockerTrans()" id="agreement_no" [(ngModel)]="tm_locker.agreement_no" placeholder="Agreement No"> -->
+              
+                </div>
+              <div class="suggestions" *ngIf="suggestedLockerData && suggestedLockerData.length > 0">
+                <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                  <thead>
+                    <tr>
+                      <th scope="col">Locker Id</th>
+                      <th scope="col">Agreement No</th>
+                      <th scope="col">Phone</th>
+                      <th scope="col">Customer Name</th>
+                      <th scope="col">Key No</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    
+                    <tr *ngFor="let cust of suggestedLockerData" (click)="selectLockerData(cust)">
+                      <td scope="row">{{cust.lockerId}}</td>
+                      <td>{{cust.agreementNo}}</td>
+                      <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                      <td>{{cust.name}}</td>
+                      <td>{{cust.keyNo}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+
+              <div class="form-group col-2">
+                <small >Locker Key</small>
+                <input style="height:25px"  type="text" class="form-control form-control-sm text-capitalize" [disabled]='disableAccountTypeAndNo'
+                  id="key_no" [(ngModel)]="tm_locker.key_no" placeholder="Key No">
+              </div>
+          <div class="form-group col-3">
+            <small>Phone</small>
+            <input style="height:25px"  type="text" class="form-control form-control-sm text-capitalize"  [disabled]='disableAccountTypeAndNo'
+              [(ngModel)]="tm_locker.phone" placeholder="Customer Phone">
+          </div>
+
+          <div class="form-group col-4">
+            <small for="cust_occup">Occupation</small>
+            <select
+                style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                [disabled]='disableAccountTypeAndNo' [(ngModel)]="tm_locker.occupation" placeholder="Occupation"
+                id="Occupation" class="form-control form-control-sm">
+                <option value="">Select Occupation</option>
+                <option *ngFor="let l of occupationList" [value]="l.type"
+                  [selected]="tm_locker.occupation == l.type">{{l.type}}</option>
+              </select>
+              
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-12">
+            <small for="cust_addr">Present Address</small>
+            <input style="height: 70px!important;"  type="text" class="form-control form-control-sm text-capitalize"
+              id="cust_addr" [(ngModel)]="tm_locker.present_address" [disabled]='disableAll' placeholder="Cust Present Address">
+          </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-3">
+              <small for="trans_type">Acc Type</small> <br>
+              <select
+                style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                [disabled]='disableAccountTypeAndNo' [(ngModel)]="tm_locker.acc_type_cd"
+                id="account_type" class="form-control form-control-sm">
+                <option value="">-</option>
+                <option *ngFor="let l of accountTypeList" [value]="l.acc_type_cd"
+                  [selected]="tm_locker.acc_type_cd == l.acc_type_cd">{{l.acc_type_cd}}-{{l.acc_type_desc}}</option>
+              </select>
+            </div>
+  
+            <div class="form-group col-3">
+              <small for="acc_no">Acc Number</small>
+              <div class="input-group">
+                <input type="text" [disabled]='disableAll' class="form-control form-control-sm "
+                id="acct_num" placeholder="Enter Acc# / Cust Name / Phone number" style="height:25px"
+                [(ngModel)]="tm_locker.acc_num"  autocomplete="new-field-1">
+               <div class="input-group-append">
+                       <button class="btn btn-primary btn-sm"  style="font-size:x-small" (click)="suggestCustomerSaving()"><i class="fa fa-search"></i></button>
+  
+               </div>
+              </div>
+              <!-- <input style="height:25px" [disabled]='disableAll'
+                 [(ngModel)]="tm_locker.acc_num" type="text"
+                class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number"> -->
+            </div>
+  
+            <div class="form-group col-3">
+                <small for="trans_type">Security Acc Type</small> <br>
+                <select
+                  style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                  [disabled]='disableAccountTypeAndNo' [(ngModel)]="tm_locker.ind_acc_type_cd"
+                  id="account_type" class="form-control form-control-sm">
+                  <option value="">-</option>
+                  <option *ngFor="let l of accountTypeList" [value]="l.acc_type_cd"
+                    [selected]="tm_locker.ind_acc_type_cd == l.acc_type_cd">{{l.acc_type_cd}}-{{l.acc_type_desc}}</option>
+                </select>
+              </div>
+    
+              <div class="form-group col-3">
+                <small for="acc_no">Security Acc Number</small>
+                <div class="input-group">
+                  <input type="text" [disabled]='disableAll' class="form-control form-control-sm "
+                  id="acct_num" placeholder="Enter Acc# / Cust Name / Phone number" style="height:25px"
+                  [(ngModel)]="tm_locker.ind_acc_num" autocomplete="new-field-1">
+                 <div class="input-group-append">
+                         <button class="btn btn-primary btn-sm"  style="font-size:x-small" (click)="suggestCustomerSecurity()"><i class="fa fa-search"></i></button>
+    
+                 </div>
+                </div>
+                <!-- <input style="height:25px" (change)="getSecAccNumber()"
+                   [(ngModel)]="tm_locker.ind_acc_num" type="text" [disabled]='disableAll'
+                  class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number"> -->
+              </div>
+
+
+
+              <div class="suggestions" *ngIf="suggestedCustomerSaving && suggestedCustomerSaving.length > 0">
+                <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                  <thead>
+                    <tr>
+                      <th scope="col">Acc#</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Phone</th>
+                      <th scope="col">Guardian Name</th>
+                      <!-- <th scope="col">Address</th> -->
+                    </tr>
+                  </thead>
+                  <tbody>
+                    
+                    <tr *ngFor="let cust of suggestedCustomerSaving" (click)="getAccountOpeningDataS(cust)">
+                      <td scope="row">{{cust.acc_num}}</td>
+                      <td>{{cust.cust_name}}</td>
+                      <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                      <td>{{cust.guardian_name}}</td>
+                      <!-- <td>{{cust.present_address}}</td> -->
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+
+
+            <div class="suggestions" *ngIf="suggestedCustomerSecurity && suggestedCustomerSecurity.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <!-- <th scope="col">Address</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr *ngFor="let cust of suggestedCustomerSecurity" (click)="getAccountOpeningDataSq(cust)">
+                    <td scope="row">{{cust.acc_num}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <!-- <td>{{cust.present_address}}</td> -->
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+  
+          </div>
+          <div class="form-row">
+            <div class="form-group col-3">
+                <small for="acc_no">Locker ID</small>
+                <input style="height:25px"(change)="getLocType()"
+                   [(ngModel)]="tm_locker.locker_id" type="text" [disabled]='disableAll'
+                  class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Locker ID">
+              </div>
+              <div class="form-group col-3">
+                <small for="acc_no">Locker Type</small>
+                <select [(ngModel)]="loc_type" disabled class="form-control form-control-sm custom-scrollbar">
+                    <option *ngFor="let l_type of locker_type" [value]="l_type.id">{{ l_type.type }}</option>
+                </select>
+            </div>
+            <div class="form-group col-3">
+                <small for="acc_no">Locker Status</small>
+                <select [(ngModel)]="loc_status" disabled class="form-control form-control-sm custom-scrollbar">
+                    <option *ngFor="let l_status of locker_status" [value]="l_status.id">{{ l_status.type }}</option>
+                </select>
+            </div>
+              <!-- <div class="form-group col-3">
+                <small for="loc_type">Locker Type</small>{{loc_type}}
+                <input style="height:25px"  
+                [(ngModel)]="loc_type" type="text" [disabled]='true'
+               class="form-control form-control-sm text-capitalize" id="loc_type" placeholder="Locker Type">
+
+            </div>
+            <div class="form-group col-3">
+                <small for="loc_status">Locker Status</small>{{loc_status}}
+                <input style="height:25px"  
+                [(ngModel)]="loc_status" type="text" [disabled]='true'
+               class="form-control form-control-sm text-capitalize" id="loc_status" placeholder="Locker Status">
+               
+            </div> -->
+              <div class="form-group col-3">
+                <small for="acc_no">Rented Till</small>
+                <input style="height:25px"  
+                   [(ngModel)]="tm_locker.rented_till" type="date" [disabled]='disableAll'
+                  class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number">
+              </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-12">
+                <small for="acc_no">Remerks</small>
+                <input style="height:25px" 
+                   [(ngModel)]="tm_locker.narration" type="text" style="height: 70px!important;" [disabled]='disableAll'
+                  class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Enter Remerks">
+              </div>
+              
+          </div>
+
+      </div>
+
+
+      <div class="col-6 col-md-5 border-left">
+        
+          
+        <h1></h1>
+        <h4 class="customHeader">Joint Holder</h4>
+        <section *ngFor="let t1 of td_accholderList; let i = index">
+          <div class="form-row">
+            <div class="form-group col-3">
+              <small for="joint_cust_code">Cust Code</small>
+              <!-- <input type="text" [disabled]='disableAll' [(ngModel)]="t1.cust_cd" style="height:25px" class="form-control form-control-sm text-capitalize"
+            (change)="getSetJointHolderName(i)" id="joint_cust_code" placeholder="Cust Code"> -->
+
+              <!-- <input type="text" [disabled]='disableAll' [(ngModel)]="t1.cust_cd" style="height:25px"
+                class="form-control form-control-sm text-capitalize" (input)="suggestCustomerJointHolder(i)"
+                id="joint_cust_code" placeholder="Cust Code"> -->
+                <input type="text"  disabled [(ngModel)]="t1.cust_cd" style="height:25px"
+                class="form-control form-control-sm text-capitalize" 
+                id="joint_cust_code" placeholder="Cust Code">
+              </div>
+
+            <div class="form-group col-6">
+              <small for="joint_cust_name">Account Holder</small>
+              <div class="input-group">
+              <input  type="text" [(ngModel)]="t1.acc_holder" style="height:25px" [disabled]='disableAll' (input)="enableSearch(i)"
+                class="form-control form-control-sm text-capitalize" id="joint_cust_name" placeholder="Account Holder">
+                <div class="input-group-append">
+                  <button class="btn btn-primary btn-sm" [disabled]="disablejoinholder" style="font-size:x-small" (click)="suggestCustomerJointHolder(i)"><i class="fa fa-search"></i></button>
+          
+                </div>
+              </div>
+                <div class="suggestions border p-2" [hidden]="hidejoin"
+                *ngIf="suggestedCustomerJointHolder && i==suggestedCustomerJointHolderIdx">
+                
+                <table id="joinholder" >
+                  <tr>
+                    <th> Customer Code / Phone</th>
+                    <th> Name / Gurdian Name</th>
+                  </tr>
+                  <tbody *ngFor="let cust of suggestedCustomerJointHolder" >
+                    <tr  (click)="setCustDtlsJointHolder(cust.cust_cd,i)">
+                      <td>
+                        {{cust.cust_cd}}  {{((null === cust.phone) ? '' : ' / '+ cust.phone)}}
+                      </td>
+                      <td>
+                        {{cust.cust_name +'/'+ cust.guardian_name}}
+            
+                      </td>
+                    </tr>
+                   
+                  </tbody>
+                  
+                </table>
+              </div>
+            </div>
+
+            <div class="form-group col-3">
+              <small for="trans_type">Relation</small> <br>
+              <select [disabled]='disableAll'
+                style="height:25px; font-size: small; padding-top: 0px; background-color: whitesmoke;" id="trans_type"
+                class="form-control form-control-sm" (change)="setRelationship($event.target.value, i)">
+                <option [value]="t1.relation" disabled selected>{{t1.relationId}}-{{t1.relation}}</option>
+                <option *ngFor="let l of relationship" [value]="l.val">{{l.id}}-{{l.val}}</option>
+              </select>
+            </div>
+
+          </div>
+        </section>
+
+        <div class="text-right mb-3">
+          <button type="button" style=" padding-top: 0px;" class="btn btn-primary btn-sm mr-2"
+            (click)="addJointHolder()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+          </button>
+
+          <button  type="button" style=" padding-top: 0px;" class="btn btn-primary btn-sm"
+            (click)="removeJointHolder()">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+          </button>
+        </div>
+       
+            <h1></h1>
+            <h4 class="customHeader">Transaction Details</h4>
+            <div class="form-row">
+              <div class="form-group col-3">
+                <small for="trans_type">Trans Type</small> <br>
+                <select [disabled]='disableAll'
+                  style="height:25px; font-size: small; padding-top: 0px; background-color: whitesmoke;" id="trans_type"
+                  class="form-control form-control-sm" [(ngModel)]="td_deftrans.trf_type"
+                  (change)="setTransType($event.target.value)">
+                  <!-- <option [value]="td_deftrans.trf_type" selected>{{td_deftrans.trf_type_desc}}</option> -->
+                  <option [value]="l.trf_type" [selected]="masterModel.tddeftrans.trf_type==l.trf_type"
+                    *ngFor="let l of transferTypeListTemp">{{l.trf_type_desc}}</option>
+                </select>
+              </div>
+              <!-- {{td_deftrans.trans_cd}} -->
+              <!-- <div class="form-group col-2">
+                <small for="trans_code">Trans Code</small>
+                <input type="text" disabled [(ngModel)]="td_deftrans.trans_cd" style="height:25px"
+                  class="form-control form-control-sm text-capitalize" id="trans_code" placeholder="Trans Code">
+              </div> -->
+              <div class="form-group col-3">
+                <small for="trans_code">Loker Rent</small>
+                <input type="text" disabled [(ngModel)]="RentAmount" style="height:25px"
+                  class="form-control form-control-sm text-capitalize" id="trans_code" placeholder="Locker Rent">
+              </div>
+              <div class="form-group col-3">
+                <small for="trans_code">GST</small>
+                <input type="text" [(ngModel)]="td_deftrans.ovd_intt_recov" style="height:25px" (change)="gstChange()"
+                  class="form-control form-control-sm text-capitalize" id="trans_code" placeholder="GST">
+              </div>
+              <div class="form-group col-3">
+                <small for="trans_code">Total Amount</small>
+                <input type="text" [(ngModel)]="td_deftrans.amount" style="height:25px"
+                  class="form-control form-control-sm text-capitalize" id="trans_code" placeholder="Total amount">
+              </div>
+            </div>
+    
+            <h1></h1>
+        <h4 class="customHeader">Security Account Details</h4>
+        <div class="form-row">
+            <div class="form-group col-4">
+              <small for="trans_type">Account Type</small> <br>
+              <select
+                style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                 [(ngModel)]="tm_deposit.acc_type_cd" disabled id="account_type" class="form-control form-control-sm">
+                <option value="">-</option>
+                <option *ngFor="let l of accountTypeList" [value]="l.acc_type_cd"
+                  [selected]="tm_deposit.acc_type_cd == l.acc_type_cd">{{l.acc_type_cd}}-{{l.acc_type_desc}}</option>
+              </select>
+            </div>
+  
+            <div class="form-group col-5">
+              <small for="acc_no">Account Number</small>
+              <input style="height:25px" disabled
+                 [(ngModel)]="tm_deposit.acc_num" type="text"
+                class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number">
+            </div>
+  
+  
+            <div class="form-group col-3">
+              <small for="dbs_acc_open_dt">Opening Date</small>
+              <!-- <input style="height:25px;" type="text" placeholder="dd/mm/yyyy" class="form-control"
+                [ngModel]="tm_deposit.opening_dt" disabled bsDatepicker
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"> -->
+                <input style="height:25px;" type="text" placeholder="dd/mm/yyyy" class="form-control"
+                [ngModel]="tm_deposit.opening_dt" disabled bsDatepicker>
+            </div>
+  
+          </div>
+        
+        <div >
+
+            <div class="form-row">
+  
+              <div class="form-group col-3">
+                <small for="term_dep_const">Constitution</small> <br>
+                <select
+                  style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                  id="trans_type" [(ngModel)]="tm_deposit.constitution_cd" disabled
+                  class="form-control form-control-sm" >
+                  <option [value]="tm_deposit.constitution_cd" disabled selected>
+                    {{tm_deposit.constitution_cd}}-{{tm_deposit.constitution_desc}}</option>
+                  <option *ngFor="let l of selectedConstitutionList" [value]="l.constitution_cd">
+                    {{l.constitution_cd}}-{{l.constitution_desc}}</option>
+                </select>
+              </div>
+  
+              <div class="form-group col-4">
+                <small for="term_dep_oprn_instr">Operational Instr</small> <br>
+                <select
+                  style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                  id="acc_oprn_instr" [(ngModel)]="tm_deposit.oprn_instr_cd" 
+                  class="form-control form-control-sm" disabled>
+                  <option [value]="tm_deposit.oprn_instr_cd" selected>
+                    {{tm_deposit.oprn_instr_cd}}-{{tm_deposit.oprn_instr_desc}}</option>
+                  <option *ngFor="let l of operationalInstrList" [value]="l.oprn_cd">{{l.oprn_cd}}-{{l.oprn_desc}}
+                  </option>
+                </select>
+              </div>
+              
+  
+              <div class="form-group col-2">
+                <small for="term_dep_cert_no">Cert. No.</small>
+                <input [(ngModel)]="tm_deposit.cert_no" disabled style="height:25px" type="text"
+                  class="form-control form-control-sm text-capitalize" id="term_dep_cert_no">
+              </div>
+              <div class="form-group col-3">
+                <small for="dbs_acc_open_dt">Maturity Date</small>
+                <!-- <input disabled style="height:25px;" type="text" placeholder="dd/mm/yyyy" class="form-control"
+                  [(ngModel)]="tm_deposit.mat_dt" disabled bsDatepicker
+                  [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"> -->
+                  <input disabled style="height:25px;" type="text" placeholder="dd/mm/yyyy" class="form-control"
+                  [(ngModel)]="tm_deposit.mat_dt" disabled bsDatepicker>
+              </div>
+            </div>
+  
+            <div class="form-row">
+              <div class="form-group col-4">
+                <small for="term_dep_int_trans_type">Intt Transfer Type</small> <br>
+                <select disabled
+                  style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                  id="intt_trans_type" [(ngModel)]="tm_deposit.intt_trf_type" class="form-control form-control-sm"
+                  (change)="setIntTfrType($event.target.value)">
+                  <option [value]="tm_deposit.intt_trf_type" disabled >{{tm_deposit.intt_tfr_type_dscr}}</option>
+                  <option *ngFor="let l of intTransferType" [value]="l.tfr_type">{{l.tfr_desc}}</option>
+                </select>
+              </div>
+  
+              <div class="form-group col-2">
+                <small for="term_dep_intt_rate">Intt Rate</small>
+                <input [(ngModel)]="tm_deposit.intt_rt" disabled
+                  style="height:25px; text-align-last: right;" type="number" min="0" step='any'
+                  (focusout)="processInterest()" class="form-control form-control-sm text-capitalize"
+                  id="term_dep_intt_rate">
+              </div>
+  
+              <div class="form-group col-3">
+                <small for="term_dep_principal">Principal</small>
+                <input [(ngModel)]="tm_deposit.prn_amt" disabled
+                  style="height:25px; text-align-last: right;" type="number" min="0" step='any'
+                  (focusout)="processPrincipal()" class="form-control form-control-sm text-capitalize"
+                  id="term_dep_principal">
+              </div>
+  
+  
+              <div class="form-group col-3">
+                <small for="term_dep_interest">Interest</small>
+                <input [(ngModel)]="tm_deposit.intt_amt" style="height:25px; text-align-last: right;" disabled
+                  type="number" min="0" step='any' class="form-control form-control-sm text-capitalize"
+                  id="term_dep_interest">
+              </div>
+  
+              
+  
+            </div>
+  
+            <div class="form-row">
+              <!-- <div class="form-group col-3">
+              <small for="term_dep_mat_dt">Maturity Date</small>
+              <input disabled style="height:25px; width: 150px" type="text" placeholder="dd/mm/yyyy"
+                [(ngModel)]="tm_deposit.mat_dt" bsDatepicker [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }">
+            </div> -->
+  
+            <div class="form-group col-9">
+              <div class="container border">
+                <div class="form-row">
+
+                  <div class="form-group col-3">
+                    <small for="acc_no">Deposit Period</small>
+                  </div>
+
+                  <div class="form-group col-3">
+                    <small for="term_dep_yr">Year</small>
+                    <input disabled [(ngModel)]="tm_deposit.year" style="height:25px" type="number"
+                      max='100' min="0" (focusout)="processYearMonthDay()"
+                      class="form-control form-control-sm text-capitalize" id="term_dep_yr">
+                  </div>
+                  <div class="form-group col-3">
+                    <small for="term_dep_mon">Month</small>
+                    <input disabled [(ngModel)]="tm_deposit.month" style="height:25px" type="number"
+                      max='12' min="0" (focusout)="processYearMonthDay()"
+                      class="form-control form-control-sm text-capitalize" id="term_dep_mon">
+                  </div>
+                  <div class="form-group col-3">
+                    <small for="term_dep_day">Day</small>
+                    <input disabled [(ngModel)]="tm_deposit.day" style="height:25px" type="number"
+                      max='30' min="0" (focusout)="processYearMonthDay()"
+                      class="form-control form-control-sm text-capitalize" id="term_dep_day">
+                  </div>
+
+                </div>
+              </div>
+            </div>
+  
+              <div class="form-group col-3">
+                <small for="term_dep_matu_val">Matured Value</small>
+                <input [ngModel]="tm_deposit.mat_val" disabled style="height:25px; text-align-last: right;"
+                  type="number" min="0" step='any' class="form-control form-control-sm text-capitalize"
+                  id="term_dep_matu_val">
+              </div>
+              <!-- <div class="form-group col-3">
+                <small for="term_dep_cert_no">S/B Account No</small>
+                <input [disabled]='disableAll' [(ngModel)]="tm_deposit.user_acc_num" style="height:25px" type="text"
+                  class="form-control form-control-sm" id="term_dep_cert_no">
+              </div> -->
+            </div>
+  
+          </div>
+    
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <======================================================================================> -->
+
+  <div class="container col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-3">
+   
+    <!-- <================================================================> -->
+
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-12">
+        <h1></h1>
+        <h4 class="customHeader">Nominee Details</h4>
+
+        <section *ngFor="let t1 of td_nomineeList; let i = index ">
+          <div class="form-row">
+            <div class="form-group col-2">
+              <small for="nom_name">Nominee Name</small>
+              <input [(ngModel)]="t1.nom_name" style="height:25px" [disabled]='disableAll' type="text"
+                class="form-control form-control-sm text-capitalize" id="nom_name"
+                (ngModelChange)="t1.nom_name = $event.toUpperCase()" placeholder="Nominee Name">
+            </div>
+
+            <div class="form-group col-4">
+              <small for="nom_addr">Nominee Address</small>
+              <input [(ngModel)]="t1.nom_addr1" style="height:25px" [disabled]='disableAll' type="text"
+                class="form-control form-control-sm text-capitalize" id="nom_addr"
+                (ngModelChange)="t1.nom_addr1 = $event.toUpperCase()" placeholder="Nominee Address">
+            </div>
+
+
+            <div class="form-group col-2">
+              <small for="nom_percent">Percentage</small>
+              <input [(ngModel)]="t1.percentage" style="height:25px" [disabled]='disableAll' type="text"
+                class="form-control form-control-sm text-capitalize" id="nom_percent"
+                (change)="checkNomineePercentage(i)" placeholder="Percentage">
+            </div>
+            <div class="form-group col-2">
+              <small for="nom_rel">Relation</small>
+              <!-- <input [(ngModel)]="t1.relation" style="height:25px" [disabled]='disableAll' type="text" class="form-control form-control-sm text-capitalize" id="nom_rel"
+          (ngModelChange)="t1.relation = $event.toUpperCase()" placeholder="Relation"> -->
+              <select class="form-control form-control-sm Custrelation" [(ngModel)]="t1.relation">
+                <option value="" disabled>Choose</option>
+                <option *ngFor="let l of relStatus" [value]="l.val">{{l.val}}</option>
+              </select>
+            </div>
+
+            <div class="form-group col-2">
+              <small for="nom_phone">Phone</small>
+              <input [(ngModel)]="t1.phone_no" style="height:25px" [disabled]='disableAll' type="text"
+                class="form-control form-control-sm text-capitalize" id="nom_phone" placeholder="Phone"
+                (keyPress)="noSpecialChars($event)">
+            </div>
+          </div>
+        </section>
+
+        <div class="text-right mb-3">
+          <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm  mr-2"
+            (click)="addNominee()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+          </button>
+
+          <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm"
+            (click)="removeNominee()">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-12">
+        <!-- <div *ngIf="td_deftrans.trf_type=='C'">
+        <h1></h1>
+        <h6 style="background-color: lightskyblue">Denomination Details</h6>
+
+        <section *ngFor="let t1 of tm_denominationList; let i=index">
+        <div class="form-row">
+          <div class="form-group col-5">
+            <small for="trans_type">Rupees</small> <br>
+            <select
+              style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+              id="trans_type" class="form-control form-control-sm" [disabled]="disableAll"
+              (change)="setDenomination($event.target.value, i)">
+              <option [value]="t1.rupees" disabled selected>{{t1.rupees_desc}}</option>
+              <option [value]="l.value" *ngFor="let l of denominationList" >{{l.rupees}}</option>
+              </select>
+          </div>
+
+
+          <div class="form-group col-3">
+            <small for="deno_count">Count</small>
+            <input [(ngModel)]="t1.count" type="text" [disabled]="disableAll"
+            style="height:25px" class="form-control form-control-sm text-capitalize" id="deno_count"
+            (change)="calculateTotalDenomination(i)" placeholder="Count">
+          </div>
+
+          <div class="form-group col-4">
+            <small for="deno_total">Total</small>
+            <input [(ngModel)]="t1.total" type="text" disabled
+             style="height:25px" class="form-control form-control-sm text-capitalize" id="deno_total"  placeholder="Total">
+          </div>
+        </div>
+        </section>
+
+
+        <div class="form-row">
+          <div class="form-group col-8" style="text-align: right;">
+            <label class="form-check-label"> <small> Total</small> </label>
+          </div>
+
+          <div class="form-group col-4">
+            <input [(ngModel)]='denominationGrandTotal' disabled type="text" style="height:25px" class="form-control form-control-sm text-capitalize" id="total"
+              placeholder="Total">
+          </div>
+        </div>
+
+        <div class="text-right mb-3">
+          <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" (click)="addDenomination()" class="btn btn-primary btn-sm ">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+           </button>
+
+           <button mat-raised-button type="button" style="height:22px; padding-top: 0px;"  (click)="removeDenomination()" class="btn btn-primary btn-sm ">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+           </button>
+       </div>
+
+      </div> -->
+
+
+        <div *ngIf="td_deftrans.trf_type=='T'">
+          <h1></h1>
+          <h4 class="customHeader">Transfer Details</h4>
+
+         
+          <section *ngFor="let l of td_deftranstrfList; let i=index">
+            <div class="form-row">
+              <div class="form-group col-2">
+                <small for="debit_gl_ac">GL Code</small>
+                <input type="text" (focusout)="checkAndSetDebitAccType('gl_acc', l.gl_acc_code)"
+                  [(ngModel)]="l.gl_acc_code" style="height:25px" [disabled]='disableAll'
+                  class="form-control form-control-sm text-capitalize" id="debit_gl_ac">
+              </div>
+
+              <div class="form-group col-4">
+                <small for="debit_gl_head">GL Head</small>
+                <input type="text" disabled [(ngModel)]="l.gl_acc_desc" style="height:25px"
+                  class="form-control form-control-sm text-capitalize" id="debit_gl_head">
+              </div>
+
+              <div class="form-group col-3">
+                <small for="Inst_num">Instrument Num</small>
+                <input type="text" [(ngModel)]="l.instrument_num" style="height:25px"
+                  class="form-control form-control-sm text-capitalize" [disabled]='disableAll' id="Inst_num">
+              </div>
+            </div>
+          </section>
+          <section *ngFor="let l of td_deftranstrfList; let i=index">
+            <div class="form-row">
+              <!-- <div class="form-group col-1">
+              <small for="debit_ac">Account Type</small>
+              <input type="text" [(ngModel)]="l.cust_acc_type" (focusout)="checkAndSetDebitAccType('cust_acc', l.cust_acc_type)" style="height:25px"
+              [disabled]='disableAll' class="form-control form-control-sm text-capitalize" id="debit_ac">
+            </div>
+
+            <div class="form-group col-3">
+              <small for="debit_ac_dsc">Account Desc</small>
+              <input type="text" [(ngModel)]="l.cust_acc_desc" style="height:25px" disabled class="form-control form-control-sm text-capitalize"
+                id="debit_ac_dsc">
+            </div> -->
+              <div class="form-group col-2">
+                <small for="credit_ac">Account Type</small>
+                <select id="credit_ac" class="form-control form-control-sm" [(ngModel)]="l.cust_acc_type"
+                  [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                  (focusout)="checkAndSetDebitAccType('cust_acc', l.cust_acc_type)">
+                  <option *ngIf="accountTypeList" disabled>Choose</option>
+                  <option *ngFor="let acctType of accountTypeList" [value]="acctType.acc_type_cd">
+                    {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group col-3">
+                <small for="credit_ac_name">Acc Holder Name</small>
+                <div class="input-group">
+                <input type="text" class="form-control form-control-sm "
+                  [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0" [(ngModel)]="l.cust_name"
+                  type="text" placeholder="Enter Acc# / Customer Name / Phone number" 
+                  name="x-field-1" autocomplete="new-field-1">
+                  <div class="input-group-append">
+                    <button  class="btn btn-primary btn-sm"  (click)="suggestCustomerCr(i)"><i class="fa fa-search"></i></button>
+                  </div>
+                </div>
+                <div class="suggestions"
+                  *ngIf="suggestedCustomerCr && suggestedCustomerCr.length > 0 && indxsuggestedCustomerCr==i ">
+                  <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                    <thead>
+                      <tr>
+                        <th scope="col">Acc#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Gurdian Name</th>
+                        <th scope="col">Address</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let cust of suggestedCustomerCr"
+                        (click)="setCustDtlsCr(cust.acc_num,cust.cust_name,i)">
+                        <td scope="row">{{cust.acc_num}}</td>
+                        <td>{{cust.cust_name}}</td>
+                        <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                        <td>{{cust.guardian_name}}</td>
+                        <td>{{cust.present_address}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+                  *ngIf="suggestedCustomerCr && !(suggestedCustomerCr.length > 0) && indxsuggestedCustomerCr==i">
+                  <strong class="text-danger"> does not match with any customer</strong>
+                </div>
+              </div>
+
+
+              <div class="form-group col-2">
+                <small for="debit_ac_no">Account Number</small>
+                <input type="text" [(ngModel)]="l.cust_acc_number" disablled style="height:25px"
+                  (focusout)="setDebitAccDtls( l.cust_acc_number)" [disabled]='disableAll'
+                  class="form-control form-control-sm text-capitalize" id="debit_ac_no">
+              </div>
+
+              <!-- <div class="form-group col-3">
+              <small for="debit_ac_name">Acc Holder Name</small>
+              <input type="text" disabled [(ngModel)]="l.cust_name" style="height:25px" class="form-control form-control-sm text-capitalize"
+                id="debit_ac_name">
+            </div> -->
+
+              <div class="form-group col-2">
+                <small for="debit_amount">Amount</small>
+                <input type="text" [disabled]='disableAll' [(ngModel)]="l.amount" style="height:25px"
+                  (focusout)="checkDebitBalance(l.amount)" class="form-control form-control-sm text-capitalize"
+                  id="debit_amount">
+              </div>
+
+            </div>
+          </section>
+
+          <!-- <div class="form-row">
+
+          <div class="form-group col-1" style="text-align: left;">
+            <label class="form-check-label"> <small> Total Debit</small> </label>
+          </div>
+
+          <div class="form-group col-4">
+            <input type="text" style="height:25px; text-align-last: right;" type="number" step='any'
+              class="form-control form-control-sm text-capitalize" id="total" placeholder="Total">
+          </div>
+
+          <div class="form-group col-7" style="text-align: right;">
+            <button mat-raised-button type="button" style="height:22px; padding-top: 0px;"  class="btn btn-primary btn-sm ">
+              <i class="fa fa-plus-circle" aria-hidden="true"></i>
+             </button>
+
+             <button mat-raised-button type="button" style="height:22px; padding-top: 0px;"  class="btn btn-primary btn-sm ">
+              <i class="fa fa-minus-circle" aria-hidden="true"></i>
+             </button>
+          </div>
+
+        </div> -->
+
+        </div>
+      </div>
+    </div>
+
+    <!-- <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{alertMsgType}}: </strong>
+    {{alertMsg}}
+    <button mat-raised-button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlertMsg()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div> -->
+    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-container *ngTemplateOutlet="buttonDiv">
+
+  </ng-container>
+
+
+</div>
+<ng-template #unappconfirm>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">You Have Already Unapproved Transaction With This Account, Wish to edit or delete Transaction?
+    </h4>
+    <!-- <button mat-raised-button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <div>
+      <div class="col-12 scroll-when-long">
+        <div class="table-responsive" *ngIf="unApproveTrans">
+          <h4 class="customHeader">List of Unapproved Transaction for Acc# {{unApproveTrans.acc_num}}.</h4>
+          <table class="table table-sm table-hover " id="customers2">
+            <!-- <thead> -->
+              <tr>
+                <th scope="col">Trans Code</th>
+                <th scope="col">Trans Dt</th>
+                <th scope="col">Agreement No</th>
+                <th scope="col">Amount</th>
+              </tr>
+            <!-- </thead> -->
+            <tbody>
+              <tr >
+                <td>{{unApproveTrans.trans_cd}}</td>
+                <td>{{unApproveTrans.trans_dt}}</td>
+                <td>{{unApproveTrans.acc_num}}</td>
+                <td>{{unApproveTrans.amount | currency:'INR'}}</td>
+                
+
+                <!-- <td *ngIf="unApproveTrans.length > 1"><button mat-raised-button type="button"
+                    class="btn btn-primary float-right" (click)="onUpapprovedConfirm(tran)">Confirm</button></td> -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <button mat-raised-button type="button" class="btn btn-default" (click)="onUpapprovedCancel()">Cancel</button> &nbsp;
+    <button mat-raised-button type="button" class="btn btn-primary float-right"
+      (click)="onUpapprovedConfirm(unApproveTrans)">View/Edit</button>
+  </div>
+</ng-template>
+
+<ng-template #Delconfirm >
+  <div class="modal-body text-center" >
+    <p>'Are you sure you want to <b style="color: red;">Delete</b> Transaction of Acc {{this.masterModel.tmlocker.acc_num}}
+      with Transancation Cd {{this.td_deftrans.trans_cd}}</p>
+    <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+    <button mat-raised-button type="button" class=" btn btn-primary" (click)="deleteData()" >Yes</button>
+    
+  </div>
+</ng-template>

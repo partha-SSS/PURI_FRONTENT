@@ -1,0 +1,412 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="form-group col-3">
+            <small for="acc_type_cd"><i class="fa fa-star text-danger" aria-hidden="true"></i> Account Type</small>
+            <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+              (change)="onAccountTypeChange()">
+              <option *ngIf="AcctTypes2" disabled>Choose</option>
+              <option *ngFor="let acctType of AcctTypes2" [value]="acctType.acc_type_cd">
+                {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+              </option>
+
+            </select>
+          </div>
+          <div class="col-9">
+            <small for="acct_num"> <i class="fa fa-star text-danger" aria-hidden="true"></i> Search Name/Cust
+              code/Phone</small>
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                placeholder="Enter Acc# / Customer Name / Phone number" (input)="onChangeNull()" name="x-field-1"
+                autocomplete="new-field-1">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+  
+            <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.acc_num}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+              *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+              <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any
+                customer</strong>
+            </div>
+          </div>
+          <!-- <div class="col-12" *ngIf="showWait"><b>Please wait...</b></div> -->
+          <!-- <div class="col-6">
+            <small for="fromDate"><i class="fa fa-star text-danger" aria-hidden="true"></i> From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div> -->
+          <!-- <div class="col-6">
+            <small for="toDate"><i class="fa fa-star text-danger" aria-hidden="true"></i> To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div> -->
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="disablePrint" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint (click)="printCall()">Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <!-- <button mat-raised-button type="button" (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_PassBookFastPage']" >Print Fast Page</button> -->
+  
+      </div>
+    </div>
+    <div *ngIf="showAlert" class="alert alert-success alert-dismissible fade show" role="alert" style="width: 67%;">
+      <strong>Msg,</strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+     <div id="hiddenTab"   *ngIf="sys.ardbCD!='25' && sys.ardbCD!='7' "><br>
+        <div style="text-align: center;margin-top: 20%;"*ngIf="sys.ardbCD!='25' && sys.ardbCD!='15'"><b>{{Header}}</b></div>
+        <div style="text-align: center;font-size: x-large;margin-top: 5%;"*ngIf="sys.ardbCD=='15'"><b>{{ardbName}}</b></div>
+        <div style="text-align: center;font-size: large;margin-top: 1%;"*ngIf="sys.ardbCD=='15'"><b>{{Header}}</b></div>
+        <img *ngIf="sys.ardbCD=='15'" src="./assets/images/npardb.png"  class="log3">
+        <!-- <div style="text-align: center;font-size: large;margin-top: 1%;"*ngIf="sys.ardbCD=='15'"><b>{{Header}}</b></div> -->
+        <br><br>
+          
+          <div class="form-row" style="margin-left: 10%;">
+            <div style="width: 40%;"><b>Branch:-  {{branchName}}</b> </div>
+          <div *ngIf="showTable" style="width: 50%;text-align: right"><b>After Maturity Inst:-  {{masterModel?.tmdeposit?.standing_instr_flag=='1'?"Auto Close":masterModel?.tmdeposit?.standing_instr_flag=='2'?"Auto Renew":"None"}}</b></div>
+
+              
+          </div>
+            <div class="form-row" style="margin-left: 10%;padding-top: 1%;">
+              <div style="width: 40%;"><b>A/C No:-   {{cAcc}}</b></div>
+            <div *ngIf="showTable" style="text-align: right;width: 50%;"><b>Issue Date:  {{today| date:'dd-MM-yyyy'}}</b></div>
+
+          </div>
+          <div class="form-row" style="margin-left: 10%;padding-top: 1%;" >
+          <div style="width: 70%;"><b>Name:-  {{cName}}</b></div>
+          <div *ngIf="showTable" style="text-align: right;width: 20%;"><b>CIF:-  {{masterModel?.tmdeposit?.cust_cd}}</b></div>                
+          </div>
+
+            <div class="form-row" style="margin-left: 10%;padding-top: 1%;" >
+              <div><b>Guardian Name:-  {{gName}}</b> </div>
+            </div>
+            <div class="form-row"style="margin-left: 10%;padding-top: 1%;"> 
+              <div *ngIf="showTable"><b>Joint Holder's Name:-   {{joinHold?joinHold:"N/A"}}</b></div>
+            </div>
+            <div class="form-row"style="margin-left: 10%;padding-top: 1%;"> 
+              <div><b>Address:-  {{cAddress}}</b></div>
+            </div>
+        <table  class="mkSmall" *ngIf="showTable">    
+          <tr>
+            <th style="text-align:center;"><u>Deposit Amount</u></th>
+            <th style="text-align:center;"><u>Deposit Period</u></th>
+            <th style="text-align:center;"><u>Interest Rate</u></th>
+            <th style="text-align:center;"><u>Effective Date</u></th>
+            <th style="text-align:center;"><u>Maturity Date</u></th>
+            <th style="text-align:center;" *ngIf="ShowCC"><u>Maturity Value</u></th>
+           
+    
+          </tr>
+          <tbody>
+           <tr *ngIf="showTable" style="font-weight: 800;">
+              <td style="text-align:center;">{{masterModel.tmdeposit.prn_amt|currency:'INR'}}</td>
+              <td style="text-align:center;">{{Deposit_Period}}</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.intt_rt}}%</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.opening_dt.toString().substr(0,10)}}</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.mat_dt.toString().substr(0,10)}}</td>
+              <td style="text-align: center;" *ngIf="ShowCC">{{(masterModel.tmdeposit.prn_amt + masterModel.tmdeposit.intt_amt)|currency:'INR'}}</td>
+  
+            </tr>
+          </tbody>
+          </table>
+          <div class="form-row"style="margin-left: 5%;padding-top: 1%;"> 
+            <div *ngIf="showTable && ShowMIS"><b>Monthly Installment:-  {{masterModel.tmdeposit.intt_amt|currency:'INR'}}({{masterModel.tmdeposit.intt_amt|amountToWord}})</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;padding-top: 1%;"> 
+            <div *ngIf="showTable && ShowMIS"><b>Issue Amount in Words:-  {{masterModel.tmdeposit.prn_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;padding-top: 1%;"> 
+            <div *ngIf="ShowMIS" ><b>Mode of Operation:-  {{oprn_instr_desc}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;padding-top: 1%;"> 
+            <div *ngIf="showTable && ShowMIS" ><b>SI Credited To:-  {{this.sbAcc}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;padding-top: 1%;"> 
+            <div *ngIf="showTable && ShowCC"><b>Issue Amount in Words:-  {{masterModel.tmdeposit.prn_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;padding-top: 1%;"> 
+            <div *ngIf="showTable && ShowCC"><b>Mature Amount in Words:-  {{masterModel.tmdeposit.prn_amt+masterModel.tmdeposit.intt_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;padding-top: 1%;"> 
+            <div *ngIf="ShowCC" ><b>Mode of Operation:-  {{oprn_instr_desc}}</b></div>
+          </div>
+          <div *ngIf="sys.ardbCD=='15'" style="text-align: right;padding-top: 2%;padding-right: 5%;"><b>Branch Manager</b></div>
+
+          
+       </div>
+       <div id="hiddenTab"  style="font-size: large;" *ngIf="sys.ardbCD=='25'"><br>
+        <h2 style="text-align: center;margin-top: 9%;"><b>K.G.Bose Sarani,Katwa,Purba Bardhaman,W.B-713130</b></h2>
+        <div style="text-align: center;"><b>{{Header}}</b></div>
+        <br><br>
+          
+            <div class="form-row" style="margin-left: 10%;">
+              <div style="width: 40%;"><b>Branch:-  {{branchName}}</b> </div>
+             <div *ngIf="showTable" style="width: 50%;text-align: right"><b>After Maturity Inst:-  {{masterModel?.tmdeposit?.standing_instr_flag=='1'?"Auto Close":masterModel?.tmdeposit?.standing_instr_flag=='2'?"Auto Renew":"None"}}</b></div>
+
+                
+            </div>
+              <div class="form-row" style="margin-left: 10%;">
+                <div style="width: 40%;"><b>A/C No:-   {{cAcc}}</b></div>
+              <div *ngIf="showTable" style="text-align: right;width: 50%;"><b>Issue Date:  {{today| date:'dd-MM-yyyy'}}</b></div>
+
+             </div>
+             <div class="form-row" style="margin-left: 10%;" >
+             <div style="width: 70%;"><b>Name:-  {{cName}}</b></div>
+             <div *ngIf="showTable" style="text-align: right;width: 20%;"><b>CIF:-  {{masterModel?.tmdeposit?.cust_cd}}</b></div>                
+            </div>
+            <div class="form-row" style="margin-left: 10%;" >
+              <div><b>Guardian Name:-  {{gName}}</b> </div>
+            </div>
+            <div class="form-row"style="margin-left: 10%;"> 
+              <div *ngIf="showTable"><b>Joint Holder's Name:-   {{joinHold}}</b></div>
+            </div>
+            <div class="form-row"style="margin-left: 10%;"> 
+              <div><b>Address:-  {{cAddress}}</b></div>
+            </div>
+        <table  class="mkSmall" *ngIf="showTable">    
+          <tr>
+            <th style="text-align:center;"><u>Deposit Amount</u></th>
+            <th style="text-align:center;"><u>Deposit Period</u></th>
+            <th style="text-align:center;"><u>Interest Rate</u></th>
+            <th style="text-align:center;"><u>Effective Date</u></th>
+            <th style="text-align:center;"><u>Maturity Date</u></th>
+            <th style="text-align:center;" *ngIf="ShowCC && this.tm_deposit.acc_type_cd!='2'"><u>Maturity Value</u></th>
+            <th style="text-align: center;" *ngIf="this.tm_deposit.acc_type_cd=='2'"><u>Interest / Frequency</u></th>
+    
+    
+          </tr>
+          <tbody>
+           <tr *ngIf="showTable" style="font-weight: 700;">
+              <td style="text-align:center;">{{masterModel.tmdeposit.prn_amt|currency:'INR'}}</td>
+              <td style="text-align:center;">{{Deposit_Period}}</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.intt_rt}}%</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.opening_dt.toString().substr(0,10)}}</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.mat_dt.toString().substr(0,10)}}</td>
+              <td style="text-align: center;" *ngIf="ShowCC && this.tm_deposit.acc_type_cd!='2'">{{masterModel.tmdeposit.prn_amt+masterModel.tmdeposit.intt_amt|currency:'INR'}}</td>
+              <td style="text-align: center;" *ngIf="this.tm_deposit.acc_type_cd=='2'">{{masterModel.tmdeposit.intt_amt|currency:'INR'}}/{{masterModel.tmdeposit.intt_trf_type=='O'?'On-Maturity':masterModel.tmdeposit.intt_trf_type=='Y'?'Yearly':masterModel.tmdeposit.intt_trf_type=='H'?'Haf-Yearly':masterModel.tmdeposit.intt_trf_type=='Q'?'Quaterly':'Monthly' }}</td>
+    
+            </tr>
+          </tbody>
+          </table>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowMIS"><b>Monthly Installment:-  {{masterModel.tmdeposit.intt_amt|currency:'INR'}}({{masterModel.tmdeposit.intt_amt|amountToWord}})</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowMIS"><b>Issue Amount in Words:-  {{masterModel.tmdeposit.prn_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="ShowMIS" ><b>Mode of Operation:-  {{oprn_instr_desc}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowMIS" ><b>SI Credited To:-  {{this.sbAcc}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowCC"><b>Issue Amount in Words:-  {{masterModel.tmdeposit.prn_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowCC"><b>Mature Amount in Words:-  {{masterModel.tmdeposit.prn_amt+masterModel.tmdeposit.intt_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="ShowCC" ><b>Mode of Operation:-  {{oprn_instr_desc}}</b></div>
+          </div>
+
+       </div>
+       <div id="hiddenTab"  style="font-size: large;" *ngIf="sys.ardbCD=='7'"><br>
+        <div style="text-align: center;margin-top: 19%;"><b>{{Header}}</b></div>
+        <br><br>
+          
+        <div class="form-row" style="margin-left: 10%;">
+          <div style="width: 40%;"><b>Branch:-  {{branchName}}</b> </div>
+         <div *ngIf="showTable" style="width: 50%;text-align: right"><b>After Maturity Inst:-  {{masterModel?.tmdeposit?.standing_instr_flag=='1'?"Auto Close":masterModel?.tmdeposit?.standing_instr_flag=='2'?"Auto Renew":"None"}}</b></div>
+
+            
+        </div>
+          <div class="form-row" style="margin-left: 10%;">
+            <div style="width: 40%;"><b>A/C No:-   {{cAcc}}</b></div>
+          <div *ngIf="showTable" style="text-align: right;width: 50%;"><b>Issue Date:  {{today| date:'dd-MM-yyyy'}}</b></div>
+
+         </div>
+         <div class="form-row" style="margin-left: 10%;" >
+         <div style="width: 70%;"><b>Name:-  {{cName}}</b></div>
+         <div *ngIf="showTable" style="text-align: right;width: 20%;"><b>CIF:-  {{masterModel?.tmdeposit?.cust_cd}}</b></div>                
+        </div>
+
+
+            <div class="form-row" style="margin-left: 10%;" >
+              <div style="width: 60%;"><b>Guardian Name:-  {{gName}}</b> </div>
+              <div *ngIf="showTable && ShowMIS" style="text-align: right;width: 30%;"><b>SI Credited To:-  {{this.sbAcc}}</b></div>
+              
+            </div>
+            <div class="form-row"style="margin-left: 10%;"> 
+              <div *ngIf="showTable"><b>Joint Holder's Name:-   {{joinHold}}</b></div>
+            </div>
+            <div class="form-row"style="margin-left: 10%;"> 
+              <div><b>Address:-  {{cAddress}}</b></div>
+            </div>
+            <div class="form-row"style="margin-left: 10%;">
+              <div *ngIf="showTable && ShowMIS"><b>Monthly Installment:-  {{masterModel.tmdeposit.intt_amt|currency:'INR'}}({{masterModel.tmdeposit.intt_amt|amountToWord}})</b></div>
+            </div>
+
+        <table  class="mkSmall" *ngIf="showTable">    
+          <tr>
+            <th style="text-align:center;"><u>Deposit Amount</u></th>
+            <th style="text-align:center;"><u>Deposit Period</u></th>
+            <th style="text-align:center;"><u>Interest Rate</u></th>
+            <th style="text-align:center;"><u>Effective Date</u></th>
+            <th style="text-align:center;"><u>Maturity Date</u></th>
+            <th style="text-align:center;" *ngIf="ShowCC"><u>Maturity Value</u></th>
+    
+    
+          </tr>
+          <tbody>
+           <tr *ngIf="showTable" style="font-weight: 700;">
+              <td style="text-align:center;">{{masterModel.tmdeposit.prn_amt|currency:'INR'}}</td>
+              <td style="text-align:center;">{{Deposit_Period}}</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.intt_rt}}%</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.opening_dt.toString().substr(0,10)}}</td>
+              <td style="text-align:center;">{{masterModel.tmdeposit.mat_dt.toString().substr(0,10)}}</td>
+              <td style="text-align: center;" *ngIf="ShowCC">{{masterModel.tmdeposit.prn_amt+masterModel.tmdeposit.intt_amt|currency:'INR'}}</td>
+    
+            </tr>
+          </tbody>
+          </table>
+          <div *ngIf="showTable" class="form-row"style="margin-left: 5%; margin-top:22%"> 
+            <div style="margin-left: 20px"><b>Name:- {{cName}}, </b></div>
+            <div style="margin-left: 20px"><b>A/C No:- {{cAcc}}, </b></div>
+            <div style="margin-left: 20px"><b>Issue Date:- {{today| date:'dd-MM-yyyy'}}, </b></div>
+            <div style="margin-left: 20px"><b>Amount:- {{masterModel?.tmdeposit?.prn_amt|currency:'INR'}}, </b></div>
+            <div style="margin-left: 20px"><b>Deposit Period:- {{Deposit_Period}}</b></div>
+            <div style="margin-left: 20px"><b>ROI:- {{masterModel.tmdeposit.intt_rt}}%, </b></div>
+            <div style="margin-left: 20px"><b>Maturity Date:- {{masterModel.tmdeposit.mat_dt.toString().substr(0,10)}}, </b></div>
+            <div  style="margin-left: 20px" *ngIf="ShowCC"><b>Maturity Value:- {{masterModel?.tmdeposit?.prn_amt+masterModel?.tmdeposit?.intt_amt|currency:'INR'}} </b></div>     
+          </div>
+          <!-- <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowMIS"><b>Monthly Installment:-  {{masterModel.tmdeposit.intt_amt|currency:'INR'}}({{masterModel.tmdeposit.intt_amt|amountToWord}})</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowMIS"><b>Issue Amount in Words:-  {{masterModel.tmdeposit.prn_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="ShowMIS" ><b>Mode of Operation:-  {{oprn_instr_desc}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowMIS" ><b>SI Credited To:-  {{this.sbAcc}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowCC"><b>Issue Amount in Words:-  {{masterModel.tmdeposit.prn_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="showTable && ShowCC"><b>Mature Amount in Words:-  {{masterModel.tmdeposit.prn_amt+masterModel.tmdeposit.intt_amt|amountToWord}}</b></div>
+          </div>
+          <div class="form-row"style="margin-left: 5%;"> 
+            <div *ngIf="ShowCC" ><b>Mode of Operation:-  {{oprn_instr_desc}}</b></div>
+          </div> -->
+
+       </div>
+    </div>
+  
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="disablePrint" [useExistingCss]="true"
+        printSectionId="hiddenTab" ngxPrint (click)="printCall()">Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <!-- <button mat-raised-button type="button" (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_PassBookFastPage']" >Print Fast Page</button> -->
+  
+      </div>
+    </div>
+  </div>
+  <ng-template #UpdateSuccess let-modal data-keyboard="false" data-backdrop="false">
+   
+    <div class="modal-body">
+      <h4 style="color: darkgreen;"><b>{{cName}}</b> {{Header}} Print successfully....</h4>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <ng-template #alreadyUpdate let-modal data-keyboard="false" data-backdrop="false">
+   
+    <div class="modal-body">
+      <h4 style="color: rgb(146, 8, 8);"><b>{{cName}}</b> Certificate Already Printed</h4>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <loading *ngIf="isLoading"></loading>
+  
+  

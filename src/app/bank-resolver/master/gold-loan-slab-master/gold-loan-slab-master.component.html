@@ -1,0 +1,183 @@
+
+<loading *ngIf="isLoading"></loading>
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add New Gold Slab</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+   
+    
+    <form [formGroup]="locker" >
+      <div>
+        <label for="EffectiveDt">Effective Date</label>
+        <input style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="EffectiveDt" type="date" formControlName="EffectiveDt" />
+      </div>
+    
+      <!-- <div>
+        <label for="LowerSlabValue">Lower Slab Value</label>
+        <input style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="LowerSlabValue" type="number" formControlName="LowerSlabValue" (change)="setRange('L',$event)"/>
+      </div>
+    
+      <div>
+        <label for="UpperSlabValue">Upper Slab Value</label>
+        <input style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="UpperSlabValue" type="number" formControlName="UpperSlabValue" (change)="setRange('U',$event)"/>
+      </div> -->
+<!--     
+      <div>
+        <label for="SlabRange">Slab Range</label>
+        <input readonly style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="SlabRange" type="text" formControlName="SlabRange" />
+      </div> -->
+    
+      <div>
+        <label for="InttRate">Interest Rate</label>
+        <input style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="InttRate" type="number" formControlName="InttRate" />
+      </div>
+      <div>
+        <label for="sanc_perc">Sanction(%)</label>
+        <input style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="sanc_perc" type="number" formControlName="sanc_perc" />
+      </div>
+    
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SaveLocker()">Add</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<ng-template #content2 let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add New Gold Price</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+   
+    
+    <form [formGroup]="goldPrice" >
+      <div>
+        <label for="effective_date">Effective Date</label>
+        <input style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="effective_date" type="date" formControlName="effective_date" />
+      </div>
+    
+      <div>
+        <label for="gold_rate">1 Gram 24 Carat Gold Price</label>
+        <input style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" id="gold_rate" type="number" formControlName="rate_per_gram" />
+      </div>
+    
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SaveTodayGoldPrise()">Add</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add Gold Slab</button>
+
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="UpdateTodayGoldPrice()">Update Today Gold Price</button>
+  </div>
+</div>
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-6 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Gold Slab master Details</h4>
+            
+            <div class="table-responsive" class="scroll-when-long">
+              <h2 style="color: red;"><b>Today Gold Price/Gm: {{letestGoldPrice}}</b></h2>
+                  <div class="form-row">
+                     <div class="form-group col-2">
+                      Effective From
+                    </div>
+                    <!-- <div class="form-group col-2">
+                      Lower Slab
+                     </div>
+                     <div class="form-group col-2">
+                      Upper Slab
+                     </div>
+                      -->
+                     <div class="form-group col-4">
+                      Sanc Perc
+                     </div>
+                     <div class="form-group col-2">
+                      Interest Rate
+                     </div>
+                  </div>
+                    <div class="form-row" *ngFor="let locker of reportData;let i = index">
+                    <div class="form-group col-2">
+                      <input type="text" style="border-radius: 1.25rem!important;"  disabled [value]="locker.effectiveDt  | slice:0:10"  class="form-control form-control-sm custom-scrollbar"   >
+                      </div>
+                      <!-- <div class="form-group col-2">
+                        <input type="text" style="border-radius: 1.25rem!important;" disabled  value="{{locker.lowerSlabValue }}" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-2">
+                        <input type="text" style="border-radius: 1.25rem!important;" disabled value="{{locker.upperSlabValue  }}" class="form-control form-control-sm custom-scrollbar"  >
+
+                      </div> -->
+                      
+                      <div class="form-group col-4">
+                        <input type="text" style="border-radius: 1.25rem!important;" disabled value="{{locker.sanc_perc  }}" class="form-control form-control-sm custom-scrollbar"  >
+
+                      </div>
+                      <div class="form-group col-2">
+                        <input type="text" style="border-radius: 1.25rem!important;" disabled value="{{locker.inttRate  }}" class="form-control form-control-sm custom-scrollbar"  >
+
+                      </div>
+                    </div>
+                 
+              <hr>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+        </div>
+  </div>
+
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add Gold Slab</button>
+
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>

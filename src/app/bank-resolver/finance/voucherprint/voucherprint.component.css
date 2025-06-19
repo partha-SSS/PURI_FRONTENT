@@ -1,0 +1,22 @@
+.scroll-to-top {
+    position: fixed;
+    bottom: 50%;
+    right: 20px;
+    padding: 10px;
+    background-color: #0c9dc9;
+    color: #ffffff;
+    border: 1px solid;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .scroll-to-bottom {
+    position: fixed;
+    top: 51%;
+    right: 20px;
+    padding: 10px;
+    background-color: #0c9dc9;
+    color: #ffffff;
+    border: 1px solid;
+    border-radius: 50%;
+    cursor: pointer;
+  }

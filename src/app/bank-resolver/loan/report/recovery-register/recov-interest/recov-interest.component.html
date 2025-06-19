@@ -1,0 +1,171 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate" >From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+              formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate" >To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="form-row">
+          <div class="col-12">
+           <div >
+            <small for="acc_type_cd">Loan Type</small>
+              <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd">
+                <option *ngIf="AcctTypes" disabled>Choose</option>
+                <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                  {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                </option>
+              </select>
+           </div>
+          </div>
+        </div> -->
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+    
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="mattable" 
+     ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    </div>
+    </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+
+  <div class="mat-elevation-z8" id="mattable">
+<table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+ 
+  <ng-container matColumnDef="mainHeader">
+    <th mat-header-cell colspan="18" *matHeaderCellDef>
+      <div class="justify-content-center" style="text-align:center"><br>
+        <h4>{{ardbName}} {{branchName}}</h4>
+        <h4>Run Date & Time : {{today}} </h4>
+        <h4> <u>Interest Recovery from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+      </div>
+   </th>
+  </ng-container>
+  <ng-container matColumnDef="acc_name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Account Name </th>
+    <td mat-cell *matCellDef="let row" > 
+      {{row.acctype.acc_name}}
+      </td>
+   </ng-container>
+   <ng-container matColumnDef="cur_intt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>  Current Interest </th>
+    <td mat-cell *matCellDef="let row"> 
+      {{row.acctype.tot_acc_curr_intt_recov|currency:"INR"}}
+      </td>
+   </ng-container>
+   <ng-container matColumnDef="ovd_intt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Overdue Interest </th>
+    <td mat-cell *matCellDef="let row" > 
+      {{row.acctype.tot_acc_ovd_intt_recov|currency:"INR"}}
+      </td>
+   </ng-container>
+   <ng-container matColumnDef="pen_intt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Penal Interest </th>
+    <td mat-cell *matCellDef="let row"> 
+      {{row.acctype.tot_acc_penal_intt_recov|currency:"INR"}}
+      </td>
+   </ng-container>
+   <ng-container matColumnDef="tot_intt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Interest </th>
+    <td mat-cell *matCellDef="let row"> 
+      {{row.acctype.tot_acc_curr_intt_recov+row.acctype.tot_acc_ovd_intt_recov+row.acctype.tot_acc_penal_intt_recov|currency:"INR"}}
+      </td>
+   </ng-container>
+  
+  <tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+</table>
+   <table style="margin-bottom:20px">
+    <tr>
+      <td style="width:10%;" ></td>
+      <td style="width: 20%;"><b>Total Interest recov:-</b></td>
+      <td style="width: 17%"><b>{{totcurrInttSum|currency:"INR"}}</b></td>
+      <td style="width: 18%"><b>{{totovdInttSum|currency:"INR"}}</b></td>
+      <td style="width: 17%"><b>{{totpenalInttSum|currency:"INR"}}</b></td>
+      <td><b> {{totcurrInttSum+totovdInttSum+totpenalInttSum|currency:"INR"}}</b></td>
+    </tr>
+  </table>
+<footer>
+  <small>
+    This report is generated through CFS-2022
+   </small> 
+   
+ </footer>
+</div>
+<!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+ 
+
+   
+  
+  <!-- <br><br><br><br>
+  <small>This report is generated through CFS-2022</small> -->
+   </div>
+  <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  </div>
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+  </div>
+  </div>
+ 
+  <loading *ngIf="isLoading"></loading>
+  

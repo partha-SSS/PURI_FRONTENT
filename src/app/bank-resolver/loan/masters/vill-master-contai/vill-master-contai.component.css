@@ -1,0 +1,13 @@
+.btn-primary-spacing
+{
+margin-right: 10px !important;
+}
+.suggestions{
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    z-index: 999;
+    width: 50px;
+    height: auto;
+    max-height: 300px;
+    overflow: auto;
+  }

@@ -1,0 +1,106 @@
+
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 shadow-sm mb-4 bg-white p-3" style="text-align: center;">
+    <p>Click print button for print passbook fastpage</p>
+    <button mat-raised-button class="btn btn-primary"  [useExistingCss]="true"
+    printSectionId={{printID}} ngxPrint >Print FastPage</button> &nbsp;
+  </div>
+<div id="fastPage" style="font-family:Verdana, Geneva, Tahoma, sans-serif;font-size:20px!important;" >
+    <div style="margin-top: 53%; ">&nbsp;</div>
+    <div class="form-row" style="margin-left: 3%;">
+        <div style="width: 70%;"><b>A/C No:   {{suggestedCustomer[0]?.acc_num}}</b></div>
+        <!-- <div style="text-align: right;width: 20%;"><b *ngIf="sys.ardbCD!='4'">IFSC: {{IFSC}}</div> -->
+        <div style="text-align: right;width: 20%;"><b>CIF:  {{masterModel.tmdeposit.cust_cd}}</b></div>
+    </div>
+      <div class="form-row" style="margin-left: 3%;padding-top: 5px;">
+          <div style="width: 55%;"><b>Name:  {{suggestedCustomer[0]?.cust_name}}</b></div>
+          <div style="text-align: right;width: 35%;"><b>Branch:   {{branchName}}</b></div>
+     </div>
+      <div class="form-row" style="margin-left: 3%;padding-top: 5px;" >
+      <div><b>Guardian Name:  {{suggestedCustomer[0]?.guardian_name}}</b> </div>
+    </div>
+    <div class="form-row"style="margin-left: 3%;padding-top: 5px;"> 
+      <div><b>Joint Holder's Name:   {{joinHold}}</b></div>
+    </div>
+    <div class="form-row"style="margin-left: 3%;padding-top: 5px;"> 
+      <div><b>Address:  {{suggestedCustomer[0]?.present_address}}</b></div>
+    </div>
+    <br>
+    
+        <div class="form-row" style="margin-left: 3%;padding-top: 5px;">
+            <div style="width: 35%;"><b>Occupation:  {{custDtls?.occupation?custDtls.occupation:''}}</b> </div>
+            <div style="width: 30%;"><b>Mode of Operation:  {{oprn_instr_desc}}</b> </div>
+        </div>
+        <div class="form-row" style="margin-left: 3%;padding-top: 5px;">
+            <div style="width:97%;"><b>Contact No:  {{custDtls?.phone?custDtls?.phone:''}}</b></div>
+        </div>
+        <div class="form-row" style="margin-left: 3%;padding-top: 5px;">
+          <div style="width: 50%;"><b>Issue Date:  {{curDay}}</b></div>
+          <div style="text-align: right;width: 47%;"><b>Branch Manager / Authorised Signatory</b></div>
+        </div>
+    
+  </div>
+ 
+  <div id="fastPageGhatal" style="font-family:Arial, Helvetica, ui-sans-serif;" hidden>
+    <div style="margin-top: 11%; ">&nbsp;</div>
+    
+    <div style="margin-left: 66%; font-size:large" >
+         <b style="margin-left:20%;">{{branchName}}</b><br><br><br>
+          <p style="line-height:58px;">{{suggestedCustomer[0]?.acc_num==null?"&nbsp;":suggestedCustomer[0]?.acc_num}}</p>
+          <p style="line-height:52px;">{{suggestedCustomer[0]?.cust_name==null?"&nbsp;":suggestedCustomer[0]?.cust_name}}</p>
+          <p style="line-height:52px;">{{suggestedCustomer[0]?.guardian_name==null?"&nbsp;":suggestedCustomer[0]?.guardian_name}}</p>
+          <p style="line-height:50px;">{{suggestedCustomer[0]?.present_address==null?"&nbsp;":suggestedCustomer[0]?.present_address}}</p>
+          <p style="line-height:49px;">{{custDtls.occupation==null?"&nbsp;":custDtls.occupation}}</p>
+          <p style="line-height:48px;">{{suggestedCustomer[0]?.phone==null?"&nbsp;":suggestedCustomer[0]?.phone}}</p>
+          <p style="margin-left:15%;line-height:48px;">{{oprn_instr_desc==null?"&nbsp;":oprn_instr_desc}}</p>
+          <p style="line-height:48px;margin-left:5%;">{{curDay}}</p>
+    </div>
+  </div>
+  <div id="fastPageRD"  style="width: 60%;padding-left: 3% " hidden>
+    <div style="padding: 10px;">
+      <div style="margin-top: 58%; ">&nbsp;</div>
+      <div class="form-row">
+          <div style="width: 40%;"><b>A/C No:  {{suggestedCustomer[0]?.acc_num}}</b></div>
+          <div style="text-align: right;width: 20%;"><b>CIF:  {{masterModel?.tmdeposit?.cust_cd}}</b></div>
+      </div>
+        <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 40%;"><b>Name:  </b>{{suggestedCustomer[0]?.cust_name}}</div>
+          <div style="text-align: right;width: 20%;"><b>Branch:  </b>{{branchName}}</div>
+
+       </div>
+        <div class="form-row" style="padding-top: 5px;" >
+        <div style="width: 60%;"><b>Guardian Name:  </b>{{suggestedCustomer[0]?.guardian_name}} </div>
+      </div>
+      <div class="form-row"style="padding-top: 5px;"> 
+        <div style="width: 60%;"><b>Joint Holder's Name:  </b> {{joinHold}}</div>
+      </div>
+      <div class="form-row"style="padding-top: 5px;"> 
+        <div style="width: 60%;"><b>Address:  </b>{{suggestedCustomer[0]?.present_address}}</div>
+      </div>
+      <br><br>
+    </div>
+      <div style="padding: 10px;">
+          <div class="form-row">
+              <div style="width: 40%;"><b>Inst Amt/Month:  {{masterModel?.tmdeposit?.instl_amt | number : '1.2-2'}}</b> </div>
+              <div style="width: 20%;text-align: right;"><b>No of Inst:  {{masterModel.tmdeposit.instl_no}}(Month)</b> </div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 40%;"><b>Opening Dt:  </b>{{masterModel?.tmdeposit?.opening_dt.substr(0,10)}} </div>
+            <div style="width: 20%;text-align: right;"><b>Rate of Intt:  {{masterModel?.tmdeposit?.intt_rt}}%</b> </div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;">
+            <div style="width: 40%;"><b>Maturity Dt:  </b>{{masterModel?.tmdeposit?.mat_dt.substr(0,10)}} </div>
+            <div style="width: 20%;text-align: right;"><b>Maturity Amt:  {{RDmatValue | number : '1.2-2'}}</b></div>
+          </div>
+          <div class="form-row" style="padding-top: 5px;" >
+            <div style="width: 40%;"><b>SI Debited From:  </b>{{standingIns}} </div>
+            <div style="width: 20%;text-align: right;">&nbsp;</div>
+          </div>
+          <div class="form-row" style="padding-left: 42%;padding-top:10%;">
+            <div><b>Authorised Signatory</b></div>
+          </div>
+      </div>
+    
+  </div>
+
+
+

@@ -1,0 +1,354 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false" >
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" >
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div class="form-row">
+        <div class="col-6">
+          <small for="acct_num" >Search Name/Cust code/Phone</small>
+          <div class="input-group">
+            <input type="text"class="form-control form-control-sm "
+            formControlName="acct_num" id="acct_num" placeholder="Enter Acc# / Customer Name / Phone number"
+            (input)="onChangeNull()" name="x-field-1" autocomplete="new-field-1">
+            <div class="input-group-append">
+              <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                <i class="fa fa-search"></i> 
+              </button>
+            </div>
+          </div>
+         
+          <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+            <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+              <thead>
+                <tr>
+                  <th scope="col">Acc#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Gurdian Name</th>
+                  <th scope="col">Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                  <td scope="row">{{cust.acc_num}}</td>
+                  <td>{{cust.cust_name}}</td>
+                  <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                  <td>{{cust.guardian_name}}</td>
+                  <td>{{cust.present_address}}</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+        <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+        *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+        <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any customer</strong>
+        </div>
+        </div>
+        <div class="col-3">
+          <small for="fromDate" >From Date</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" disabled (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <small for="toDate" >To Date</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+            formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenToDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" disabled (click)="isOpenToDp = !isOpenToDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="showWait">
+          Please wait...
+        </div>
+      </div>
+
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4" style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="trial111" 
+     ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+    
+    </div>
+    </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+
+  <!-- <mat-form-field appearance="outline">
+    <mat-label>Search Account Statement</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+  </mat-form-field> -->
+  
+  <div class="mat-elevation-z8" id="trial111">
+    
+    <table mat-table [dataSource]="dataSource" matSort >
+      
+    
+      
+      <!-- Fruit Column -->
+      <ng-container matColumnDef="SLNO">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Sl No.
+        </th>
+      <td mat-cell *matCellDef="let element; let i=index;"> {{i+1}} </td>
+      </ng-container>
+      <ng-container matColumnDef="particulars">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Particulars
+        </th>
+      <td mat-cell *matCellDef="let row"> {{row.particulars}} </td>
+      </ng-container>
+      <ng-container matColumnDef="paid_date" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;" >Paid Date</th>
+        <td mat-cell *matCellDef="let row" >{{row.opening_dt.substr(0,10)}}</td>
+      </ng-container>
+       <!-- Fruit Column -->
+       <ng-container matColumnDef="prn_amt" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Paid Amt </th>
+        <td mat-cell *matCellDef="let row"> {{row.prn_amt| currency:"INR"}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="clr_bal" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;width: 150px;">Clear Balance</th>
+        
+        <td mat-cell *matCellDef="let row; let i = index;" style="width: 150px;">
+          
+            {{ cumulativeLength(i)| currency:"INR"}}
+        
+        </td>
+        <!-- <td mat-cell *matCellDef="let row">{{row.clr_bal| currency:"INR" }} -->
+      </ng-container>
+      
+  
+       
+  
+  
+      <!-- Header column -->
+      <ng-container matColumnDef="Header">
+        <th mat-header-cell *matHeaderCellDef colspan="5">
+          <div class="justify-content-center" style="text-align:center">
+            <br><h4>{{ardbName}} ({{branchName}})</h4>
+            
+            <h4>Run Date & Time : {{today}} </h4>
+            <h4> <u>  Account Statement RD from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{ this.reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+            <h4> A/C No.<b> {{cAcc}}</b> / Name: <b>{{cName}}</b>/Present Address: <b>{{cAddress}}</b> </h4>
+            <h4><b>Total Balance - {{clrSum| currency:"INR"}}</b></h4>
+          </div>
+        </th>
+      </ng-container>
+     
+      
+      <tr mat-header-row *matHeaderRowDef="['Header']"
+       class="example-second-header-row">
+      </tr>
+      
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            
+      <!-- Row shown when there is no matching data. -->
+      <tr mat-row *matNoDataRow>
+      </tr>
+    </table>
+    <footer><small>
+      This report is generated through CFS-2022
+     </small></footer>
+  </div>
+  <!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[ 10, 25, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+  
+
+
+   <!-- <pagination style="float:right;"
+  [totalItems]="reportData?.length"  
+  [itemsPerPage]="itemsPerPage"
+  [boundaryLinks]="true"
+  [directionLinks]="true"
+  [maxSize]="5"
+  [(ngModel)]="currentPage"
+  name="currentPage"
+  (pageChanged)="pageChanged($event)"
+  (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+   <table class="p-3" id="trial" hidden>
+     <tr *ngIf="reportData">
+       <!-- <th></th> -->
+       <th >A/c No.</th>
+       <th >Name</th>
+       <th style="text-align:right">Clear Balance</th>
+       <th style="text-align:right">Current Balance</th>
+       <th style="text-align:right">Prn Amt</th>
+       <th style="text-align:right">Penal Amt</th>
+       <th style="text-align:right">Penal Rt</th>
+      </tr>
+     <tbody *ngFor="let i of pagedItems; let itr=index;" >
+     <tr>
+      <td >{{i.acc_num}}</td>
+      <td >{{i.cust_name}}</td>
+      <td style="text-align:right">{{i.clr_bal  | number : '1.2-2'}}</td>
+      <td style="text-align:right">{{i.curr_bal | number : '1.2-2'}}</td>
+      <td style="text-align:right">{{i.prn_amt | number : '1.2-2'}}</td>
+      <td style="text-align:right">{{i.penal_amt | number : '1.2-2'}}</td>
+      <td style="text-align:right">{{i.penal_intt_rt | number : '1.2-2'}}</td>
+    </tr>
+   
+     <tr *ngIf="itr==reportData.length-1">
+      <td colspan="2" style="text-align:right;font-weight:800">Total</td>
+      <td  style="text-align:right;font-weight:800">{{clrSum | number : '1.2-2'}}</td>
+      <td  style="text-align:right;font-weight:800">{{currSum | number : '1.2-2'}}</td>
+
+      <td colspan="3" style="text-align:right;font-weight:800"></td>
+     </tr>
+  
+   
+    
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="8"> <small>
+          This report is generated through CFS-2022
+         </small> </td>
+      </tr></tfoot>
+   </table>
+   <div hidden id="hiddenTab">
+    <div class="justify-content-center" style="text-align:center">
+      <h4>{{ardbName}} {{branchName}}</h4>
+  
+      <h4>Run Date & Time : {{today}} </h4> <br>
+      <h4> <u> Account Statement RD from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{ this.reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+      <!-- <table>
+        <tr>
+          <th>A/C No. : {{reportcriteria.controls.acct_num.value}}</th>
+          
+        </tr>
+        <tr>
+          
+          <th>Name : {{reportcriteria.controls.acct_num.value}}</th>
+         
+        </tr>
+        <tr>
+         
+          <th>A/C No. : {{reportcriteria.controls.acct_num.value}}</th>
+        </tr>
+      </table> -->
+  
+  
+   </div>
+   <table  style="text-align:left;margin-left: 28%;" *ngIf="reportData">
+    <tr>
+      <th>A/C No. {{cAcc}}</th>
+    </tr>
+    <tr>
+      <th>Name: {{cName}}</th>
+    </tr>
+    <tr>
+      <th>Present Address:  {{cAddress}}</th>
+    </tr>
+  </table>
+  <br>
+   <table class="p-3" id="trial1" class="mkSmall">
+    <thead>
+      <tr *ngIf="reportData">
+        <!-- <th></th> -->
+        <th >A/c No.</th>
+        <th >Name</th>
+        <th style="text-align:right">Clear Balance</th>
+        <th style="text-align:right">Current Balance</th>
+        <th style="text-align:right">Prn Amt</th>
+        <th style="text-align:right">Penal Amt</th>
+        <th style="text-align:right">Penal Rt</th>
+       </tr>
+    </thead>
+   
+    <tbody *ngFor="let i of reportData; let itr=index;" >
+      <tr>
+        <td >{{i.acc_num}}</td>
+        <td >{{i.cust_name}}</td>
+        <td style="text-align:right">{{i.clr_bal  | number : '1.2-2'}}</td>
+        <td style="text-align:right">{{i.curr_bal | number : '1.2-2'}}</td>
+        <td style="text-align:right">{{i.prn_amt | number : '1.2-2'}}</td>
+        <td style="text-align:right">{{i.penal_amt | number : '1.2-2'}}</td>
+        <td style="text-align:right">{{i.penal_intt_rt | number : '1.2-2'}}</td>
+      </tr>
+      <tr *ngIf="itr==reportData.length-1">
+       <td colspan="2" style="text-align:right;font-weight:800">Total</td>
+       <td  style="text-align:right;font-weight:800">{{clrSum | number : '1.2-2'}}</td>
+       <td  style="text-align:right;font-weight:800">{{currSum | number : '1.2-2'}}</td>
+
+       <td colspan="3" style="text-align:right;font-weight:800"></td>
+      </tr>
+   
+   </tbody>
+   <tfoot>
+    <tr>
+     <td>&nbsp;</td>
+     <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+     </tr>
+   
+  </tfoot>
+  
+  </table>
+  <footer>
+    <small>
+      This report is generated through CFS-2022
+     </small> 
+   </footer>
+  <!-- <br><br><br><br>
+  <small>This report is generated through CFS-2022</small> -->
+   </div>
+  <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  </div>
+  
+
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+ <button mat-raised-button type="button" 
+ class="btn btn-rounded btn-primary m-1" 
+ [useExistingCss]="true"
+ printSectionId="trial111" 
+ ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+</div>
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

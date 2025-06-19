@@ -1,0 +1,1708 @@
+
+<ng-template #Delconfirm >
+    <div class="modal-body text-center" >
+      <p>'Are you sure you want to <b style="color: red;">Delete</b> Transaction of Acc {{this.td.acc_num.value}}
+        with Transancation Cd {{this.td.trans_cd.value}}</p>
+      <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+      <button mat-raised-button type="button" class=" btn btn-primary" (click)="onDeleteClick()" >Yes</button>
+      
+    </div>
+  </ng-template>
+  <ng-template #currDemand let-modal bd-example-modal-lg>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Current Demand ({{fdt}} to {{tdt}})</h4>
+  
+    </div>
+    <div class="modal-body">
+  
+      <table class="table table-sm table-hover" id="customers2">
+        <tr>
+          <th>Current Prn.</th>
+          <th>Overdue Prn.</th>
+          <th>Current Intt.</th>
+          <th>Overdue Intt.</th>
+          <th>Penal Intt.</th>
+          <th>Total Demand</th>
+        </tr>
+        <tr *ngFor="let item of CurrentYearDemand ">
+          <td>{{item.curr_prn?item.curr_prn:0| currency:'INR'}}</td>
+          <td>{{item.ovd_prn?item.ovd_prn:0| currency:'INR'}}</td>
+          <td>{{item.curr_intt?item.curr_intt:0| currency:'INR'}}</td>
+          <td>{{item.ovd_intt?item.ovd_intt:0| currency:'INR'}}</td>
+          <td>{{item.penal_intt?item.penal_intt:0| currency:'INR'}}</td>
+          <td>{{(item.curr_prn?item.curr_prn:0)+(item.ovd_prn?item.ovd_prn:0)+(item.curr_intt?item.curr_intt:0)+(item.ovd_intt?item.ovd_intt:0)+(item.penal_intt?item.penal_intt:0) | currency:'INR'}}</td>
+          <!-- <td>
+            <button mat-raised-button>
+              <button mat-raised-button class="btn btn-primary float-right" (click)="Submit()">View/Edit</button>
+            </button>
+          </td> -->
+        </tr>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <!-- <button mat-raised-button class="btn btn-default" (click)="modalRef.hide();disableOperation=false;showTransactionDtl=false;">Cancel</button> -->
+      <button mat-raised-button class="btn btn-default" (click)="onCancel2()">Close</button>
+    </div>
+  </ng-template>
+  <ng-template #contentbatch let-modal bd-example-modal-lg>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Unapprove Transaction List</h4>
+  
+    </div>
+    <div class="modal-body">
+  
+  
+  
+      <table class="table table-sm table-hover" id="customers2">
+        <tr>
+          <th>Trans Cd</th>
+          <th>Operation Type</th>
+          <th>Trans Type</th>
+          <th>Trans Amount</th>
+        </tr>
+        <tr *ngFor="let item of unapprovedTrans; let i = index;" title="Click to Select" style="cursor: pointer;">
+          <td>{{item.trans_cd}}</td>
+          <td>{{item.trans_type=='B'?"Disbursement":"Recovery"}}</td>
+          <td>{{item.trf_type=='T'?"Transfer":"Cash"}}</td>
+          <td>{{item.amount}}</td>
+          <!-- <td>
+            <button mat-raised-button>
+              <button mat-raised-button class="btn btn-primary float-right" (click)="Submit()">View/Edit</button>
+            </button>
+          </td> -->
+        </tr>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <!-- <button mat-raised-button class="btn btn-default" (click)="modalRef.hide();disableOperation=false;showTransactionDtl=false;">Cancel</button> -->
+      <!-- <button mat-raised-button class="btn btn-default" (click)="onCancel()">Cancel</button> &nbsp; -->
+      <button mat-raised-button class="btn btn-primary float-right" (click)="Submit()">View/Edit</button>
+    </div>
+  </ng-template>
+  <ng-template #contentLoanRep let-modal bd-example-modal-lg>
+    <div class="modal-header">
+      <h4 class="modal-title customHeader" id="modal-basic-title">Loan Repayment Schedule</h4>
+    </div>
+    <div class="modal-body">
+  
+      <table class="table table-sm table-hover" id="customers2">
+        <tr>
+          <th>Rep Id</th>
+          <th>Due Date</th>
+          <th>Instl Prn</th>
+          <th>Instl Paid</th>
+          <th>Status</th>
+        </tr>
+        <tr *ngFor="let item of LoanRepSch; let i = index;">
+          <td>{{item.rep_id}}</td>
+          <td>{{item.due_dt1}}</td>
+          <td>{{item.instl_prn}}</td>
+          <td>{{item.instl_paid}}</td>
+          <td>{{item.status=='U'?"Unpaid":item.status=='P'?"Paid":"Overdue"}}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Ok</button>
+    </div>
+  </ng-template>
+  <ng-template #contentLoanStmt let-modal bd-example-modal-xl>
+    <div class="modal-header">
+      <h4 class="modal-title customHeader" id="modal-basic-title">Loan Statement</h4>
+    </div>
+    <div class="modal-body ">
+      <div class="col-lg-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+        <!-- <iframe *ngIf="ReportUrl" [src]="ReportUrl" width="100%" height="400px" allowfullscreen></iframe> -->
+        <div class="mat-elevation-z8" id="mattable">
+          <table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+            <!-- Position Column -->
+            
+           
+            <ng-container matColumnDef="trans_dt">
+            
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Trans DT
+              
+              </th>
+             
+              
+              <td mat-cell *matCellDef="let element"> {{element.trans_dt.substr(0,10)}} </td>
+            </ng-container>
+          
+            <!-- Name Column -->
+            <ng-container matColumnDef="disb_amt">
+           
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Disb Amt 
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.disb_amt | number : '1.2-2'}} </td>
+            </ng-container>
+          
+            <!-- Weight Column -->
+           
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="curr_intt_cal">
+            
+               <th mat-header-cell *matHeaderCellDef mat-sort-header>Curr Intt
+               
+               </th>
+             
+               
+               <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_intt_calculated  | number : '1.2-2'}} </td>
+             </ng-container>
+           
+             <!-- Name Column -->
+             <ng-container matColumnDef="ovd_intt_cal">
+             
+               <th mat-header-cell *matHeaderCellDef mat-sort-header > Ovd Intt
+               </th>
+            
+               <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt_calculated | number : '1.2-2'}} </td>
+             </ng-container>
+             <ng-container matColumnDef="penal_intt_cal">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Penal Intt
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.penal_intt_calculated  | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="last_intt_calc_dt">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Last Intt Calc
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.last_intt_calc_dt.substr(0,10)}} </td>
+            </ng-container>
+            <ng-container matColumnDef="prn_trf">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Prn Trf
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.prn_trf | number : '1.2-2'}} </td>
+            </ng-container>
+          
+            <ng-container matColumnDef="intt_trf">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Intt Trf
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.intt_trf | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="curr_intt_recov">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Curr Intt Recov
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_intt_recov | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="ovd_intt_recov">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Ovd Intt Recov
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt_recov | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="penal_intt_recov">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Penal Intt Recov
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.penal_intt_recov | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="adv_prn_recov">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Adv Prn Recov
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.adv_prn_recov | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="curr_prn_recov">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Curr Prn Recov
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_prn_recov | number : '1.2-2'}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="ovd_prn_recov">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Ovd Prn Recov
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_prn_recov | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="totalRecov">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header >Total Recovery
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_intt_recov+element.ovd_intt_recov+element.penal_intt_recov+element.adv_prn_recov+element.curr_prn_recov+element.ovd_prn_recov | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="curr_prn">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Curr Prn
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_prn | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="ovd_prn">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Ovd Prn
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_prn | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="curr_intt">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Curr Intt
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.curr_intt | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="ovd_intt">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Ovd Intt
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.ovd_intt | number : '1.2-2'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="penal_intt">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header >Penal Intt
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.penal_intt | number : '1.2-2'}} </td>
+            </ng-container>
+      
+            
+      
+            <!-- <ng-container matColumnDef="recov_amt">
+             
+              <th mat-header-cell *matHeaderCellDef mat-sort-header > Recov Amt
+              </th>
+           
+              <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.recov_amt | number : '1.2-2'}} </td>
+            </ng-container> -->
+            <ng-container matColumnDef="header0" >
+              <td mat-header-cell *matHeaderCellDef  style="text-align:left;font-weight: 800;">
+               
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header1" >
+              <td mat-header-cell *matHeaderCellDef style="text-align:center">
+                
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header2" >
+              <td mat-header-cell *matHeaderCellDef colspan="3" style="text-align:center">
+                Interest Calculated
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header3" >
+              <td mat-header-cell *matHeaderCellDef style="text-align:center">
+                
+              </td>
+             
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header4" >
+              <td mat-header-cell *matHeaderCellDef colspan="2">
+                Ovd Trf
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header5" >
+              <td mat-header-cell *matHeaderCellDef colspan="3" style="text-align:center">
+               Interest Recovery
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            
+            <ng-container matColumnDef="header6" >
+              <td mat-header-cell *matHeaderCellDef colspan="3" style="text-align:center">
+                Principal Recovery
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header7" >
+              <td mat-header-cell *matHeaderCellDef  style="text-align:center">
+               Total Recovery
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header8" >
+              <td mat-header-cell *matHeaderCellDef colspan="5" style="text-align:center">
+                Balance
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="header9" >
+              <td mat-header-cell *matHeaderCellDef colspan="" style="text-align:center">
+                
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer1">
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+              Total
+              </td>
+           
+            </ng-container>
+            <ng-container matColumnDef="disclaimer2">
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+                {{disbSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer3" >
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+                {{currInttCalSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer4" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{ovdInttCalSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer5" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{penalInttCalSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer6">
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+             
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer7">
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+              
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer8" >
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+                
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer9" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{currInttRecovSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer10" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{ovdInttRecovSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer11">
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{penalInttRecovSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer12" >
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+                {{advPrnRecovSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer13">
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+                {{currPrnRecovSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            
+            <ng-container matColumnDef="disclaimer14" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{ovdPrnRecovSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer15" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{totalRecovSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer16">
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{currPrnSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer17" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{ovdPrnSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer18" >
+              <td mat-footer-cell *matFooterCellDef style="font-weight: 800;text-align:center">
+                {{currInttSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            <ng-container matColumnDef="disclaimer19" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{ovdInttSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container><ng-container matColumnDef="disclaimer20" >
+              <td mat-footer-cell *matFooterCellDef  style="font-weight: 800;text-align:center">
+                {{penalInttSum | number : '1.2-2'}}
+              </td>
+              
+              <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+              <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+            </ng-container>
+            
+      
+            <tr mat-footer-row *matFooterRowDef="['disclaimer1','disclaimer2','disclaimer3','disclaimer4','disclaimer5','disclaimer6','disclaimer7','disclaimer8','disclaimer9','disclaimer10','disclaimer11','disclaimer12','disclaimer13','disclaimer14','disclaimer15','disclaimer16','disclaimer17','disclaimer18','disclaimer19','disclaimer20']" class="example-second-footer-row"></tr>
+            <tr mat-header-row *matHeaderRowDef="['header0','header1','header2','header3','header4','header5','header6','header7','header8','header9']"></tr>
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          
+            <tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+             </table>
+          <!-- <footer>
+            <small>
+              This report is generated through CFS-2022
+             </small>
+           </footer> -->
+          </div>
+          <!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Ok</button>
+    </div>
+  </ng-template>
+  <ng-template #custDtls>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left customHeader" style="padding-right: 10px;">Customer Details </h4>
+      <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <table class="table table-sm table-hover" id="customers2">
+        <!-- <thead> -->
+          <tr>
+            <th scope="col">Cust Cd.</th>
+            <th scope="col">Member ID</th>
+            <th scope="col">Loan Case No.</th>
+            <th scope="col">L/F No.</th>
+            <th scope="col">Block</th>
+            <th scope="col">Phone No.</th>
+            <th scope="col">Guardian Name</th>
+            <th scope="col">Present Address</th>
+          </tr>
+        <!-- </thead> -->
+        <tbody>
+          <tr>
+            <td>{{l_cust_cd}}</td>
+            <td>{{member_id}}</td>
+            <td>{{l_case_no}}</td>
+            <td>{{acc_lfNo}}</td>
+            <td>{{acc_block}}</td>
+            <td>{{acc_phone}}</td>
+            <td>{{guardian_name}}</td>
+            <td>{{present_address}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
+  <ng-template #LoanChallan>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left customHeader" style="padding-right: 10px;">Recovery Challan </h4>
+      
+      <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row print" id="challan" hidden >
+        <div class="col-6 table-container" >
+          <div style="border: 1px solid #b7b4b4;">
+            <div>
+              <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+                <br><h5>{{ardbName}} </h5>
+                <h5>{{branchName}}</h5>
+                <h5>Run Date & Time : {{today}} </h5>
+                <h5>{{ardbAddr}}</h5>
+            <br>
+            </div>
+            </div>
+            <hr>
+            <br>
+            <div class="row" style="padding-left: 5px;" >
+              <div class="col-6">
+              <b>Trans Date:</b> {{sys?.CurrentDate | date:'dd/MM/yyyy'}}
+              </div>
+              <div class="col-6">
+                <b>Trans ID:</b> {{t_cd}}
+              </div>
+            </div>
+            <div class="row" style="padding-left: 5px;">
+              <div class="col-12">
+                <b>Loan Account:</b> {{acDesc}}
+                <br>
+                <b>Lonee Name:</b> {{partyName}}
+                <br>
+                <b>Address:</b> {{present_address}}
+              </div>
+            </div>
+            <div class="row" style="padding-left: 5px;padding-bottom: 10px;">
+              <div class="col-6">
+                <b>Member No:</b> {{m_id}}
+                <br>
+                <b>Curr & Ovd Intt Rt. :</b> {{currRt}} & {{ovdRt}}
+                <br>
+                <b>Loan ID: {{ln_id}}</b>
+              </div>
+              <div class="col-6">
+                <b>Ledger No:</b> {{acc_lfNo}}
+                <br>
+                <b>Operation:</b> Recovery By  {{trns_type=='C'?"Cash":"Transfer"}}
+                <br>
+                <!-- <b>Share:</b> {{s_a}} -->
+                
+                <b>Intt Recov Till:</b> {{i_n_dt?.substr(0,10)}}
+              </div>
+            </div>
+            <br>
+            <b style="font-size: large; padding-left: 28%;">Total Amount:{{t_a| number : '1.2-2'}}</b> 
+            <hr>
+            <div>
+              <div class="row" style="padding-left: 5px;">
+                <div class="col-4" style="border-right: 1px solid #cdcdcd;">
+                  <b> Prn / Intt Typ</b>
+                  <hr><br>
+                  <b>Current</b> 
+                  <br>
+                  <b>Overdue</b>
+                  <br>
+                  <b>Advance / Penal</b> 
+                  <br><br>
+                  <hr>
+                  <b>Total</b>
+                </div>
+                <div class="col-4" style="border-right: 1px solid #cdcdcd;text-align: right; padding-right: 10%;">
+                  <b>Principal</b>
+                  <hr><br>
+                  {{c_p| number : '1.2-2'}}
+                  <br>
+                  {{o_p| number : '1.2-2'}}
+                  <br>
+                  {{a_p| number : '1.2-2'}}
+                  <br><br>
+                  <hr>
+                  {{c_p+o_p+a_p | number : '1.2-2'}}
+                </div>
+                <div class="col-4" style="text-align: right; padding-right: 10%;">
+                  <b>Interest</b>
+                  <hr><br>
+                  {{c_i | number : '1.2-2'}}
+                  <br>
+                  {{o_i | number : '1.2-2'}}
+                  <br>
+                  {{p_i | number : '1.2-2'}}
+                  <br><br>
+                  <hr>
+                {{c_i+o_i+p_i | number : '1.2-2'}}
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+  
+        <div class="col-6 table-container" >
+          <div style="border: 1px solid #b7b4b4;">
+            <div>
+              <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+                <br><h5>{{ardbName}} </h5>
+                <h5>{{branchName}}</h5>
+                <h5>Run Date & Time : {{today}} </h5>
+                <h5> {{ardbAddr}}</h5>
+                <br>
+            </div>
+            </div>
+            <hr>
+            <br>
+            <div class="row" style="padding-left: 5px;">
+              <div class="col-6">
+              <b>Trans Date:</b>  {{sys?.CurrentDate | date:'dd/MM/yyyy'}}
+              </div>
+              <div class="col-6">
+                <b>Trans ID:</b> {{t_cd}}
+              </div>
+            </div>
+            <div class="row" style="padding-left: 5px;">
+              <div class="col-12">
+                <b>Loan Account:</b> {{acDesc}}
+                <br>
+                <b>Lonee Name:</b> {{partyName}}
+                <br>
+                <b>Address:</b> {{present_address}}
+              </div>
+            </div>
+            <div class="row" style="padding-left: 5px;padding-bottom: 10px;">
+              <div class="col-6">
+                <b>Member No:</b> {{m_id}}
+                <br>
+                <b>Curr & Ovd Intt Rt. :</b> {{currRt}} & {{ovdRt}}
+                <br>
+                <b>Loan ID:</b> {{ln_id}}
+              </div>
+              <div class="col-6">
+                <b>Ledger No:</b> {{acc_lfNo}}
+                <br>
+                <b>Operation:</b> Recovery By {{trns_type=='C'?"Cash":"Transfer"}}
+                <br>
+                <!-- <b>Share:</b> {{s_a | number : '1.2-2'}}
+                <br> -->
+                <b>Intt Recov Till:</b> {{i_n_dt?.substr(0,10)}}
+              </div>
+            </div><br>
+            <b style="font-size: large; padding-left: 28%;">Total Amount:{{t_a| number : '1.2-2'}}</b> 
+            <hr>
+            <div>
+              <div class="row" style="padding-left: 5px;">
+                <div class="col-4" style="border-right: 1px solid #cdcdcd;">
+                  <b> Prn / Intt Typ</b>
+                  <hr><br>
+                  <b>Current</b> 
+                  <br>
+                  <b>Overdue</b>
+                  <br>
+                  <b>Advance / Penal</b> 
+                  <br><br>
+                  <hr>
+                  <b>Total</b>
+                </div>
+                <div class="col-4" style="border-right: 1px solid #cdcdcd;text-align: right; padding-right: 10%;">
+                  <b>Principal</b>
+                  <hr><br>
+                  {{c_p| number : '1.2-2'}}
+                  <br>
+                  {{o_p| number : '1.2-2'}}
+                  <br>
+                  {{a_p| number : '1.2-2'}}
+                  <br><br>
+                  <hr>
+                  {{c_p+o_p+a_p| number : '1.2-2'}}
+                </div>
+                <div class="col-4" style="text-align: right; padding-right: 10%;">
+                  <b>Interest</b>
+                  <hr><br>
+                  {{c_i| number : '1.2-2'}}
+                  <br>
+                  {{o_i| number : '1.2-2'}}
+                  <br>
+                  {{p_i| number : '1.2-2'}}
+                  <br><br>
+                  <hr>
+                {{c_i+o_i+p_i| number : '1.2-2'}}
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <h4>Are you want to print this transaction challan?</h4>
+    </div>
+    <div class="modal-footer">
+      <div class="print">
+          <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [useExistingCss]="true" 
+          class="btn btn-rounded btn-primary m-1" 
+          printSectionId="challan" ngxPrint (click)="modalRef.hide()">Print Challan</button>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #ContaiLoanChallan>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left customHeader" style="padding-right: 10px;">Recovery Challan </h4>
+      
+      <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row " id="challan2" hidden>
+        <div class="col-12 container" >
+          <div style="border: 1px solid #b7b4b4;">
+            <div>
+              <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+                <h4>Receipt</h4>
+                <h5>{{ardbName}} </h5>
+                <h5>Contai * Purba Medinipur &nbsp;&nbsp;&nbsp;REGD NO. 10 CONT. DATE 01/02/1967</h5>
+                <h5>Run Date & Time : {{today}} </h5>             
+                <h5>{{branchName}}</h5>
+                  <h5>{{ardbAddr}}</h5>
+            </div>
+            </div>
+            <br>
+            <div class="row" style="padding-left: 10px;padding-right: 10px;font-size: larger;" >
+              <div class="col-6">
+              <b>Trans Date:</b> {{sys?.CurrentDate | date:'dd/MM/yyyy'}}
+              </div>
+              <div class="col-6 text-right">
+                <b>Trans ID:</b> {{t_cd}}
+              </div>
+            </div>
+            <div class="row" style="padding-left: 10px;padding-right: 10px; font-size: larger;">
+              <div class="col-8">
+                <b>Loan Account:</b> {{acDesc}}
+                <br>
+                <b>Lonee Name:</b> {{partyName}}
+                <br>
+                <b>Address:</b> {{present_address}}
+              </div>
+              <div class="col-4 text-right">
+                <b>Loan Case No:</b> {{l_case_no}}
+                <br>
+                <b>Ledger No:</b> {{acc_lfNo}}
+                
+              </div>
+            </div>
+            <div class="row" style="padding-left: 10px;padding-bottom: 10px;padding-right: 10px; font-size: larger;">
+              <div class="col-6">
+                <b>Purpose:</b> {{pps}}
+                <br>
+                <b>Curr & Ovd Intt Rt. :</b> {{currRt}} & {{ovdRt}}
+                <br>
+                <b>Loan ID: {{ln_id}}</b>
+              </div>
+              <div class="col-6 text-right">
+                
+                <b>Legal Charge:</b> {{l_ch}}
+                <br>
+                <b>Operation:</b> Recovery By  {{trns_type=='C'?"Cash":"Transfer"}}
+                <br>
+                <!-- <b>Share:</b> {{s_a}} -->
+                
+                <b>Intt Recov Till:</b> {{i_n_dt?.substr(0,10)}}
+              </div>
+            </div>
+            <div>
+              <table style="margin:2%; padding:5%; width: 95%;border: 1px solid gray;">
+                <thead><tr style="border-bottom:1px solid #969494;">
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important"><b>Prn / Intt Typ</b></td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; width: 35%!important;text-align: right; "><b>Principal</b></td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; "><b>Interest</b></td>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid #969494;">
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Current</td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{c_p| number : '1.2-2'}}</b></td>
+                  <td style="padding:5px;font-size: larger;text-align: right;"><b>{{c_i | number : '1.2-2'}}</b></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #969494;">
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Overdue</td>
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; text-align: right;width: 35%!important"><b> {{o_p| number : '1.2-2'}}</b></td>
+                    <td style="padding:5px;font-size: larger;text-align: right;"><b> {{o_i | number : '1.2-2'}}</b></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #969494;">
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Advance/Penal</td>
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{a_p| number : '1.2-2'}}</b></td>
+                      <td style="padding:5px;font-size: larger;text-align: right;"><b>{{p_i | number : '1.2-2'}}</b></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid #969494;">
+                        <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Total</td>
+                        <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{c_p+o_p+a_p | number : '1.2-2'}}</b></td>
+                        <td style="padding:5px;font-size: larger;text-align: right;"><b>{{c_i+o_i+p_i | number : '1.2-2'}}</b></td>
+                        </tr>
+                </tbody>
+                
+              </table>
+              
+              <div class="row" style="margin-left:20%; font-size: larger;">
+                <b style="text-align: center;">Total Amount:{{t_a| number : '1.2-2'}}</b> &nbsp;&nbsp;(<b class="amountToWord">{{t_a | amountToWord}} ONLY</b>)
+               
+               </div>
+               <br>
+              <table style="margin-left:20%; width: 60%;border: 1px solid gray;">
+                <tr style="border: 1px solid gray;width: 100%;">
+                  <td style="border-right: 1px solid #808080;padding:5px;font-size: larger; width: 35%!important">Outstanding Principal</td>
+                  <td style="border-right: 1px solid gray;padding:5px;font-size: larger; width: 20%!important"><b>{{outPrn| number : '1.2-2'}}</b></td>
+                  <td style="border-right: 1px solid gray;padding:5px;font-size: larger; width: 25%!important">Interest</td>
+                  <td style="padding:5px; width: 20%!important; font-size: larger;"><b>{{outIntt| number : '1.2-2'}}</b></td>
+                </tr>
+              </table>
+              <br><br><br>
+              <div class="row" >
+                <div class="col-4" style="text-align: center;font-size: large; "><b>CASHIER</b> </div>
+                <div class="col-4" style="text-align: center;font-size: large; "><b>J.O.(ACCTS.)</b></div>
+                <div class="col-4" style="text-align: center;font-size: large; "><b>MANAGER</b></div>
+  
+              </div>
+              <br>
+            </div>
+          </div>
+        </div>
+        <br><br><br><br>
+        <div class="col-12 container" >
+          <div style="border: 1px solid #b7b4b4;">
+            <div>
+              <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+                <h4>Receipt</h4>
+                <h5>{{ardbName}} </h5>
+                <h5>Contai * Purba Medinipur &nbsp;&nbsp;&nbsp;REGD NO. 10 CONT. DATE 01/02/1967</h5>
+                <h5>Run Date & Time : {{today}} </h5>             
+                <h5>{{branchName}}</h5>
+                  <h5>{{ardbAddr}}</h5>
+            </div>
+            </div>
+            <br>
+            <div class="row" style="padding-left: 10px;padding-right: 10px;font-size: larger;" >
+              <div class="col-6">
+              <b>Trans Date:</b> {{sys?.CurrentDate | date:'dd/MM/yyyy'}}
+              </div>
+              <div class="col-6 text-right">
+                <b>Trans ID:</b> {{t_cd}}
+              </div>
+            </div>
+            <div class="row" style="padding-left: 10px;padding-right: 10px; font-size: larger;">
+              <div class="col-8">
+                <b>Loan Account:</b> {{acDesc}}
+                <br>
+                <b>Lonee Name:</b> {{partyName}}
+                <br>
+                <b>Address:</b> {{present_address}}
+              </div>
+              <div class="col-4 text-right">
+                <b>Loan Case No:</b> {{l_case_no}}
+                <br>
+                <b>Ledger No:</b> {{acc_lfNo}}
+                
+              </div>
+            </div>
+            <div class="row" style="padding-left: 10px;padding-bottom: 10px;padding-right: 10px; font-size: larger;">
+              <div class="col-6">
+                <b>Purpose:</b> {{pps}}
+                <br>
+                <b>Curr & Ovd Intt Rt. :</b> {{currRt}} & {{ovdRt}}
+                <br>
+                <b>Loan ID: {{ln_id}}</b>
+              </div>
+              <div class="col-6 text-right">
+                
+                <b>Legal Charge:</b> {{l_ch}}
+                <br>
+                <b>Operation:</b> Recovery By  {{trns_type=='C'?"Cash":"Transfer"}}
+                <br>
+                <!-- <b>Share:</b> {{s_a}} -->
+                
+                <b>Intt Recov Till:</b> {{i_n_dt?.substr(0,10)}}
+              </div>
+            </div>
+            <div>
+              <table style="margin:2%; padding:5%; width: 95%;border: 1px solid gray;">
+                <thead><tr style="border-bottom:1px solid #969494;">
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important"><b>Prn / Intt Typ</b></td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; width: 35%!important;text-align: right; "><b>Principal</b></td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; "><b>Interest</b></td>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid #969494;">
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Current</td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{c_p| number : '1.2-2'}}</b></td>
+                  <td style="padding:5px;font-size: larger;text-align: right;"><b>{{c_i | number : '1.2-2'}}</b></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #969494;">
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Overdue</td>
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; text-align: right;width: 35%!important"><b> {{o_p| number : '1.2-2'}}</b></td>
+                    <td style="padding:5px;font-size: larger;text-align: right;"><b> {{o_i | number : '1.2-2'}}</b></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #969494;">
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Advance/Penal</td>
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{a_p| number : '1.2-2'}}</b></td>
+                      <td style="padding:5px;font-size: larger;text-align: right;"><b>{{p_i | number : '1.2-2'}}</b></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid #969494;">
+                        <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important"><b>Total</b></td>
+                        <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{c_p+o_p+a_p | number : '1.2-2'}}</b></td>
+                        <td style="padding:5px;font-size: larger;text-align: right;"><b>{{c_i+o_i+p_i | number : '1.2-2'}}</b></td>
+                        </tr>
+                </tbody>
+                
+              </table>
+              
+              <div class="row" style="margin-left:20%; font-size: larger;">
+                <b style="text-align: center;">Total Amount:{{t_a| number : '1.2-2'}}</b> &nbsp;&nbsp;(<b class="amountToWord">{{t_a | amountToWord}} ONLY</b>)
+               
+               </div>
+               <br>
+              <table style="margin-left:20%; width: 60%;border: 1px solid gray;">
+                <tr style="border: 1px solid gray;width: 100%;">
+                  <td style="border-right: 1px solid #808080;padding:5px;font-size: larger; width: 35%!important">Outstanding Principal</td>
+                  <td style="border-right: 1px solid gray;padding:5px;font-size: larger; width: 20%!important"><b>{{outPrn| number : '1.2-2'}}</b></td>
+                  <td style="border-right: 1px solid gray;padding:5px;font-size: larger; width: 25%!important">Interest</td>
+                  <td style="padding:5px; width: 20%!important; font-size: larger;"><b>{{outIntt| number : '1.2-2'}}</b></td>
+                </tr>
+              </table>
+              <br><br><br>
+              <div class="row" >
+                <div class="col-4" style="text-align: center;font-size: large; "><b>CASHIER</b> </div>
+                <div class="col-4" style="text-align: center;font-size: large; "><b>J.O.(ACCTS.)</b></div>
+                <div class="col-4" style="text-align: center;font-size: large; "><b>MANAGER</b></div>
+  
+              </div>
+              <br>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h4>Are you want to print this transaction challan?</h4>
+    </div>
+    <div class="modal-footer">
+      <div class="print">
+          <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [useExistingCss]="true" 
+          class="btn btn-rounded btn-primary m-1" 
+          printSectionId="challan2" ngxPrint (click)="modalRef.hide()">Print Challan</button>
+      </div>
+    </div>
+  </ng-template>
+  <loading *ngIf="isLoading"></loading>
+  <div class="row d-flex justify-content-center align-items-center"
+    style="background-color: #78c2ad21; min-height: 90vh;">
+    <ng-template #buttonDiv>
+      <div
+      class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="openModal(Delconfirm)" [disabled]="!isDelete">Delete</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onResetClick()">Reset</button>
+      <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onResetClick()">Clear</button> -->
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onSaveClick()">Save</button>
+  
+      <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" style="position: absolute;right: 10px;" (click)="printChallan()">Print Challan</button>
+    
+    </div>
+    </ng-template>
+    <ng-container *ngTemplateOutlet="buttonDiv">
+  
+    </ng-container>
+    
+    <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+      <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11">
+        <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+         'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+          <strong>{{showMsg.Message}}</strong>
+          <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <!--  -->
+        <!-- <div class="input-group">
+          <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+          <div class="input-group-append">
+            <span class="input-group-text">$</span>
+            <span class="input-group-text">0.00</span>
+          </div>
+        </div> -->
+        <!--  -->
+        
+        <form [formGroup]="accTransFrm" class="col-12">
+          <div class="form-row">
+            
+            <!-- {{disableOperation}} -->
+            <div class="form-group col-6">
+              <small for="acct_num">Search by Loan ID / Customer Name / Phone number
+                <!-- <small style="display: inline;" class="form-text text-muted">
+                  Press tab.
+                </small> -->
+              </small>
+              <!-- <input type="number" [attr.disabled]="null == operations ? '' : null" class="form-control form-control-sm "
+                formControlName="acct_num" id="acct_num" placeholder="Account Number" (keydown.Tab)="onAccountNumTabOff()"
+                name="x-field-1" autocomplete="new-field-1"> -->
+              <!-- <input type="text" [attr.disabled]="null == operations ? '' : null" class="form-control form-control-sm "
+                formControlName="acct_num" id="acct_num" placeholder="Enter Loan ID / Customer Name / Phone number"
+                (input)="suggestCustomer()"
+                name="x-field-1" autocomplete="new-field-1"> -->
+                <div class="input-group">
+                <!-- <input type="text" [attr.disabled]="null == operations ? '' : null" class="form-control form-control-sm "
+                formControlName="acct_num" id="acct_num" placeholder="Enter Loan ID / Customer Name / Phone number"
+                name="x-field-1" autocomplete="new-field-1"
+                (input)="clearSuggestedCust()"> can be changed marker --> 
+                <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                name="x-field-1" autocomplete="new-field-1"
+                (input)="clearSuggestedCust()">
+                <div class="input-group-append"> 
+              <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+              </div>
+              </div>
+  
+              <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+                <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                  <thead>
+                    <tr>
+                      <th scope="col">Acc#</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">{{name}}</th>
+                      <th scope="col">Guardian Name</th>
+                      <th scope="col">Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                      <td scope="row">{{cust.loan_id}}</td>
+                      <td>{{cust.cust_name}}</td>
+                      <td style="text-align: center;">{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                      <td>{{cust.guardian_name}}</td>
+                      <td>{{cust.present_address}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+                *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)"> -->
+                <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+                *ngIf="shownoresult">
+                <strong class="text-danger">" {{this.f.acct_num.value}} " does not match with any customer</strong>
+              </div>
+            </div>
+            <div class="form-group col-3" style="margin-left:1%;">
+              <small for="acc_type_cd">Loan Type</small>
+              <select id="acc_type_cd" [readonly]="true" class="form-control form-control-sm" formControlName="acc_type_cd"
+                (change)="onAcctTypeChange()">
+                <option *ngIf="AcctTypes" [readonly]="true">Choose</option>
+                <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                  {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                </option>
+              </select>
+            </div>
+            <!-- <div class="col-1 pl-1" style="margin-top:1.6%;">
+              <button mat-raised-button class="btn btn-primary" [disabled]="disabledOnNull" (click)="suggestCustomer()">Search</button>
+            </div> -->
+            <div class="form-group col-2">
+              <small for="oprn_cd">Operation Type</small>
+              <!-- <select id="oprn_cd" [attr.disabled]="(null == operations || disableOperation) ? '' : null" -->
+              <select id="oprn_cd"
+                class="form-control form-control-sm" formControlName="oprn_cd" (change)="onOperationTypeChange()">
+                <option *ngIf="operations" [readonly]="true" value="">Choose</option>
+                <option *ngFor="let oper of operations" [hidden]="oper.oprn_desc=='Disbursement'" [value]="oper.oprn_cd">{{oper.oprn_desc}}</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <hr>
+      <div class="row"> 
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 ">
+          <div class="row">
+            <div class="col-12 mt-2">
+              <!-- <app-account-details-for-acct-trans></app-account-details-for-acct-trans> -->
+              <form [formGroup]="accDtlsFrm">
+                <h4 class="customHeader">Loan Details</h4>
+                <div class="form-row">
+                  <div class="form-group col-12">
+                    <small for="cust_name">Party</small>
+                    <span class="badge badge-warning pull-right" *ngIf="joinHold!=''"> 
+                      JOINT HOLDER:-{{joinHold}}
+                     </span>
+                    <input type="text" class="form-control form-control-sm" formControlName="cust_name" id="cust_name"
+                      placeholder="Name" [readonly]="true">
+                    <span class="badge badge-warning" *ngIf="acc_lfNo!=null"> 
+                      L/F No:-{{acc_lfNo}}
+                    </span>
+                    <span class="badge badge-warning" *ngIf="acc_block!=null"> 
+                      Block:-{{acc_block}}
+                   </span>
+                   <span class="badge badge-warning" *ngIf="acc_phone!=null"> 
+                    PH No:-{{acc_phone}}
+                 </span>
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="intt_recev">Intt Receivable</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="intt_recev" id="intt_recev"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="cheque_facility_flag">Total Principal</small>
+                    <span class="badge badge-warning pull-right" *ngIf="subSidyAmt>0"> 
+                      Subsidy Amount:-{{subSidyAmt}}
+                     </span>
+                    <input type="text" class="form-control form-control-sm" formControlName="principal" id="principal"
+                      [readonly]="true">
+                  </div>
+                  
+                  <div class="form-group col-4">
+                    <small for="constitution_cd">Current Interest</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_intt" id="curr_intt"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-2">
+                    <small for="curr_intt_rate">Interest Rate</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_intt_rate"
+                      id="curr_intt_rate" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="acc_close_dt">Current Principal</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_principal"
+                      id="curr_principal" [readonly]="true">
+                  </div>
+                  
+                  <div class="form-group col-4">
+                    <small for="clr_bal">Overdue Interest</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_intt" id="ovd_intt"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-2">
+                    <small for="ovd_intt_rate">Ovd Interest Rt</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_intt_rate"
+                      id="ovd_intt_rate" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="oprn_instr_cd">Overdue Principal</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_principal"
+                      id="ovd_principal" [readonly]="true">
+                  </div>
+                  <div class="form-group col-4">
+                    <small for="penal_intt">Penal Interest</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="penal_intt" id="penal_intt"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-2"></div>
+                  <div class="form-group col-6">
+                    <small for="curr_bal">Total Due</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="total_due" id="total_due"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-4">
+                    <input type="text" class="form-control form-control-sm" formControlName="disb_dt" id="disb_dt" hidden
+                      [readonly]="true">
+                  </div>
+                </div>
+                <button style="font-weight: 500; font-size: 14px;" type="button" class="btn btn-link" (click)="openModalC5(contentLoanRep)">Show Rep Sch</button>
+                <button style="font-weight: 500; font-size: 14px;" type="button" class="btn btn-link" (click)="openModal(content)">Show Sanction Dtls</button>
+                <button style="font-weight: 500; font-size: 14px;" type="button" class="btn btn-link" (click)="openModalC1(contentLoanStmt)">Show Loan Stmt</button>
+                <button style="font-weight: 500; font-size: 14px;" type="button" class="btn btn-link" (click)="customerDtls(custDtls)">Show Customer Details</button>
+                <button style="font-weight: 500; font-size: 14px;" type="button" class="btn btn-link" (click)="openModal(currDemand)">Show Current Demand</button>
+                <!-- <button style="font-weight: 500; font-size: 14px;" type="button" class="btn btn-link" (click)="customerDtls(LoanChallan)">Show Customer Details</button> -->
+  
+                <ng-template #content>
+                  <div class="modal-header">
+                    <h4 class="modal-title pull-left customHeader">Sanction Details </h4>
+                    <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <table class="table table-sm table-hover" id="customers2">
+                      <!-- <thead> -->
+                        <tr>
+                          <th scope="col">Sector</th>
+                          <th scope="col">Activity</th>
+                          <th scope="col">Sanction Amt</th>
+                          <th scope="col">Drawal Limit</th>
+                        </tr>
+                      <!-- </thead> -->
+                      <tbody>
+                        <tr *ngFor="let sancdtl of sancdtls">
+                          <td>{{sancdtl.sector_desc}}</td>
+                          <td>{{sancdtl.activity_desc}}</td>
+                          <td>{{sancdtl.sanc_amt}}</td>
+                          <td>{{sancdtl.draw_limit}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-template>
+  
+  
+  
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- {{isDisburs}}
+        {{isRecovery}} -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 ">
+          <form [formGroup]="tdDefTransFrm" *ngIf="showTransactionDtl">
+            <h4 class="customHeader mt-2">Transaction Details</h4>
+            <div class="form-row">
+              <div class="form-group col-2">
+                <small for="amount">Trans Code</small>
+                <input type="text" class="form-control form-control-sm" formControlName="trans_cd" id="trans_cd" [readonly]="true">
+              </div>
+              <div class="form-group col-2" *ngIf="isRecovery">
+                <small for="recov_type">Recovery Type<span class="text-danger">*</span></small>
+                <select id="recov_type" class="form-control form-control-sm" formControlName="recov_type" [readonly]="true"
+                  (change)="onRecovTypeChange()">
+                  <option [readonly]="true">Choose</option>
+                  <!-- <option value="A" [selected]="true">Auto</option> -->
+                  <option value="A" [selected]="editDeleteMode==false">Auto</option>
+                  <option value="M">Manual</option>
+                </select>
+              </div>
+              <div class="form-group col-2" *ngIf="isDisburs">
+                <small for="trans_mode">Trans Mode<span class="text-danger">*</span></small>
+                <select id="trans_mode" class="form-control form-control-sm" formControlName="trans_mode"
+                  (change)="onTransModeChange()">
+                  <option [readonly]="true">Choose</option>
+                  <option value="W">Withdrawl Slip</option>
+                  <option value="V">Voucher</option>
+                  <option value="Q">Cheque/Draft</option>
+                </select>
+              </div>
+              <div class="form-group col-2" *ngIf="showTranferType">
+                <small for="trf_type">Transaction Type<span class="text-danger">*</span></small>
+                <select id="trf_type" class="form-control form-control-sm" formControlName="trf_type"
+                  (change)="onTransTypeChange()">
+                  <option *ngIf="operations" [readonly]="true">Choose</option>
+                  <option *ngIf="operations" value="C">Cash</option>
+                  <option *ngIf="operations" value="T">Transfer</option>
+                </select>
+              </div>
+              
+              <div class="form-group col-4" *ngIf="isRecovery">
+                <small for="intt_recov_dt">Intt. Recovery Till <span class="text-danger">*</span></small>
+                <input type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" [readonly]="true" 
+                    formControlName="intt_recov_dt" >
+                  
+              </div>
+              <div class="form-group col-2">
+                <small for="amount">Amount <span class="text-danger">*</span> </small>
+                <input type="text" class="form-control form-control-sm" formControlName="amount" id="amount"
+                 (keyup)="onAmtChng2($event)" (change)="onAmtChng()">
+              </div>
+              <div class="form-group col-2" *ngIf="isDisburs && showInstrumentDtl">
+                <small for="instrument_num">Instrument</small>
+                <input type="text" class="form-control form-control-sm" formControlName="instrument_num"
+                  id="instrument_num">
+              </div>
+              <div class="form-group col-3" *ngIf="isDisburs && showInstrumentDtl">
+                <small for="instrument_dt">Instrument Dt</small>
+                <input type="date" class="form-control form-control-sm" formControlName="instrument_dt"
+                  id="instrument_dt">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-2" *ngIf="isDisburs">
+                <small for="share">Share</small>
+                <input type="number" class="form-control form-control-sm" formControlName="share" id="share"
+                  (change)="onMiscChng()">
+              </div>
+              <div class="form-group col-2" *ngIf="isDisburs">
+                <small for="comm">Comm.</small>
+                <input type="number" class="form-control form-control-sm" formControlName="comm" id="comm"
+                  (change)="onMiscChng()">
+              </div>
+              <div class="form-group col-2" *ngIf="isDisburs">
+                <small for="svcchrg">Svc Chrg</small>
+                <input type="number" class="form-control form-control-sm" formControlName="svcchrg" id="svcchrg"
+                  (change)="onMiscChng()">
+              </div>
+              <div class="form-group col-2" *ngIf="isDisburs">
+                <small for="saleform">Saleble Form</small>
+                <input type="number" class="form-control form-control-sm" formControlName="saleform" id="saleform"
+                  (change)="onMiscChng()">
+              </div>
+              <div class="form-group col-2" *ngIf="isDisburs">
+                <small for="insurence">Insurance</small>
+                <input type="number" class="form-control form-control-sm" formControlName="insurence" id="insurence"
+                  (change)="onMiscChng()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-3" *ngIf="isDisburs">
+                <small for="instl_no">No of Installment</small>
+                <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="instl_no" id="instl_no">
+              </div>
+              <div class="form-group col-2" *ngIf="isDisburs">
+                <small for="periodicity">Periodicity</small>
+                <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="periodicity"
+                  id="periodicity">
+              </div>
+              <div class="form-group col-4">
+                <small for="curr_intt_rate">Current Intt Rate</small>
+                <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="curr_intt_rate"
+                  id="curr_intt_rate">
+              </div>
+              <div class="form-group col-4">
+                <small for="ovd_intt_rate">Ovd Intt Rate</small>
+                <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="ovd_intt_rate"
+                  id="ovd_intt_rate">
+              </div>
+              <div class="form-group col-4" *ngIf="isDisburs">
+                <small for="instl_start_dt">Installment Start Dt</small>
+                <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="instl_start_dt"
+                  id="instl_start_dt">
+              </div>
+              <div class="form-group col-4" *ngIf="isDisburs">
+                <small for="paid_amount">Paid Amount</small>
+                <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="paid_amount"
+                  id="paid_amount">
+              </div>
+              <!-- Recovery -->
+              <div class="form-group col-4" *ngIf="isRecovery">
+                <small for="no_of_day">No. of Days</small>
+                <input type="text" class="form-control form-control-sm" formControlName="no_of_day" id="no_of_day"
+                  [readonly]="true">
+              </div>
+              <!-- <div class="form-group col-3" *ngIf="isRecovery">
+                <small for="intt_rate">Effective Intt. Rt</small>
+                <input type="text" class="form-control form-control-sm" formControlName="intt_rate" id="intt_rate"
+                  [readonly]="true">
+              </div> -->
+              <div class="form-row">
+                <div class="form-group col-4" *ngIf="isRecovery">
+                  <small for="curr_prn_recov">Current Principal Recov</small>
+                  <input type="text" class="form-control form-control-sm" formControlName="curr_prn_recov"
+                    id="curr_prn_recov" (focusout)="checkValidity(1)">
+                </div>
+                <div class="form-group col-4" *ngIf="isRecovery">
+                  <small for="ovd_prn_recov">Overdue Principal Recov</small>
+                  <input type="text" class="form-control form-control-sm" formControlName="ovd_prn_recov"
+                    id="ovd_prn_recov" (focusout)="checkValidity(2)">
+                </div>
+                <div class="form-group col-4" *ngIf="isRecovery">
+                  <small for="adv_prn_recov">Advance Principal Recov</small>
+                  <input type="text" class="form-control form-control-sm" formControlName="adv_prn_recov"
+                    id="adv_prn_recov">
+                </div>
+                <div class="form-group col-4" *ngIf="isRecovery">
+                  <small for="curr_intt_recov">Current Interest Recov</small>
+                  <input type="text" class="form-control form-control-sm" formControlName="curr_intt_recov"
+                    id="curr_intt_recov" (focusout)="checkValidity(4)">
+                </div>
+                
+                <div class="form-group col-4" *ngIf="isRecovery">
+                  <small for="ovd_intt_recov">Overdue Interest Recov</small>
+                  <input type="text" class="form-control form-control-sm" formControlName="ovd_intt_recov"
+                    id="ovd_intt_recov" (focusout)="checkValidity(5)">
+                </div>
+                <div class="form-group col-4" *ngIf="isRecovery">
+                  <small for="penal_intt_recov">Penal Interest Recov</small>
+                  <input type="text" class="form-control form-control-sm" formControlName="penal_intt_recov"
+                    id="penal_intt_recov" (focusout)="checkValidity(6)">
+                </div>
+                <div class="form-group col-3" *ngIf="isRecovery ">
+                  <small for="ongoing_unit_no">Legal Charge</small>
+                  <input type="number" cols="2" class="form-control form-control-sm" formControlName="ongoing_unit_no"
+                    id="ongoing_unit_no">
+                </div>
+                <div class="form-group col-9" *ngIf="isRecovery ">
+                  <small for="remarks_on_manual">Remarks</small>
+                  <textarea type="text" cols="2" class="form-control form-control-sm" formControlName="remarks_on_manual"
+                    id="remarks_on_manual"></textarea>
+                </div>
+              </div>
+            </div>
+          </form>
+          <!-- denomination details removed -->
+          <div class="row" *ngIf="td.trf_type.value !== ''">
+            <div class="col-12 col-sm-6 col-md-12 mt-2">
+              <!-- <div *ngIf="td.trf_type.value === 'C'">
+                <h6 style="background-color: lightskyblue">Denomination Details</h6>
+  
+                <section *ngFor="let t1 of tm_denominationList; let i=index">
+                  <div class="form-row">
+                    <div class="form-group col-5">
+                      <small>Rupees</small> <br>
+                      <select
+                        class="form-control form-control-sm" (change)="setDenomination($event.target.value, i)">
+                        <option value="t1.value" [readonly]="true" selected>{{t1.rupees_desc}}</option>
+                        <option [value]="l.value" *ngFor="let l of denominationList">{{l.rupees}}</option>
+                      </select>
+                    </div>
+  
+  
+                    <div class="form-group col-3">
+                      <small for="deno_count">Count</small>
+                      <input [(ngModel)]="t1.count" type="text"
+                        class="form-control form-control-sm text-capitalize" (change)="calculateTotalDenomination(i)"
+                        id="deno_count" placeholder="Count">
+                    </div>
+  
+                    <div class="form-group col-4">
+                      <small for="deno_total">Total</small>
+                      <input [(ngModel)]="t1.total" type="text"
+                        class="form-control form-control-sm text-capitalize" id="deno_total" placeholder="Total">
+                    </div>
+                  </div>
+                </section>
+  
+  
+                <div class="form-row">
+                  <div class="form-group col-8" style="text-align: right;">
+                    <label class="form-check-label"> <small> Total</small> </label>
+                  </div>
+  
+                  <div class="form-group col-4">
+                    <input [(ngModel)]='denominationGrandTotal' [readonly]="true" type="text"
+                      class="form-control form-control-sm text-capitalize" id="total" placeholder="Total">
+                  </div>
+                </div>
+  
+                <div class="text-right mb-3">
+                  <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm  mr-1"
+                    (click)="addDenomination()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                  </button>
+  
+                  <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm"
+                    (click)="removeDenomination()">
+                    <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                  </button>
+                </div>
+  
+              </div> -->
+  
+              <div *ngIf="td.trf_type.value   === 'T'">
+                <h4 class="customHeader">Transfer Details</h4>
+                <section *ngFor="let l of td_deftranstrfList; let i=index">
+                  <div class="form-row">
+                    <div class="form-group col-3">
+                      <small for="credit_ac_name">GL Code</small>
+                      <div class="input-group">
+                        <input type="text" class="form-control form-control-sm "
+                          [disabled]="undefined !== l.cust_acc_type && l.cust_acc_type.length > 0" [(ngModel)]="l.gl_acc_code"
+                          placeholder="Enter GL-Code"  id="debit_gl_ac" (keyup)="hidetab($event)">
+                          <div class="input-group-append">
+                            <button  class="btn btn-primary btn-sm"
+                              (click)="checkAndSetDebitAccType('gl_acc', l)">
+                              <i class="fa fa-search"></i>
+                            </button>
+                          </div>
+                      </div>
+                      <div class="suggestionsTrfGl" [hidden]="hidegl">
+                        <table class="table table-hover table-bordered table-sm w-auto small" id="customers1" [hidden]="hidegl"  >
+                          <thead>
+                            <tr>
+                              <th scope="col">GL-Code</th>
+                              <th scope="col">GL-Head</th>
+                            </tr>
+                          </thead>
+                          <tbody >
+                            <tr *ngFor="let cust of acc_master"  (click)="setGLCode(cust.acc_cd,cust.acc_name,i,cust)">
+                              <td style="width: 200px" scope="row">{{cust.acc_cd}}</td>
+                              <td style="width: 200px">{{cust.acc_name}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+                        *ngIf="acc_master && !(acc_master.length > 0) && indxsuggestedCustomerCr==i">
+                        <strong class="text-danger"> does not match with any Gl-Code</strong>
+                      </div> -->
+                    </div>
+  
+                    <div class="form-group col-4">
+                      <small for="debit_gl_head">GL Head</small>
+                      <input type="text" [readonly]="true" [(ngModel)]="l.gl_acc_desc"
+                        class="form-control form-control-sm text-capitalize" id="debit_gl_head">
+                    </div>
+  
+                    <div class="form-group col-3">
+                      <small for="Inst_num">Instrument Num</small>
+                      <input type="text" class="form-control form-control-sm text-capitalize" id="Inst_num"
+                        [disabled]="undefined !== l.cust_acc_type && l.cust_acc_type.length > 0">
+                    </div>
+                    <button
+                      *ngIf="td_deftranstrfList.length > 1 && (undefined !== l.cust_acc_type || undefined !== l.gl_acc_code  )"
+                      type="button" style="height:22px; padding-top: 0px;" class="btn btn-danger btn-sm mt-4"
+                      (click)="removeTransfer(l)">
+                      <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <div class="form-row">
+                    <!-- comment before hand -->
+  
+                    <!-- <div class="form-group col-2">
+                      <small for="debit_ac">Account Type</small>
+                      <input type="text" [(ngModel)]="l.cust_acc_type"
+                        [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                        (focusout)="checkAndSetDebitAccType('cust_acc', l)"
+                        class="form-control form-control-sm text-capitalize" id="debit_ac">
+                    </div>
+  
+                    <div class="form-group col-2">
+                      <small for="debit_ac_dsc">Account Desc</small>
+                      <input type="text" [(ngModel)]="l.cust_acc_desc"  [readonly]="true"
+                        class="form-control form-control-sm text-capitalize" id="debit_ac_dsc">
+                    </div> -->
+                    <!-- comment beforehand -->
+                    <div class="form-group col-2">
+                      <small for="credit_ac">Account Type</small>
+                      <select id="credit_ac" class="form-control form-control-sm" [(ngModel)]="l.cust_acc_type"
+                        [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0 || disableOnSaveEdit"
+                        (focusout)="checkAndSetDebitAccType('cust_acc', l)">
+                        <option *ngIf="accountTypeList" [readonly]="true">Choose</option>
+                        <option *ngFor="let acctType of accountTypeList" [value]="acctType.acc_type_cd">
+                          {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="form-group col-3" >
+                      <small for="credit_ac_name">Acc Holder Name</small>
+                      <div class="input-group">
+                        <input type="text" class="form-control form-control-sm "
+                        [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0 || disableOnSaveEdit" [(ngModel)]="l.cust_name"
+                        type="text" placeholder="Enter Acc# / Customer Name / Phone number" (input)="onChangeTrf(i)"
+                        name="x-field-1" autocomplete="new-field-1">
+                        <div class="input-group-append">
+                              <button  class="btn btn-primary btn-sm" [disabled]="disableChangeTrf" (click)="suggestCustomerCr(i)"><i class="fa fa-search"></i></button>
+                       </div>
+                      </div>
+                      
+                      <div class="suggestionsTrf"
+                        *ngIf="suggestedCustomerCr && suggestedCustomerCr.length > 0 && indxsuggestedCustomerCr==i ">
+                        <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                          <thead>
+                            <tr>
+                              <th scope="col">Acc#</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Phone</th>
+                              <th scope="col">Guardian Name</th>
+                              <th scope="col">Address</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let cust of suggestedCustomerCr"
+                              (click)="setCustDtlsCr(cust.acc_num,cust.cust_name,i); getDetails(cust)">
+                              <td scope="row">{{cust.acc_num}}</td>
+                              <td>{{cust.cust_name}}</td>
+                              <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                              <td>{{cust.guardian_name}}</td>
+                              <td>{{cust.present_address}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+                        *ngIf="suggestedCustomerCr && !(suggestedCustomerCr.length > 0) && indxsuggestedCustomerCr==i">
+                        <strong class="text-danger"> does not match with any customer</strong>
+                      </div>
+                    </div>
+  
+  
+                    <div class="form-group col-3">
+                      <small for="debit_ac_no">Account Number</small>
+                      <input type="text" [(ngModel)]="l.cust_acc_number" [readonly]="true" (focusout)="setDebitAccDtls( l)"
+                        [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                        class="form-control form-control-sm text-capitalize" id="debit_ac_no">
+                    </div>
+                    <!-- comment beforehand -->
+                    <!-- <div class="form-group col-3">
+                      <small for="debit_ac_name">Acc Holder Name</small>
+                      <input type="text" [readonly]="true" [(ngModel)]="l.cust_name"
+                        [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                        class="form-control form-control-sm text-capitalize" id="debit_ac_name">
+                    </div> -->
+                    <!-- comment beforehand -->
+                    <div class="form-group col-2">
+                      <small for="debit_amount">Amount</small>
+                      <input type="text" [(ngModel)]="l.amount" (focusout)="checkDebitBalance(l)"
+                        class="form-control form-control-sm text-capitalize" [disabled]="disableOnSaveEdit" id="debit_amount">
+                    </div>
+  
+                  </div>
+                  
+                  <hr />
+                </section>
+                <div class="text-right mb-3">
+                  <div class="form-group">
+                    <small for="trf_total_amt">Total</small>
+                    <input type="text" [readonly]="true" [(ngModel)]="TrfTotAmt"
+                      class="form-control form-control-sm text-capitalize" id="trf_total_amt">
+                    <button  type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm mr-1"
+                      (click)="addTransfer()" title="Add transfer">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </button>
+                  </div>
+  
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- denomination details removed -->
+        </div>
+      </div>
+      <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mt-2">
+        <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+         'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+          <strong>{{showMsg.Message}}</strong>
+          <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <ng-container *ngTemplateOutlet="buttonDiv">
+  
+    </ng-container>
+    
+  </div>

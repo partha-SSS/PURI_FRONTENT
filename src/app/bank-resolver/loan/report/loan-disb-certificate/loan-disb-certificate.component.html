@@ -1,0 +1,269 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate" >From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+              formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate" >To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="form-row">
+          <div class="col-12">
+           <div >
+            <small for="acc_type_cd">Loan Type</small>
+              <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd">
+                <option *ngIf="AcctTypes" disabled>Choose</option>
+                <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                  {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                </option>
+              </select>
+           </div>
+          </div>
+        </div> -->
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="mattable" 
+     ngxPrint>Print</button>
+ <button mat-raised-button type="button" [hidden]="LandingCall" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+    </div>
+    </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+<!--    
+   <mat-form-field appearance="outline">
+    <mat-label>Search Loan Statement</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. abc / 123">
+  </mat-form-field> -->
+  <div class="mat-elevation-z8" id="mattable">
+<table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+ 
+  <ng-container matColumnDef="mainHeader">
+    <th mat-header-cell colspan="19" *matHeaderCellDef>
+      <div class="justify-content-center" style="text-align:center"><br>
+        <h4>{{ardbName}} {{branchName}}</h4>
+        <h4>Run Date & Time : {{today}} </h4>
+        <h4> <u> Loan Disbursement Certificate from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+      </div>
+   </th>
+  </ng-container>
+  <ng-container matColumnDef="SLNO">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Srl No.
+    </th>
+  <td mat-cell *matCellDef="let row; let i=index;"> {{i+1}} </td>
+  </ng-container>
+   <ng-container matColumnDef="party_name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Name of Borrower</th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.party_name}}
+      </td>
+   </ng-container> <ng-container matColumnDef="application_dt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Application Receipt Dt </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.application_dt.substr(0,10)}}
+      </td>
+   </ng-container> <ng-container matColumnDef="loan_case_no">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Loan Case No </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;min-width: 120px;padding-top: 40px;text-align: right;" > 
+      {{row.loan_case_no}}
+      <div  class="bb"><b>Block Name:</b></div>
+      </td>
+   </ng-container> <ng-container matColumnDef="sanction_dt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Sanction Dt </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px; min-width: 120px;padding-top: 40px;" > 
+      {{row.sanction_dt.substr(0,10)}}
+      <div  class="bb"><b>{{row.block_name}}</b></div>
+      </td>
+   </ng-container> <ng-container matColumnDef="sanction_amt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Sanction Amt </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.sanction_amt|currency:"INR"}}
+      </td>
+   </ng-container> <ng-container matColumnDef="bond_no">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Reg Loan No </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.bond_no}}
+      </td>
+   </ng-container><ng-container matColumnDef="bond_dt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Reg Loan Date </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;min-width: 120px;padding-top: 40px;text-align: right;" > 
+      {{row.bond_dt.substr(0,10)}}
+      <div  class="bb"><b>Purpose:</b></div>
+
+      </td>
+   </ng-container><ng-container matColumnDef="disb_dt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Disb Date </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;min-width: 120px;padding-top: 40px;" > 
+      {{row.disb_dt.substr(0,10)}}
+      
+      <div  class="bb"><b>{{row.activity}}</b></div>
+      </td>
+   </ng-container><ng-container matColumnDef="disb_amt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Disb Amount </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.disb_amt|currency:"INR"}}
+      </td>
+   </ng-container><ng-container matColumnDef="project_cost">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Project Cost</th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.project_cost|currency:"INR"}}
+      </td>
+   </ng-container><ng-container matColumnDef="own_contribution">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Own Contribution </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.own_contribution|currency:"INR"}}
+      </td>
+   </ng-container><ng-container matColumnDef="land_area">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Land Sec Area Value </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.land_value |currency:"INR"}}
+      </td>
+   </ng-container><ng-container matColumnDef="cul_area">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Cultivated Area </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;text-align: right;" > 
+      {{row.land_area}}
+      </td>
+   </ng-container><ng-container matColumnDef="v_h">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Valuation of Hypotheca</th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.addl_land_area}}
+      </td>
+   </ng-container><ng-container matColumnDef="gross_income">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Gross Income Out of Loan </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.net_income_gen}}
+      </td>
+   </ng-container><ng-container matColumnDef="sec_amt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Security Amount</th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.deposit_amt |currency:"INR"}}
+      </td>
+   </ng-container><ng-container matColumnDef="lso_dt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> LSO Date </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.lso_dt.substr(0,10)=='01/01/0001'?'':row.lso_dt.substr(0,10)}}
+      </td>
+   </ng-container><ng-container matColumnDef="lso_no">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> LSO No </th>
+    <td mat-cell *matCellDef="let row" style="font-size:14px;" > 
+      {{row.lso_no}}
+      </td>
+   </ng-container>
+   
+    <!-- Footer column -->
+    <ng-container matColumnDef="Total">
+      <td mat-footer-cell *matFooterCellDef colspan="7" style="text-align: right;padding-top: 100px;">
+        <b>Pagewise Total Disbusment Amount:</b>
+        <div  style="padding-top: 80px;"><b>Chairman/Authorised Director</b></div>
+      </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="total_disb">
+      <td mat-footer-cell *matFooterCellDef="let row" colspan="" style="text-align: right;">
+         <b>{{totDisAmt | currency:"INR"}}</b>
+      </td>
+     </ng-container> 
+     <ng-container matColumnDef="space">
+      <td mat-footer-cell *matFooterCellDef="let row" colspan="11" style="padding-top: 40px;padding-left: 50px;">
+         <p>
+          Certified that all disbursements of loan included in this statement have been made against 
+          sanctioned loan cases only and after satisfying all the conditions imposed by the WBSCARDB Ltd. .
+          Certified Further that the guidelines issued by NABARD in regard to the schemes in respect of 
+          which the above mention disbursements have been made as well as the rules laid down by the RCS for 
+          the same purpose have been strictly adhered to.The related mortgage bonds have been sent for registration 
+          to the Sub-Registrar office within the stipulated date.
+         </p>
+         <div  style="padding-top: 50px;text-align: center;"><b>Chief Executive Officer</b></div>
+      </td>
+     </ng-container>
+  <tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+  <tr mat-footer-row *matFooterRowDef="['Total','total_disb','space'  ]" class="example-second-footer-row"></tr>
+  
+
+</table>
+  
+<footer>
+  <small>
+    This report is generated through CFS-2022
+   </small> 
+   
+ </footer>
+</div>
+<!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[8,16,24,32,40,48,56,resultLength]" MatPaginator></mat-paginator> -->
+ 
+
+   
+  
+  <!-- <br><br><br><br>
+  <small>This report is generated through CFS-2022</small> -->
+   </div>
+  <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  </div>
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+ <button mat-raised-button type="button" [hidden]="LandingCall" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+  </div>
+  </div>
+ 
+  <loading *ngIf="isLoading"></loading>
+  

@@ -1,0 +1,253 @@
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center">
+  <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="deleteData()">Delete</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+  </div>
+
+
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <form [formGroup]="kccFrm">
+      <h4 class="customHeader mt-2">KCC Customer Details</h4>
+      <div class="form-row">
+        <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+          <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+         'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+            <strong>{{showMsg.Message}}</strong>
+            <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+     
+        <div class="form-group col-1">
+          <small for="member_id">Customer Id</small>
+          <input type="text" class="form-control form-control-sm text-capitalize" id="member_id" disabled
+            placeholder="Id" formControlName="member_id" name="x-field-1" autocomplete="new-field-1">
+        </div>
+        <div class="form-group col-3">
+          <small for="member_name">Member Name</small>
+          <input type="text" class="form-control form-control-sm"   (input)="suggestCustomer()" 
+          formControlName="member_name" id="member_name" placeholder="Member Name" >
+          <div class="suggestions border p-2" *ngIf="suggestedCustomer">
+            <strong> [ Customer Cd / Phone ] Name </strong>
+            <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+            (click)="setCustDtls(cust.cust_cd,1,0)">
+            {{'[' + cust.cust_cd + ' / '
+            + ((null === cust.phone) ? '' : cust.phone) +'] '
+            + cust.cust_name}}
+          </p>
+          </div>
+        </div> 
+        <div class="form-group col-1">
+            <small for="bank_member_id">Member Id</small>
+            <input type="text" class="form-control form-control-sm text-capitalize" id="bank_member_id" 
+              placeholder="Id" formControlName="bank_member_id" name="x-field-1" autocomplete="new-field-1">
+          </div>
+        <div class="form-group col-3">
+          <small for="kcc_no">KCC No</small>
+          <input type="text" class="form-control form-control-sm" formControlName="kcc_no"
+           id="kcc_no"  placeholder="KCC no">
+        </div>
+        <div class="form-group col-3">
+          <small for="memo_no">Memo No</small>
+          <input type="text" class="form-control form-control-sm" formControlName="memo_no"
+          id="memo_no" placeholder="Memo No">
+        </div>
+        <div class="form-group col-2">
+          <small for="kcc_acc_no">KCC Ac. No.</small>
+          <input type="text" class="form-control form-control-sm" formControlName="kcc_acc_no"
+            id="kcc_acc_no" placeholder="KCC Ac. No.">
+        </div>
+        <div class="form-group col-2">
+          <small for="bsbd_no">BSBD A/C No.</small>
+          <input type="text" class="form-control form-control-sm" formControlName="bsbd_no"
+            id="bsbd_no" placeholder="BSBD A/C No.">
+        </div>
+        <div class="form-group col-1">
+          <small for="address_type">Address Type</small>
+          <input type="text" class="form-control form-control-sm" formControlName="address_type" id="address_type"
+            disabled>
+        </div>
+        <div class="form-group col-1">
+          <small for="photo_type">Photo Type</small>
+          <input type="text" class="form-control form-control-sm" formControlName="photo_type" id="photo_type"
+           disabled>
+        </div>
+        <div class="form-group col-2">
+          <small for="village">Village</small>
+          <input type="text" class="form-control form-control-sm" formControlName="village" id="village"
+           disabled>
+        </div>
+        <div class="form-group col-1">
+          <small for="karbanama_no">Karbanama No.</small>
+          <input type="text" class="form-control form-control-sm" formControlName="karbanama_no" id="karbanama_no"
+            placeholder="Karbanama No.">
+        </div>
+        <div class="form-group col-2">
+            <small for="mortgage_dt">Mortgage Date</small>
+               <input type="text" style="height:30px;" placeholder="dd/mm/yyyy" class="form-control" id="mortgage_dt"
+              formControlName="mortgage_dt" bsDatepicker
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }">
+          </div>
+        <div class="form-group col-2">
+          <small for="land_valuation">Land Valuation (In RS)</small>
+          <input type="number" class="form-control form-control-sm" formControlName="land_valuation" id="land_valuation"
+            placeholder="Land Valuation">
+        </div>
+        <div class="form-group col-2">
+          <small for="land_qty">Total Land Qty (In Sotok)</small>
+          <input type="number" class="form-control form-control-sm" formControlName="land_qty" id="land_qty"
+            placeholder="Qty">
+        </div>       
+        <div class="form-group col-2">
+          <small for="m_land_val">Karbanama Valuation</small>
+          <input type="number" class="form-control form-control-sm" formControlName="m_land_val" id="m_land_val"
+            placeholder="Karbanama Valuation">
+        </div>
+        <div class="form-group col-2">
+            <small for="karbannama_validity_dt">Karbanama 10 Yrs. Validity Date</small>
+               <input type="text" style="height:30px;" placeholder="dd/mm/yyyy" class="form-control" id="karbannama_validity_dt"
+              formControlName="karbannama_validity_dt" bsDatepicker
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }">
+          </div>       
+        <div class="form-group col-2">
+            <small for="m_land_qty">Mortgage Land  Qty (In Sotok)</small>
+            <input type="number" class="form-control form-control-sm" formControlName="m_land_qty" id="m_land_qty"
+              placeholder="Qty">
+          </div>
+      </div>
+    </form>
+    <div>
+      <h4 class="customHeader mt-2">Land Register Details</h4>
+      <table class="table table-bordered table-responsive">
+        <thead>
+          <tr>
+            <th style="width: 50px!important;">SL No.</th>
+            <th style="width: 200px!important;">JL No</th>
+            <th style="width: 200px!important;">Mouza Name</th>
+            <th style="width: 200px!important;" >Khatian No.</th>
+            <th style="width: 200px!important;">Plot No.</th>
+            <th  style="width: 200px!important;">Land Area</th>
+            <th  style="width: 200px!important;">Folio No</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of mmlandregister; let i=index">
+            <td >
+              <input  type="text" disabled style="width: 90px!important;"
+                class="form-control form-control-sm text-capitalize" id="sl_no" placeholder="SL No" value="{{i+1}}" >
+            </td>
+           
+            <td>
+             <input [(ngModel)]="t.dag_no" type="text" style="width: 200px!important;"
+                class="form-control form-control-sm text-capitalize" id="dag_no" placeholder="JL No"  >
+            </td>
+            <td >
+          <input [(ngModel)]="t.mouza_name" type="text" class="form-control form-control-sm text-capitalize" id="mouza_name"
+                placeholder="Mouza Name" style="width: 200px!important;">
+            </td>
+           <td >
+              <input [(ngModel)]="t.khatian_no" type="text" class="form-control form-control-sm text-capitalize" id="khatian_no"
+                placeholder="Khatian No." style="width: 200px!important;">
+            </td>
+            <td >
+             <input [(ngModel)]="t.plot_no" type="text" class="form-control form-control-sm text-capitalize" id="plot_no"
+                placeholder="Plot No." style="width: 200px!important;">
+            </td>
+            <td >
+              <input [(ngModel)]="t.land_area" type="number" class="form-control form-control-sm text-capitalize" id="land_area"
+                placeholder="Land Area" style="width: 200px!important;">
+            </td>
+            <td >
+              <input [(ngModel)]="t.lf_no" type="text" class="form-control form-control-sm text-capitalize"
+                id="lf_no" placeholder="Folio No" style="width: 200px!important;">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-right mb-3">
+      <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm  mt-4"
+        (click)="addKccLandArea()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+      </button>
+      <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-danger btn-sm mt-4"
+        (click)="removeKccLandArea()">
+        <i class="fa fa-minus-circle" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div>
+        <h4 class="customHeader mt-2">Credit Limit Details</h4>
+        <table class="table table-bordered table-responsive">
+          <thead>
+            <tr>
+              <th style="width: 200px!important;">Activity Details</th>
+              <th style="width: 200px!important;">Sanction Amt</th>
+              <th style="width: 200px!important;">Sanction Dt.</th>
+              <th style="width: 200px!important;" >Validity Dt.</th>
+              <th style="width: 200px!important;">Cr. Lmt. No</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of tdkccsanctiondtls; let i=index">
+              <td >
+                <select
+                style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                [(ngModel)]="t.crop_cd" (change)="setCorpType($event.target.value , i)"
+                id="crop_cd" class="form-control form-control-sm">
+                <option [value]="t.crop_cd" disabled selected>{{t.crop_cd}}-{{t.crop_desc}}</option>
+                <option *ngFor="let ts of selectedCorpList" [value]="ts.crop_cd">{{ts.crop_cd}}-{{ts.crop_desc}}</option>
+              </select>
+              </td>
+              <td>
+                <input [(ngModel)]="t.sanction_amt" type="number" style="width: 200px!important;"
+                  class="form-control form-control-sm text-capitalize" id="sanction_amt" placeholder="Sanction Amt"  >
+              </td>
+              <td >
+                <input type="text" style="height:30px;" placeholder="dd/mm/yyyy" class="form-control"
+                  [(ngModel)]="t.sanction_date" bsDatepicker style="width: 200px!important;"
+                  [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }">
+              </td>
+              <td >
+                <input type="text" style="height:30px;" placeholder="dd/mm/yyyy" class="form-control"
+                  [(ngModel)]="t.validity_dt" bsDatepicker style="width: 200px!important;"
+                  [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }">
+              </td>
+              <td >
+                <input [(ngModel)]="t.credit_limit_no" type="text" class="form-control form-control-sm text-capitalize" id="age"
+                  placeholder="Cr Limit" style="width: 200px!important;">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="text-right mb-3">
+        <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm  mt-4"
+          (click)="addKccSanctionDtls()">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        </button>
+  
+        <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-danger btn-sm mt-4"
+          (click)="removeKccSanctionDtls()">
+          <i class="fa fa-minus-circle" aria-hidden="true"></i>
+        </button>
+      </div>
+  </div>
+  
+  <div
+  class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+  <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button> -->
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData()">Save</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="deleteData()">Delete</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+</div>
+
+</div>
+
+

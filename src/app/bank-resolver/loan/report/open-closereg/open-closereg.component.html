@@ -1,0 +1,498 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <form [formGroup]="reportcriteria">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" formControlName="OpenClose" type="radio" name="inlineRadioOptions"
+          id="inlineRadio1" value="O">
+        <small class="form-check-label" for="inlineRadio1">Opening Register</small>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" formControlName="OpenClose" type="radio" name="inlineRadioOptions"
+          id="inlineRadio2" value="C">
+        <small class="form-check-label" for="inlineRadio2">Close Register</small>
+      </div>
+      <div class="form-row">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+
+        <div class="col-6">
+          <small for="fromDate">From Date</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+              formControlName="fromDate"
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <small for="toDate">To Date</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" [printSectionId]="reportcriteria.controls.OpenClose.value=='C'?'trial11':'trial12'"
+        ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+    <!-- <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+      [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+      (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+    <div *ngIf="reportcriteria.controls.OpenClose.value=='C'">
+      <!-- Close register -->
+      <mat-form-field appearance="outline">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+      </mat-form-field>
+      
+      <div class="mat-elevation-z8" id="trial11">
+        
+        <table mat-table [dataSource]="dataSource_c" matSort >
+          
+          <ng-container matColumnDef="sl_no">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Sl No.</th>
+            <td mat-cell *matCellDef="let element; let i=index;"> {{i+1}} </td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="trans_dt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Trans DT </th>
+            <td mat-cell *matCellDef="let row"> {{row.trans_dt}}</td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="cust_name" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Name </th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;">{{row.cust_name}}</td>
+          </ng-container>
+          <ng-container matColumnDef="acc_desc" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Loan Type </th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;">{{row.acc_desc}}</td>
+          </ng-container>
+          <ng-container matColumnDef="loan_id" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Loan ID</th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;">{{row.loan_id}}</td>
+          </ng-container>
+          <ng-container matColumnDef="sanc_dt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Sanc DT</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.sanc_dt}}</td>
+          </ng-container>
+          <ng-container matColumnDef="sanc_amt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Sanction Amt</th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">{{row.sanc_amt|currency:"INR"}}</td>
+          </ng-container>
+          <ng-container matColumnDef="curr_rt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Curr Intt Rt</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.curr_rt}}</td>
+          </ng-container>
+          <ng-container matColumnDef="ovd_rt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Ovd Intt Rt</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.ovd_rt}}</td>
+          </ng-container>
+          <ng-container matColumnDef="closing_amt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Closing Principal</th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">{{row.closing_amt|currency:"INR"}}</td>
+          </ng-container>
+          <ng-container matColumnDef="closing_intt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Closing Interest</th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">{{row.closing_intt|currency:"INR"}}</td>
+          </ng-container>
+          
+         
+         
+          
+          
+          <!-- Footer column -->
+          <ng-container matColumnDef="Total" >
+            <td mat-footer-cell *matFooterCellDef colspan="2" style="text-align: left;">
+              <b>Total (Count-{{reportData.length}})</b>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="space">
+            <td mat-footer-cell *matFooterCellDef colspan="3" >
+              <b></b>
+            </td>
+          </ng-container>
+          
+           <ng-container matColumnDef="total_sanc_amt">
+            <td mat-footer-cell *matFooterCellDef="let row" colspan="" style="text-align: right;">
+               <b>{{totSanc_c | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="space1">
+            <td mat-footer-cell *matFooterCellDef colspan="2" >
+              <b></b>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="total_closing_amt">
+            <td mat-footer-cell *matFooterCellDef="let row" colspan="" style="text-align: right;">
+               <b>{{totClsPrn | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="total_closing_intt">
+            <td mat-footer-cell *matFooterCellDef="let row" colspan="" style="text-align: right;">
+               <b>{{totClsIntt | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <!-- Header column -->
+          <ng-container matColumnDef="Header">
+            <th mat-header-cell *matHeaderCellDef colspan="10">
+              <div class="justify-content-center" style="text-align:center">
+                <br><h4>{{ardbName}} ({{branchName}})</h4>
+                
+                <h4>Run Date & Time : {{today}} </h4>
+                <h4><u> Open/Close Register from {{reportcriteria.controls.fromDate.value?.toDateString()}} to {{
+                  this.reportcriteria.controls.toDate.value?.toDateString()}}</u></h4>
+              </div>
+            </th>
+          </ng-container>
+           
+            
+          <tr mat-header-row *matHeaderRowDef="['Header']"
+           class="example-second-header-row">
+          </tr>
+          
+          
+          <tr mat-header-row *matHeaderRowDef="displayedColumns_c"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns_c;"></tr>
+          <tr mat-footer-row *matFooterRowDef="['Total','space','total_sanc_amt','space1','total_closing_amt','total_closing_intt']" class="example-second-footer-row"></tr>
+          
+          <!-- Row shown when there is no matching data. -->
+          <tr mat-row *matNoDataRow>
+            <td mat-cell colspan="4">No data matching the filter "{{input.value}}"</td>
+          </tr>
+        </table>
+        <footer><small>
+          This report is generated through CFS-2022
+         </small></footer>
+      </div>
+      <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100, this.reportData?.length]" aria-label="Select page of users"></mat-paginator> -->
+      
+      
+      
+    </div>
+    <div *ngIf="reportcriteria.controls.OpenClose.value=='O'">
+      <!-- Open Register -->
+      <mat-form-field appearance="outline">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter2($event)" placeholder="Ex. Mia" #input>
+      </mat-form-field>
+      
+      <div class="mat-elevation-z8" id="trial12">
+        
+        <table mat-table [dataSource]="dataSource_o" matSort >
+          
+          <ng-container matColumnDef="sl_no">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Sl No.</th>
+            <td mat-cell *matCellDef="let element; let i=index;"> {{i+1}} </td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="trans_dt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Trans DT </th>
+            <td mat-cell *matCellDef="let row"> {{row.trans_dt}}</td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="cust_name" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Name    </th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;">{{row.cust_name}}</td>
+          </ng-container>
+          
+          <ng-container matColumnDef="acc_desc" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Loan Type    </th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;">{{row.acc_desc}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="loan_id" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Loan ID</th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;">{{row.loan_id}}</td>
+          </ng-container>
+          <ng-container matColumnDef="sanc_dt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Sanc DT</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.sanc_dt}}</td>
+          </ng-container>
+          <ng-container matColumnDef="sanc_amt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Sanction Amt</th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">{{row.sanc_amt|currency:"INR"}}</td>
+          </ng-container>
+          <ng-container matColumnDef="disb_amt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Disbursement</th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">{{row.disb_amt|currency:"INR"}}</td>
+          </ng-container>
+          <ng-container matColumnDef="instl_no" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Installment No.</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.instl_no}}</td>
+          </ng-container>
+          <ng-container matColumnDef="curr_rt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Curr Intt Rt</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.curr_rt}}</td>
+          </ng-container>
+          <ng-container matColumnDef="ovd_rt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Ovd Intt Rt</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.ovd_rt}}</td>
+          </ng-container>
+          
+          
+         
+         
+          
+          
+          <!-- Footer column -->
+          <ng-container matColumnDef="Total" >
+            <td mat-footer-cell *matFooterCellDef colspan="2" style="text-align: left;">
+              <b>Total (Count- {{reportData.length}})</b>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="space1">
+            <td mat-footer-cell *matFooterCellDef colspan="3" >
+              <b></b>
+            </td>
+          </ng-container>
+           <ng-container matColumnDef="total_sanc_amt">
+            <td mat-footer-cell *matFooterCellDef="let row" colspan="" style="text-align: right;">
+               <b>{{totSanc_o | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="total_disb_amt">
+            <td mat-footer-cell *matFooterCellDef="let row" colspan="" style="text-align: right;">
+               <b>{{totDisb | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="space2">
+            <td mat-footer-cell *matFooterCellDef colspan="3" >
+              <b></b>
+            </td>
+          </ng-container>
+           <!-- Header column -->
+          <ng-container matColumnDef="Header">
+            <th mat-header-cell *matHeaderCellDef colspan="10">
+              <div class="justify-content-center" style="text-align:center">
+                <br><h4>{{ardbName}} ({{branchName}})</h4>
+                
+                <h4>Run Date & Time : {{today}} </h4>
+                <h4><u> Open/Close Register from {{reportcriteria.controls.fromDate.value?.toDateString()}} to {{
+                  this.reportcriteria.controls.toDate.value?.toDateString()}}</u></h4>
+              </div>
+            </th>
+          </ng-container>
+           
+            
+          <tr mat-header-row *matHeaderRowDef="['Header']"
+           class="example-second-header-row">
+          </tr>
+          
+          
+          <tr mat-header-row *matHeaderRowDef="displayedColumns_o"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns_o;"></tr>
+          <tr mat-footer-row *matFooterRowDef="['Total','space1','total_sanc_amt','total_disb_amt','space2']" class="example-second-footer-row"></tr>
+          
+          <!-- Row shown when there is no matching data. -->
+          <tr mat-row *matNoDataRow>
+            <td mat-cell colspan="4">No data matching the filter "{{input.value}}"</td>
+          </tr>
+        </table>
+        <footer><small>
+          This report is generated through CFS-2022
+         </small></footer>
+      </div>
+      <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+      
+      
+      <table class="p-3" id="trial" hidden>
+        <tr *ngIf="reportData">
+          
+          <th style="text-align:center">Trans DT</th>
+          <th>Name </th>
+          <th>Loan ID</th>
+          <th style="text-align:center">Sanc DT</th>
+          <th style="text-align:right">Sanction Amt</th>
+          <th style="text-align:right">Disbursement Amt</th>
+          <th style="text-align:right">Installment No.</th>
+          <th style="text-align:right">Curr Intt Rt</th>
+          <th style="text-align:right">Ovd Intt Rt</th>
+        </tr>
+        <tbody *ngFor="let i of reportData let itr=index;">
+          <tr>
+            <td style="text-align:center">{{i.trans_dt}}</td>
+            <td>{{i.cust_name}} </td>
+            <td>{{i.loan_id}}</td>
+            <td style="text-align:center">{{i.sanc_dt}}</td>
+            <td style="text-align:right">{{i.sanc_amt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.disb_amt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.instl_no| number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_rt| number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_rt | number : '1.2-2'}}</td>
+          </tr>
+          <tr *ngIf="itr==reportData.length-1">
+            <td colspan="4" style="text-align:right;font-weight:800">Total</td>
+            <td style="text-align:right;font-weight:800">{{totSanc_c | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:800">{{totDisb | number : '1.2-2'}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5"> <small>
+                This report is generated through CFS-2022
+              </small> </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div hidden id="hiddenTab">
+      <div class="justify-content-center" style="text-align:center">
+        <h4>{{ardbName}} {{branchName}}</h4>
+        <h4>Run Date & Time : {{today}} </h4> <br>
+        <h4> <u> Open/Close Register from {{reportcriteria.controls.fromDate.value?.toDateString()| date: 'dd/MM/yyyy'}}
+            to {{ this.reportcriteria.controls.toDate.value?.toDateString()| date: 'dd/MM/yyyy'}}</u></h4>
+      </div>
+      <div *ngIf="reportcriteria.controls.OpenClose.value=='C'">
+        <table class="p-3" id="trial1" class="mkSmall">
+          <tr *ngIf="reportData">
+            <th style="text-align:center">Trans DT</th>
+            <th>Name </th>
+            <th>Loan ID</th>
+            <th style="text-align:center">Sanc DT</th>
+            <th style="text-align:right">Sanction Amt</th>
+            <th style="text-align:right">Curr Intt Rt</th>
+            <th style="text-align:right">Ovd Intt Rt</th>
+            <th style="text-align:right">Closing Principal</th>
+            <th style="text-align:right">Closing Interest</th>
+          </tr>
+          <tbody *ngFor="let i of reportData let itr=index;">
+            <tr>
+              <td style="text-align:center">{{i.trans_dt}}</td>
+              <td>{{i.cust_name}} </td>
+              <td>{{i.loan_id}}</td>
+              <td style="text-align:center">{{i.sanc_dt}}</td>
+              <td style="text-align:right">{{i.sanc_amt| number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_rt| number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_rt| number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.closing_amt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.closing_intt | number : '1.2-2'}}</td>
+            </tr>
+            <tr *ngIf="itr==reportData.length-1">
+              <td colspan="4" style="text-align:right;font-weight:800">Total</td>
+              <td style="text-align:right;font-weight:800">{{totSanc_c | number : '1.2-2'}}</td>
+              <td></td>
+              <td></td>
+              <td style="text-align:right;font-weight:800">{{totClsPrn | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:800">{{totClsIntt | number : '1.2-2'}}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5"> <small>
+                  &nbsp;
+                </small> </td>
+              <td colspan="5"> <small>
+                  &nbsp;
+                </small> </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div *ngIf="reportcriteria.controls.OpenClose.value=='O'">
+        <table class="p-3" id="trial1" class="mkSmall">
+          <tr *ngIf="reportData">
+            <th style="text-align:center">Trans DT</th>
+            <th>Name </th>
+            <th>Loan ID</th>
+            <th style="text-align:center">Sanc DT</th>
+            <th style="text-align:right">Sanction Amt</th>
+            <th style="text-align:right">Disbursement Amt</th>
+            <th style="text-align:right">Installment No.</th>
+            <th style="text-align:right">Curr Intt Rt</th>
+            <th style="text-align:right">Ovd Intt Rt</th>
+          </tr>
+          <tbody *ngFor="let i of reportData let itr=index;">
+            <tr>
+              <td style="text-align:center">{{i.trans_dt}}</td>
+              <td>{{i.cust_name}} </td>
+              <td>{{i.loan_id}}</td>
+              <td style="text-align:center">{{i.sanc_dt}} </td>
+              <td style="text-align:right">{{i.sanc_amt| number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.disb_amt| number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.instl_no| number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_rt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_rt | number : '1.2-2'}}</td>
+            </tr>
+            <tr *ngIf="itr==reportData.length-1">
+              <td colspan="4" style="text-align:right;font-weight:800">Total</td>
+              <td style="text-align:right;font-weight:800">{{totSanc_c | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:800">{{totDisb | number : '1.2-2'}}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5"> <small>
+                  &nbsp;
+                </small> </td>
+              <td colspan="5"> <small>
+                  &nbsp;
+                </small> </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <footer>
+        <small>
+          This report is generated through CFS-2022
+        </small>
+      </footer>
+    </div>
+    <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" [printSectionId]="reportcriteria.controls.OpenClose.value=='C'?'trial11':'trial12'"
+        ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    </div>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>

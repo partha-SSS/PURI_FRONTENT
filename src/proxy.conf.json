@@ -1,0 +1,8 @@
+{
+    "/sms-api": {
+      "target": "http://sms.digilexa.in/http-api.php",  
+      "secure": false,
+      "changeOrigin": true,
+      "logLevel": "debug"
+    }
+  }

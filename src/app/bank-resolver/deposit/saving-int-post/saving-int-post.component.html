@@ -1,0 +1,179 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate" >From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" [readonly]="true" bsDatepicker
+              formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate" >To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" [readonly]="true" bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div style="text-align: center">
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="CalIntt()" >Calculate Interest</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Back</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="Delete()" >Delete</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="afterPost" (click)="PostIntt()" >Post Interest</button>
+        <button mat-raised-button type="button" 
+        class="btn btn-rounded btn-primary m-1" 
+        [useExistingCss]="true"
+        printSectionId="mattable" 
+        ngxPrint>Print</button>
+    </div>
+    </div>
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div *ngIf="showAlert2" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+    <mat-form-field appearance="outline">
+        <mat-label>Search any details</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex.abc.." #input>
+      </mat-form-field>
+   
+  <div class="mat-elevation-z8" id="mattable">
+  
+    <table mat-table [dataSource]="dataSource" matSort >
+      
+      <ng-container matColumnDef="acc_num" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Acc Number</th>
+        <td mat-cell *matCellDef="let row"> {{row.acc_num}} </td>
+      </ng-container>
+      <!-- Fruit Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">Name</th>
+        <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+      </ng-container>
+      <!-- Fruit Column -->
+      <ng-container matColumnDef="interest" style="text-align: right;">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header >Interest</th>
+        <td mat-cell *matCellDef="let row" > {{row.interest| currency:"INR"}}</td>
+      </ng-container>
+      <!-- Fruit Column -->
+      <ng-container matColumnDef="balance" style="text-align: right;">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header >Balance</th>
+        <td mat-cell *matCellDef="let row" > {{row.balance| currency:"INR"}} </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="count">
+        <td mat-footer-cell *matFooterCellDef colspan="2" style="text-align: left;">
+          <b>Total No. Count - {{this.reportData.length}}</b>
+        </td>
+      </ng-container>
+      
+       <ng-container matColumnDef="total">
+        <td mat-footer-cell *matFooterCellDef="let row" colspan="2" style="text-align: left;">
+           <b>Total Interest - {{total_intt | currency:"INR"}}</b>
+        </td>
+       </ng-container>
+        
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-footer-row *matFooterRowDef="['count','total']" class="example-second-footer-row"></tr>
+  
+      <!-- Row shown when there is no matching data. -->
+      
+    </table>
+    
+  
+  </div>
+  <mat-paginator showFirstLastButtons [pageSizeOptions]="[20, 30, 50, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator>
+  
+   <!-- <pagination style="float:right;"
+  [totalItems]="reportData?.length"  
+  [itemsPerPage]="itemsPerPage"
+  [boundaryLinks]="true"
+  [directionLinks]="true"
+  [maxSize]="5"
+  [(ngModel)]="currentPage"
+  name="currentPage"
+  (pageChanged)="pageChanged($event)"
+  (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+   
+  
+  </div>
+  <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Error! </strong> {{alertMsg}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div *ngIf="showAlert2" class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Success!! </strong> {{alertMsg}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div style="text-align: center">
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="CalIntt()" >Calculate Interest</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Back</button>
+   <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="Delete()" >Delete</button> -->
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="afterPost" (click)="PostIntt()" >Post Interest</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

@@ -1,0 +1,276 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+        <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal"
+            (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <form [formGroup]="reportcriteria">
+            <div class="form-row">
+                <div class="col-6">
+                    <small for="fromDate">From Date</small>
+                    <div class="input-group">
+                        <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled
+                            bsDatepicker formControlName="fromDate"
+                            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                            [isOpen]="isOpenFromDp">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                (click)="isOpenFromDp = !isOpenFromDp">
+                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <small for="toDate">To Date</small>
+                    <div class="input-group">
+                        <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled
+                            bsDatepicker formControlName="toDate"
+                            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                            [isOpen]="isOpenToDp">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <small for="fundType">Fund Type</small>
+                    <select id="fundType" class="form-control form-control-sm" formControlName="fundType">
+                        <option disabled>Choose</option>
+                        <option value="O">Deposit Scheme Fund</option>
+                        <option value="N">Borrowed Fund</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+        <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+</ng-template>
+<div class="row d-flex justify-content-center align-items-center pt-4" 
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+        <div>
+            <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+            <button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+                printSectionId="hiddenTab" ngxPrint>Print</button>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+        <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+            <h6>{{ardbName}} {{branchName}}</h6>
+            <h6>Run Date & Time : {{today}} </h6> <br>
+            <h6> <u>Activity-wise Demand Collection List from {{reportcriteria.controls.fromDate.value?.toDateString() |
+                    date: 'dd/MM/yyyy'}} to
+                    {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h6>
+        </div>
+        <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+            [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+            (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination>
+        <table class="p-3" id="trial">
+            <tr *ngIf="reportData">
+                <th colspan="2"></th>
+                <th colspan="6" style="text-align: center;">Demand</th>
+                <th colspan="6" style="text-align: center;">Recovery</th>
+            </tr>
+            <tr *ngIf="reportData">
+                <th>Purpose</th>
+                <!-- <th>Village</th>
+                <th>Loan ID</th>
+                <th>Name</th>
+                <th>Ledger Folio</th>
+                <th style="text-align:center">Disbursement Date</th>
+                <th>Purpose</th> -->
+                <th style="text-align:right"> Outstanding Principal</th>
+                <th style="text-align:right"> Current Principal</th>
+                <th style="text-align:right"> Overdue Principal</th>
+                <th style="text-align:right"> Current Interest</th>
+                <th style="text-align:right"> Overdue Interest</th>
+                <th style="text-align:right"> Penal Interest </th>
+                <th style="text-align:right"> Total </th>
+                <th style="text-align:right"> Current Principal</th>
+                <th style="text-align:right"> Overdue Principal</th>
+                <th style="text-align:right"> Current Interest</th>
+                <th style="text-align:right"> Overdue Interest</th>
+                <th style="text-align:right"> Penal Interest </th>
+                <th style="text-align:right"> Total </th>
+            </tr>
+            <tbody *ngFor="let i of pagedItems let itr=index;">
+                <tr>
+                    <td>{{i.activity_cd}}</td>
+                    <!-- <td>{{i.vill_name}}</td>
+                    <td>{{i.loan_id}}</td>
+                    <td>{{i.party_name}}</td>
+                    <td>{{i.loan_acc_no}}</td>
+                    <td style="text-align:center">{{i.disb_dt.substr(0,10)}}</td> -->
+                    
+                    <td style="text-align:right">{{i.outstanding_prn | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.curr_prn | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.ovd_prn | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.curr_intt | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.ovd_intt | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.penal_intt | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn+i.penal_intt | number :
+                        '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.curr_prn_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.ovd_prn_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.curr_intt_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.ovd_intt_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.penal_intt_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right">{{i.ovd_intt_recov+i.penal_intt_recov+i.curr_intt_recov+i.ovd_prn_recov+i.curr_prn_recov |
+                        number : '1.2-2'}}</td>
+                </tr>
+                <tr *ngIf="i.activity_cd==lastAct">
+                    <td style="text-align:right;font-weight:700;">Total:</td>
+                    <td style="text-align:right;font-weight:700;">{{totOut | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{totalSum | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{currPrnSum_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{ovdPrnSum_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{currInttSum_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{ovdInttSum_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{penalInttSum_recov | number : '1.2-2'}}</td>
+                    <td style="text-align:right;font-weight:700;">{{totalSum_recov | number : '1.2-2'}}</td>
+                </tr>
+            </tbody>
+            <tfoot style="text-align:left">
+                <tr>
+                  <td colspan="9"> <small>
+                    This report is generated through CFS-2022
+                   </small> </td>
+                </tr>
+                
+               </tfoot>
+        </table>
+        <div hidden id="hiddenTab">
+            <div class="justify-content-center" style="text-align:center">
+                <h4>{{ardbName}} {{branchName}}</h4>
+                <h4>Run Date & Time : {{today}} </h4> <br>
+                <h4><u>Activity-wise Demand Collection List from {{reportcriteria.controls.fromDate.value?.toDateString()
+                        | date: 'dd/MM/yyyy'}} to
+                        {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+            </div>
+            <table class="p-3" id="trial1" class="mkSmall">
+                <thead>
+                    <tr *ngIf="reportData">
+                        <th colspan="2"></th>
+                        <th colspan="6" style="text-align: center;"> Demand</th>
+                        <th colspan="6" style="text-align: center;"> Recovery</th>
+                    </tr>
+                    <tr *ngIf="reportData">
+                        <th>Purpose</th>
+                        <!-- <th>Village</th>
+                        <th>Loan ID</th>
+                        <th>Name</th>
+                        <th>Ledger Folio</th>
+                        <th style="text-align:center">Disbursement Date</th>
+                        <th>Purpose</th> -->
+                        <th style="text-align:right"> Outstanding Principal</th>
+                        <th style="text-align:right"> Current Principal</th>
+                        <th style="text-align:right"> Overdue Principal</th>
+                        <th style="text-align:right"> Current Interest</th>
+                        <th style="text-align:right"> Overdue Interest</th>
+                        <th style="text-align:right"> Penal Interest </th>
+                        <th style="text-align:right"> Total </th>
+                        <th style="text-align:right"> Current Principal</th>
+                        <th style="text-align:right"> Overdue Principal</th>
+                        <th style="text-align:right"> Current Interest</th>
+                        <th style="text-align:right"> Overdue Interest</th>
+                        <th style="text-align:right"> Penal Interest </th>
+                        <th style="text-align:right"> Total </th>
+                    </tr>
+                </thead>
+                <tbody *ngFor="let i of reportData; let itr=index;">
+                    <tr>
+                        <td>{{i.activity_cd}}</td>
+                        <!-- <td>{{i.vill_name}}</td>
+                        <td>{{i.loan_id}}</td>
+                        <td>{{i.party_name}}</td>
+                        <td>{{i.loan_acc_no}}</td>
+                        <td style="text-align:center">{{i.disb_dt.substr(0,10)}}</td>
+                        <td>{{i.activity_cd}}</td> -->
+                        <td style="text-align:right">{{i.outstanding_prn | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.curr_prn | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.ovd_prn | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.curr_intt | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.ovd_intt | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.penal_intt | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn+i.penal_intt | number
+                            : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.curr_prn_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.ovd_prn_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.curr_intt_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.ovd_intt_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.penal_intt_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right">{{i.ovd_intt_recov+i.penal_intt_recov+i.curr_intt_recov+i.ovd_prn_recov+i.curr_prn_recov |
+                            number : '1.2-2'}}
+                        </td>
+                    </tr>
+                    <tr *ngIf="i.activity_cd==lastAct">
+                        <td style="font-weight:700;text-align:center;"> Total:</td>
+                        <td style="text-align:right;font-weight:700;">{{totOut | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{totalSum | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{currPrnSum_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{ovdPrnSum_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{currInttSum_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{ovdInttSum_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{penalInttSum_recov | number : '1.2-2'}}</td>
+                        <td style="text-align:right;font-weight:700;">{{totalSum_recov | number : '1.2-2'}}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <footer>
+                <small>
+                    This report is generated through CFS-2022
+                </small>
+            </footer>
+         </div>
+        <button hidden id="chngPage" (click)="setPage(1)"></button>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+        <div>
+            <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+            <button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+                printSectionId="hiddenTab" ngxPrint>Print</button>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+        </div>
+    </div>
+</div>
+<loading *ngIf="isLoading"></loading>

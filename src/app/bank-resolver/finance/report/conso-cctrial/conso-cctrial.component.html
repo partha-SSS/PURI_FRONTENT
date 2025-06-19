@@ -1,0 +1,202 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button  type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="fromDate">From Date</label>
+            <div class="input-group">
+              <!-- <input id="fromDate" class="form-control" placeholder="yyyy-mm-dd" name="fd" [ngModel]="fromdate  | date:'yyyy-dd-MM' " formControlName="fromDate" id="fd" type="date" > -->
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label for="toDate">To Date</label>
+            <div class="input-group">
+              <!-- <input id="toDate" class="form-control" placeholder="yyyy-mm-dd" name="td" [ngModel]="todate  | date:'yyyy-dd-MM' " formControlName="toDate" id="td" type="date"> -->
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="todate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer clearfix">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportPDFTitle()">Download PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="exportAsPDF()">Export as PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="mattable" ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+      </div>
+    </div>
+    <!-- <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3"> -->
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+      
+  
+      <mat-form-field appearance="outline" *ngIf="sys.ardbCD=='4'">
+        <mat-label>Select sanction date to be hide</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. abc/123" #input>
+      </mat-form-field>
+      <div class="mat-elevation-z8" class="row" id="mattable">
+        <table  class="mat-elevation-z8">
+          <thead>
+            <tr >
+              <th colspan="10">
+                <div class="justify-content-center" style="text-align:center">
+                  <br><h4>{{ardbName}} ({{branchName}})</h4>
+                  <h4>Run Date & Time : {{today}} </h4>
+                  <h4> <u>Consolidated Cash Cum Trial from {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} to  {{todate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+               </div>
+              </th>
+              
+            </tr>
+            
+            <tr>
+              <th>Account Type</th>
+              <th>Schedule</th>
+              <th>Acc Code</th>
+              <th>Account Name</th>
+              <th style="text-align: right;">Opening Debit</th>
+              <th style="text-align: right;">Opening Credit</th>
+              <th style="text-align: right;">Debit During Period </th>
+              <th style="text-align: right;">Credit During Period</th>
+              <th style="text-align: right;">Closing Debit</th>
+              <th style="text-align: right;">Closing Credit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let accType of groupedData">
+              <tr>
+                <td colspan="10" style="font-weight: bold; text-align: left;">{{ accType.accType }}</td>
+              </tr>
+              <ng-container *ngFor="let schedule of accType.schedules">
+                <tr>
+                  <td></td>
+                  <td colspan="9" style="font-weight: bold; text-align: left;">{{ schedule.schedule }}</td>
+                </tr>
+                <ng-container *ngFor="let record of schedule.records">
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>{{record.acc_cd}}</td>
+                    <td>{{ record.acc_name }}</td>
+                    <td style="text-align: right;">{{ record.opng_dr | number : '1.2-2'}}</td>
+                    <td style="text-align: right;">{{ record.opng_cr | number : '1.2-2'}}</td>
+                    <td style="text-align: right;">{{ record.dr | number : '1.2-2'}}</td>
+                    <td style="text-align: right;">{{ record.cr | number : '1.2-2'}}</td>
+                    <td style="text-align: right;">{{ record.clos_dr | number : '1.2-2'}}</td>
+                    <td style="text-align: right;">{{ record.clos_cr | number : '1.2-2'}}</td>
+                  </tr>
+                </ng-container>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td style="font-weight: bold;">Total for {{ schedule.schedule }}</td>
+                  <td style="text-align: right; font-weight: bold;">{{ schedule.totals.opng_dr | number : '1.2-2'}}</td>
+                  <td style="text-align: right; font-weight: bold;">{{ schedule.totals.opng_cr | number : '1.2-2'}}</td>
+                  <td style="text-align: right; font-weight: bold;">{{ schedule.totals.dr | number : '1.2-2'}}</td>
+                  <td style="text-align: right; font-weight: bold;">{{ schedule.totals.cr | number : '1.2-2'}}</td>
+                  <td style="text-align: right; font-weight: bold;">{{ schedule.totals.clos_dr | number : '1.2-2'}}</td>
+                  <td style="text-align: right; font-weight: bold;">{{ schedule.totals.clos_cr | number : '1.2-2'}}</td>
+                </tr>
+              </ng-container>
+              <tr>
+                <td colspan="4" style="font-weight: bold;">All {{ accType.accType }} Total</td>
+                <td style="text-align: right; font-weight: bold;">{{ accType.accTypeTotals.opng_dr | number : '1.2-2'}}</td>
+                <td style="text-align: right; font-weight: bold;">{{ accType.accTypeTotals.opng_cr | number : '1.2-2'}}</td>
+                <td style="text-align: right; font-weight: bold;">{{ accType.accTypeTotals.dr | number : '1.2-2'}}</td>
+                <td style="text-align: right; font-weight: bold;">{{ accType.accTypeTotals.cr | number : '1.2-2'}}</td>
+                <td style="text-align: right; font-weight: bold;">{{ accType.accTypeTotals.clos_dr | number : '1.2-2'}}</td>
+                <td style="text-align: right; font-weight: bold;">{{ accType.accTypeTotals.clos_cr | number : '1.2-2'}}</td>
+              </tr>
+            </ng-container>
+            <tr>
+              <td colspan="4" style="font-weight: bold;">Grand Total</td>
+              <td style="text-align: right; font-weight: bold;">{{ grandTotals.opng_dr | number : '1.2-2'}}</td>
+              <td style="text-align: right; font-weight: bold;">{{ grandTotals.opng_cr | number : '1.2-2'}}</td>
+              <td style="text-align: right; font-weight: bold;">{{ grandTotals.dr | number : '1.2-2'}}</td>
+              <td style="text-align: right; font-weight: bold;">{{ grandTotals.cr | number : '1.2-2'}}</td>
+              <td style="text-align: right; font-weight: bold;">{{ grandTotals.clos_dr | number : '1.2-2'}}</td>
+              <td style="text-align: right; font-weight: bold;">{{ grandTotals.clos_cr | number : '1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <footer>
+          <small>
+            This report is generated through Synergic Banking
+           </small> 
+          </footer>
+      </div>
+      <!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[5, 10, 25, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+  
+      <!-- <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+        [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+        (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+      
+      
+    </div>
+    <!-- <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3">
+       <div style="text-align: center;"><strong> Synergic Banking </strong>  </div>
+       <div style="text-align: center;"><b> Branch: Main Branch</b></div>
+       <div style="text-align: center;"><b> Branch Code: 101</b></div>
+       <div style="text-align: center;"><b> Run Date: {{dt}}</b></div>
+  <wbr-pivot #CashCumTrial [toolbar]="false"
+            [width]="'100%'"
+            [height]="500"
+            (ready)="onPivotReady($event)"
+            (reportcomplete)="onReportComplete()">
+  </wbr-pivot>
+  </div> -->
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportPDFTitle()">Download PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="exportAsPDF()">Export as PDF</button> -->
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="mattable" ngxPrint>Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+      </div>
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

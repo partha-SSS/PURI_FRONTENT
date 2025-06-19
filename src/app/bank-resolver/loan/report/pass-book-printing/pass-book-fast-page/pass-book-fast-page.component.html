@@ -1,0 +1,95 @@
+<ng-template #content2 let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <h3>Print fast page with header?&nbsp;&nbsp;&nbsp;
+            <input type="radio" formControlName="yes" value="yes">
+            <label for="yes">YES</label>
+            <input type="radio"  formControlName="no" value="no">
+            <label for="no">NO</label>
+          </h3>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="showFastPage()" [useExistingCss]="true"
+      printSectionId="fastPage" ngxPrint >Print</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+
+<div id="fastPage" style="font-family:Arial, Helvetica, ui-sans-serif;font-size:14px;" hidden>
+    <div style="margin-top: 52%; " *ngIf="sys.ardbCD!='25'">&nbsp;</div>
+    <div style="margin-top: 47%; " *ngIf="sys.ardbCD=='25'">&nbsp;</div>
+    <div class="form-row" *ngIf="sys.ardbCD=='25'" style="text-align: center;margin-left: 10%;margin-bottom:1%;">
+      <h3>Katwa-Kalna Co-op. Agriculture and Rural Development Bank Ltd.<br>
+        Udyag Bhaban K.G.Bose Sarani,Katwa,Purba Bardhaman,W.B-713130<br>
+        Phone:03453255138/9564589358
+      </h3>
+    </div>
+    <div class="form-row" style="padding-left: 10%;">
+        <div style="width: 30%;"><b>Loan Id:  </b><b style="font-size: x-large;">{{pServ.accNum}}</b></div>
+        <div style="text-align: right;width: 30%;"><b>Branch:  </b> {{branchName}}</div>
+        <div style="text-align: right;width: 30%;"><b>CIF:  </b>{{custCD}}</div>
+    </div>
+      <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+          <div style="width: 60%;"><b>Name:  </b>{{this.custDtls?.cust_name}}</div>
+          <div style="width: 30%;text-align: right;"><b>Membership No:  </b>{{this.custDtls?.old_cust_cd}}</div>
+     </div>
+      <div class="form-row" style="padding-left: 10%;padding-top: 5px;" >
+      <div><b>Guardian Name:  </b>{{this.custDtls?.guardian_name}}</div>
+    </div>
+    
+    <div class="form-row"style="padding-left: 10%;padding-top: 5px;"> 
+      <div><b>Address:  </b>{{this.custDtls?.present_address}}</div>
+    </div>
+    
+    <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+      <div style="width:90%;"><b>Phone No:  </b>{{this.custDtls?.phone}}</div>
+    </div>
+    <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+     <div style="width: 50%;"><b>Loan Type:  </b> {{this.accountTypeList[0]?.acc_type_desc}}</div>
+     <div style="width: 40%;"><b>Purpose:  </b>{{this.masterModel?.tmlaonsanctiondtls[0]?.activity_desc}}</div>
+    </div>
+    <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+      <div style="width: 20%;"><b>Sanc Amt:  </b> {{this.masterModel?.tmlaonsanctiondtls[0]?.sanc_amt|number}}</div>
+      <div style="width: 30%;"><b>Int Rate:  </b>{{this.masterModel?.tmloanall?.curr_intt_rate}}%</div>
+      <div style="width: 40%;"><b>L/F:  </b>{{this.masterModel?.tmloanall?.loan_acc_no}}</div>
+    </div>
+    <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+      <div style="width: 20%;"><b>Repayment No:  </b>{{this.masterModel?.tmloanall?.instl_no}}</div>
+      <div style="width: 30%;"><b>Rep Start Date:  </b>{{this.masterModel?.tmloanall?.instl_start_dt.substr(0,10)}}</div>
+     <div style="width: 40%;"><b>Loan Case No:  </b>{{this.loan_case_no}} </div>
+    </div>
+    <div *ngIf="sys.ardbCD=='1'" class="form-row" style="padding-left: 10%;padding-top: 5px;">
+      <div style="width: 20%;"><b>IBSD A/C:  </b>{{this.IBSD_AC}}</div>
+      <div style="width: 30%;"><b>IBSD Value:  </b>{{this.IBSD_AMT}}</div>
+     <div style="width: 40%;"><b>Share Amt:  </b>{{this.SHARE_AMT}} </div>
+    </div>
+    <div class="form-row" style="padding-left: 10%;padding-top: 5px;">
+      <div style="width: 70%;"><b>Joint Holder's Name:  </b>{{this.joinHoldAll}}</div>
+    </div>
+    <div class="form-row"style="margin-left: 70%;padding-top: 15px;"> 
+      <div><b>Manager / Authorised Signatory</b></div>
+    </div>
+    </div>
+    <br><br>
+    <div style="margin-left: 40%;padding-top: 15px;"> Click here to print fast page--> <button mat-raised-button class="btn btn-primary"  [useExistingCss]="true"
+      printSectionId="fastPage" ngxPrint >Print</button></div>
+       <br><br> 
+
+
+

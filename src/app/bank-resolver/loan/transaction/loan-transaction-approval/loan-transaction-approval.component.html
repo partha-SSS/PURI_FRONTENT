@@ -1,0 +1,483 @@
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" [disabled]="disableApprove" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(Appconfirm)">Approve</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Set Filter</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Remove Filter</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClickRefreshList()">Refresh List</button>
+    <!-- <button mat-raised-button type="button" [disabled]="disableApprove" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="onDeleteClick()">Delete</button> -->
+    <button mat-raised-button type="button" [disabled]="disableApprove" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(kycContent)">Kyc</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-6">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Unapproved Transaction List</h4>
+            <div class=" row">
+              <div class="form-row"  *ngIf="filteredVm.length">
+                <div class="form-group col-5 offset-2">
+                  <small ><i class="fa fa-filter" aria-hidden="true"></i> Tran CD / Acc. No.</small>
+                  <input type="text" class="form-control form-control-sm" placeholder="Tran Cd or Account No"
+                  (input)="acctNumberAndTrnCdFilter($event.target.value)">
+                </div>
+                <div class="form-group col-5">
+                  <small ><i class="fa fa-filter" aria-hidden="true"></i> Account Type</small>
+                  <select id="title" class="form-control form-control-sm"
+                  (change)="onChangeAcctType($event.target.value)">
+                  <option *ngIf="uniqueAccTypes" selected value="-99">All</option>
+                  <option *ngFor="let accType of uniqueAccTypes " [value]="accType.acc_type_cd">
+                    {{accType.acc_type_cd +' ' +accType.acc_type_desc}}</option>
+                </select>
+                </div>
+
+              </div>
+              <!-- <label for="colFormLabelSm" class="col-4 col-form-label col-form-label-sm">Filter Account Type</label>
+              <div class="col-4">
+                <select id="title" class="form-control form-control-sm"
+                  (change)="onChangeAcctType($event.target.value)">
+                  <option *ngIf="uniqueAccTypes" selected value="-99">All</option>
+                  <option *ngFor="let accType of uniqueAccTypes " [value]="accType.acc_type_cd">
+                    {{accType.acc_type_cd +' ' +accType.acc_type_desc}}</option>
+                </select>
+              </div>
+              <div class="custom-control form-control-sm custom-switch">
+                <input type="checkbox" (change)="ShowOnlyRecovery($event)" class="custom-control-input" id="customSwitch1">
+                <label class="custom-control-label" for="customSwitch1">Recovery</label>
+              </div> -->
+            </div>
+            <hr>
+
+            <div class="table-responsive" class="scroll-when-long">
+              <table class="customers" *ngIf="filteredVm.length">
+                <!-- <thead> -->
+                  <tr>
+                    <th scope="col">Tran CD</th>
+                    <th scope="col">Account</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Acc Type</th>
+                    <th scope="col">Tran Date</th>
+                    <th scope="col">Tran Type</th>
+                    <th scope="col">Trf Type</th>
+                    <th scope="col">Created By</th>
+                  </tr>
+                <!-- </thead> -->
+                <tbody>
+                  <tr *ngFor="let unApprovedTran of filteredVm"  #tooltip="matTooltip"
+                  matTooltip="Click to select"  style="cursor: pointer;"
+                    (click)="selectTransaction(unApprovedTran)"
+                    [class.table-active]="unApprovedTran.td_def_trans_trf.trans_cd === selectedTransactionCd">
+                    <td>{{unApprovedTran.td_def_trans_trf.trans_cd}}</td>
+                    <td>{{unApprovedTran.td_def_trans_trf.acc_num}}</td>
+                    <!-- <td>{{unApprovedTran.td_def_trans_trf.amount | number: '.2-2'}}</td> -->
+                    <td>{{unApprovedTran.td_def_trans_trf.amount}}</td>
+                    <td>{{unApprovedTran.mm_acc_type.acc_type_desc}}</td>
+                    <td>{{unApprovedTran.td_def_trans_trf.trans_dt | slice:0:10}}</td>
+                    <td>{{unApprovedTran.td_def_trans_trf.trans_type === 'R' ? 'Recovery' : 'Disbursement' }}</td>
+                    <td>{{unApprovedTran.td_def_trans_trf.trf_type === 'C' ? 'Cash' : 'Transfer' }}</td>
+                    <td>{{unApprovedTran.td_def_trans_trf.created_by}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <span *ngIf="!filteredVm.length">
+                 No unapproved transactions
+              </span>
+              <hr>
+            </div>
+          </div>
+          <!-- <div class="col-12">
+            <button mat-raised-button type="button" class="btn btn-link" *ngIf="selectedAccountType === 6"
+              (click)="openModal(content)">Show RD Installaments</button>
+            <ng-template #content>
+              <div class="modal-header">
+                <h4 class="modal-title pull-left">RD Installments Details for Acc# {{selectedVm.tm_deposit.acc_num}}
+                </h4>
+                <button mat-raised-button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <app-dw-rd-instl-view></app-dw-rd-instl-view>
+              </div>
+            </ng-template>
+            <app-dw-td-intt-dtls-view *ngIf="selectedAccountType === 2 || selectedAccountType === 5">
+            </app-dw-td-intt-dtls-view>
+            <app-dw-renewal-view *ngIf="selectedTransactionMode === 'R'"></app-dw-renewal-view>
+          </div> -->
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="12">
+          <form [formGroup]="transactionDtlsFrm">
+            <h4 class="customHeader">Transaction Details</h4>
+            <div class="form-row">
+              <div class="form-group col-8">
+                <small for="party">Party </small>
+                <span class="badge badge-warning pull-right" *ngIf="joinHold!=''"> 
+                  JOINT HOLDER:-{{joinHold}}
+                 </span>
+                
+                <input type="text" class="form-control form-control-sm" formControlName="party" id="party" [readonly]="true">
+              </div>
+              <div class="form-group col-4">
+                <small for="approval_status">Approval Status</small>
+                
+                <input type="text" class="form-control form-control-sm" formControlName="approval_status" id="approval_status"
+                  [readonly]="true">
+              </div>
+              <div class="form-group col-3">
+                <small for="trans_dt">Transaction Date</small>
+                <input type="text" class="form-control form-control-sm" formControlName="trans_dt" id="trans_dt" [readonly]="true">
+              </div>
+              <div class="form-group col-3">
+                <small for="trans_cd">Transaction Code</small>
+                <input type="text" class="form-control form-control-sm" formControlName="trans_cd" id="trans_cd" [readonly]="true">
+              </div>
+              <div class="form-group col-6">
+                <small for="acc_type_cd">Account Type</small>
+                <span class="badge badge-warning pull-right" *ngIf="showINSTNO"> 
+                  Installment No: {{this.selectedVm.loan?.tmloanall?.instl_no}} {{this.selectedVm.loan?.tmloanall?.piriodicity=='Y'?"Yearly":"Monthly"}}
+                 </span>
+                <input type="text" class="form-control form-control-sm" formControlName="acc_type_cd"
+                id="acc_type_cd" [readonly]="true">
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="form-group col-6">
+                    <small for="curr_prn">Current Prn </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_prn" id="curr_prn" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="ovd_prn">Ovd Prn </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_prn" id="ovd_prn" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="curr_intt">Current Intt</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_intt" id="curr_intt" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="ovd_intt">Ovd Intt </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_intt" id="ovd_intt" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="loan_id">loan Id</small>
+                    <input type="text" class="form-control form-control-sm text-danger" formControlName="loan_id" id="loan_id"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="trans_type">Transaction Type</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="trans_type" id="trans_type" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="curr_prn_recov">Curr Prn Recov</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_prn_recov" id="curr_prn_recov"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="ovd_prn_recov">Ovd Prn Recov</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_prn_recov" id="ovd_prn_recov"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="curr_intt_recov">Curr Intt Recov</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_intt_recov" id="curr_intt_recov"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="ovd_intt_recov">Ovd Intt Recov</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_intt_recov" id="ovd_intt_recov"
+                      [readonly]="true">
+                  </div>
+                  
+                  <div class="form-group col-6">
+                    <small for="mis_advance_recov">Saleble Form</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="mis_advance_recov"
+                      id="mis_advance_recov " [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="sum_assured">Commission</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="sum_assured" id="sum_assured"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="share_amt">Share</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="share_amt" id="share_amt " [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="audit_fees_recc">Insurance</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="audit_fees_recc" id="audit_fees_recc"
+                      [readonly]="true">
+                  </div>
+                  <!-- <div class="form-group col-6">
+                    <small for="trans_type">Transfer Type</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="trans_type" id="trans_type "
+                      [readonly]="true">
+                  </div> -->
+                </div>
+
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="form-group col-6 bg-warning mt-1">
+                    <small for="tot_Prn">Total Prn</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="tot_Prn" id="tot_Prn " [readonly]="true">
+                  </div>
+                  <div class="form-group col-6 bg-warning mt-1">
+                    <small for="share_holding">Share Holding</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="share_holding" id="share_holding "
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6 bg-warning mt-1">
+                    <small for="paid_amt">Paid Amount</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="paid_amt" id="paid_amt "
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6 bg-warning mt-1">
+                    <small for="ongoing_unit_no">Legal Charge</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ongoing_unit_no" id="ongoing_unit_no "
+                      [readonly]="true">
+                  </div>
+                  <!-- <div class="form-group col-6 bg-warning">
+                    <small for="mis_adv">MIS advance</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="mis_adv" id="mis_adv " [readonly]="true">
+                  </div> -->
+                  <div class="form-group col-6">
+                    <small for="curr_intt_rate">Curr Intt Rt. </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="curr_intt_rate" id="curr_intt_rate" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="ovd_intt_rate">Ovd Intt Rt. </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="ovd_intt_rate" id="ovd_intt_rate" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="amount">Amount </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="amount" id="amount" [readonly]="true">
+                  </div>
+                  <div class="form-group col-6" [hidden]="loanOpenDm?.tddeftrans?.trans_type == 'B'">
+                    <small for="intt_till_dt">Intt till date </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="intt_till_dt" id="intt_till_dt"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="adv_prn_recov">Adv Prn Recov </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="adv_prn_recov" id="adv_prn_recov"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6" *ngIf="frmParticulars!='S'">
+                    <small for="particulars">Particulars </small>
+                    <input type="text" class="form-control form-control-sm text-danger" formControlName="particulars" id="particulars"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="penal_intt_recov">Penal Intt Recov</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="penal_intt_recov" id="penal_intt_recov"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="activity_cd">Activity Name </small>
+                    <input type="text" class="form-control form-control-sm" formControlName="activity_cd" id="activity_cd"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="instrument_no">Instrument Number</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="instrument_no" id="instrument_no"
+                      [readonly]="true">
+                  </div>
+                  <div class="form-group col-6">
+                    <small for="voucher_id">Service Charge</small>
+                    <input type="text" class="form-control form-control-sm" formControlName="voucher_id" id="voucher_id" [readonly]="true">
+                  </div>
+                 
+                 
+                </div>
+              </div>
+            </div>
+            <!-- <button type="button" class="btn btn-link" *ngIf="showDenominationDtl" (click)="openModal(content)">
+              Denomination Details
+            </button> -->
+            <!-- <button type="button" class="btn btn-link" *ngIf="undefined !== tranferDetails && tranferDetails.length > 0" (click)="openModal(trfcontent)">
+              Transfer Details
+            </button> -->
+            <ng-template #content>
+              <div class="modal-header">
+                <h4 class="modal-title pull-left customHeader">Denomination Details for Acc#
+                  <strong>{{selectedVm.td_def_trans_trf.acc_num}}</strong> and Transaction Code
+                  <strong>{{selectedVm.td_def_trans_trf.trans_cd}}</strong>
+                </h4>
+                <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <table class="table table-sm table-hover" id="customers2">
+                  <!-- <thead> -->
+                    <tr>
+                      <th scope="col">&#8377;</th>
+                      <th scope="col">Count</th>
+                      <th scope="col">Total &#8377;</th>
+                    </tr>
+                  <!-- </thead> -->
+                  <tbody>
+                    <tr *ngFor="let denomination of tmDenominationTransLst">
+                      <td>&#8377;{{denomination.rupees}}</td>
+                      <td>{{denomination.count}}</td>
+                      <td>&#8377;{{denomination.total}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td><strong>Total</strong></td>
+                      <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-template>
+            <!-- <ng-template #trfcontent>
+              <div class="modal-header text-center">
+                <h4 class="modal-title pull-left customHeader">Transfer Details for Acc#
+                 <strong>{{selectedVm.td_def_trans_trf.acc_num}}</strong> and Transaction Code
+                 <strong>{{selectedVm.td_def_trans_trf.trans_cd}}</strong>
+                </h4>
+                <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <table class="table table-sm table-hover" id="customers2">
+                 
+                    <tr>
+                      <th scope="col">Acc Typ / Acc No</th>
+                      <th scope="col">GL Head</th>
+                      <th scope="col">Amount</th>
+                    </tr>
+                 
+                  <tbody>
+                    <tr *ngFor="let transfer of tranferDetails">
+                      <td *ngIf="transfer.acc_num !== '0000'">{{transfer.acc_type_cd +' - ' +
+                        transfer.remarks +' / ' +transfer.created_by + '(' +transfer.acc_num + ')'}}</td>
+                      <td *ngIf="transfer.acc_num === '0000'"></td>
+                      <td *ngIf="transfer.acc_num !== '0000'"></td>
+                      <td *ngIf="transfer.acc_num === '0000'">{{transfer.acc_type_cd + ' - ' + transfer.acc_name}}</td>
+                      <td>&#8377;{{transfer.amount}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td><strong>Total</strong></td>
+                      <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-template> -->
+          </form>
+          <hr>
+        </div>
+      </div>
+    </div>
+    <div class="col-12" *ngIf="trfDtls">
+      <table class="table table-sm table-hover" id="customers2">
+        <!-- <thead> -->
+          <tr>
+            <th scope="col">Transfer Details:</th>
+            <th scope="col" style="text-align: center;">Acc Typ / Acc No</th>
+            <th scope="col">GL Head</th>
+            <th scope="col">Amount</th>
+          </tr>
+        <!-- </thead> -->
+        <tbody>
+          <tr *ngFor="let transfer of tranferDetails">
+            <td>&nbsp;</td>
+            <td style="text-align: center;" *ngIf="transfer.acc_num !== '0000'">{{transfer.acc_type_cd +' - ' +
+              transfer.remarks +' / ' +transfer.created_by + '(' +transfer.acc_num + ')'}}</td>
+            <td *ngIf="transfer.acc_num === '0000'"></td>
+            <td *ngIf="transfer.acc_num !== '0000'"></td>
+            <td *ngIf="transfer.acc_num === '0000'">{{transfer.acc_type_cd + ' - ' + transfer.acc_name}}</td>
+            <td>&#8377;{{transfer.amount}}</td>
+          </tr>
+          <tr>
+            <td></td> 
+            <td></td>
+            <td><strong>Total</strong></td>
+            <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" [disabled]="disableApprove" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(Appconfirm)">Approve</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Set Filter</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Remove Filter</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClickRefreshList()">Refresh List</button>
+    <!-- <button mat-raised-button type="button" [disabled]="disableApprove" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="onDeleteClick()">Delete</button> -->
+    <button mat-raised-button type="button" [disabled]="disableApprove" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(kycContent)">Kyc</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+
+<ng-template #kycContent>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left customHeader">KYC details for Acc# {{selectedVm.td_def_trans_trf.acc_num}}
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-kyc></app-kyc>
+  </div>
+</ng-template>
+<ng-template #Appconfirm >
+  <div class="modal-body text-center" >
+    <p>'Are you sure, you want to <b style="color: rgb(8, 148, 55);">APPROVE</b> this Transaction</p>
+    <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+    <button mat-raised-button type="button" class=" btn btn-primary" (click)="onApproveClick()" >Yes</button>
+    
+  </div>
+</ng-template>
+<ng-template #MakerChecker >
+  <div class="modal-body text-center" >
+    <p>A transaction created by a user cannot be approved by that user.</p>
+   <button mat-raised-button type="button" class=" btn btn-primary" (click)="this.modalRef.hide()" >Close</button>
+    
+  </div>
+</ng-template>
+<ng-template #lockApprove >
+  <div class="modal-body text-center" >
+    <p style="color: rgb(223, 45, 45);">You can not Approved this transaction, Another user already selected this transaction for approve.</p>
+   <button mat-raised-button type="button" class=" btn btn-primary" (click)="this.modalRef.hide()" >Close</button>
+    
+  </div>
+</ng-template>

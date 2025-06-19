@@ -1,0 +1,137 @@
+<div *ngIf="show">
+  <loading *ngIf="isLoading"></loading>
+  <form [formGroup]="transactionDtlsFrm">
+    <h6 style="background-color:lightskyblue">Transaction Details</h6>
+    <div class="form-row">
+      <div class="form-group col-6">
+        <small for="acc_type_cd">Account Type</small>
+        <input type="text" class="form-control form-control-sm" formControlName="acc_type_cd" id="acc_type_cd" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="acc_num">A/C</small>
+        <input type="text" class="form-control form-control-sm" formControlName="acc_num" id="acc_num" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="trans_type">Transaction Type</small>
+        <input type="text" class="form-control form-control-sm" formControlName="trans_type" id="trans_type" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="trans_mode">Transaction Mode</small>
+        <input type="text" class="form-control form-control-sm" formControlName="trans_mode" id="trans_mode" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="amount">Amount </small>
+        <input type="text" class="form-control form-control-sm" formControlName="amount" id="amount" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="curr_intt_recov">Interest</small>
+        <input type="text" class="form-control form-control-sm" formControlName="curr_intt_recov" id="curr_intt_recov"
+          disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="amount">Total Amount</small>
+        <input type="text" class="form-control form-control-sm" formControlName="amount" id="amount" disabled>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-6">
+        <small for="instrument_dt">Instrument Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="instrument_dt" id="instrument_dt"
+          disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="instrument_num">Instrument Number</small>
+        <input type="text" class="form-control form-control-sm" formControlName="instrument_num" id="instrument_num"
+          disabled>
+      </div>
+      <div class="form-group col-12">
+        <small for="paid_to">Paid To</small>
+        <input type="text" class="form-control form-control-sm" formControlName="paid_to" id="paid_to" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="trf_type">Transaction  Type</small>
+        <input type="text" class="form-control form-control-sm" formControlName="trf_type" id="trf_type" disabled>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-6">
+        <small for="approval_status">Approval Status</small>
+        <input type="text" class="form-control form-control-sm" formControlName="approval_status" id="approval_status"
+          disabled>
+      </div>
+    </div>
+    <button type="button" class="btn btn-link" *ngIf="showDenominationDtl" (click)="openModal(content)">
+      Denomination Details
+    </button>
+    <button type="button" class="btn btn-link" *ngIf="showTransferDtl" (click)="openModal(trfcontent)">
+      Transfer Details
+    </button>
+    <ng-template #content>
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Denomination Details
+        </h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-sm table-hover">
+          <thead>
+            <tr>
+              <th scope="col">&#8377;</th>
+              <th scope="col">Count</th>
+              <th scope="col">Total &#8377;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let denomination of tmDenominationTransLst">
+              <td>&#8377;{{denomination.rupees}}</td>
+              <td>{{denomination.count}}</td>
+              <td>&#8377;{{denomination.total}}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><strong>Total</strong></td>
+              <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-template>
+    <ng-template #trfcontent>
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Transfer Details
+        </h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-sm table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Acc Typ / Acc No</th>
+              <th scope="col">GL Head</th>
+              <th scope="col">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transfer of tranferDetails">
+              <td *ngIf="transfer.acc_num !== '0000'">{{transfer.acc_type_cd +' - ' +
+                transfer.remarks +' / ' +transfer.created_by + '(' +transfer.acc_num + ')'}}</td>
+              <td *ngIf="transfer.acc_num === '0000'"></td>
+              <td *ngIf="transfer.acc_num !== '0000'"></td>
+              <td *ngIf="transfer.acc_num === '0000'">{{transfer.acc_type_cd + ' - ' + transfer.acc_name}}</td>
+              <td>&#8377;{{transfer.amount}}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><strong>Total</strong></td>
+              <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-template>
+  </form>
+</div>

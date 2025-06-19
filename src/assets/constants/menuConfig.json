@@ -1,0 +1,1030 @@
+[
+  {
+    "menu_name": "UCIC",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "passkey",
+    "ref_page": "UT_CustomerProfile",
+    "childMenuConfigs": [
+      {
+        "menu_name": "Transaction",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "assignment",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Customer Profile Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "UT_CustomerProfile"
+          },
+          {
+            "menu_name": "Self Help Group",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "UT_SelfHelp"
+          },
+          {
+            "menu_name": "Member List",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "UR_MemberList"
+          },
+          {
+            "menu_name": "Net Worth Statement",
+            "show": false,
+            "level_no": 3,
+            "permission":"N",
+            "iconName": "star_rate",
+            "ref_page": "UR_Networth"
+          }
+        ]
+      }
+    ],
+    "show": false
+  },
+  {
+    "menu_name": "Finance",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "monetization_on",
+    "childMenuConfigs": [
+      {
+        "menu_name": "Transaction",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Voucher",
+            "show": false,
+            "level_no": 4,
+            "iconName": "star_rate",
+            "permission":"Y",
+            "ref_page": "FT_Voucher"
+          },
+          {
+            "menu_name": "Approve Voucher",
+            "show": false,
+            "level_no": 4,
+            "iconName": "star_rate",
+            "ref_page": "FT_ApproveTrns"
+          },
+          {
+            "menu_name": "Backdate Voucher Entry",
+            "show": false,
+            "level_no": 4,
+            "iconName": "star_rate",
+            "ref_page": "FT_BackdateVoucher"
+          },
+          
+          {
+            "menu_name": "Yearly Adjustment Voucher Entry",
+            "show": false,
+            "level_no": 4,
+            "iconName": "star_rate",
+            "ref_page": "FT_YearlyVoucher"
+          }
+        ]
+      },
+      {
+        "menu_name": "Report",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Print Voucher",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FT_PrintVoucher"
+          },
+          {
+            "menu_name": "Cash Account",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_CashAccount"
+          },
+          {
+            "menu_name": "Day Book",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_DayBook"
+          },
+          {
+            "menu_name": "Cash Cum Trial",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_CashCumTrial"
+          },
+          {
+            "menu_name": "Trial Balance",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_TrialBalance"
+          },
+          {
+            "menu_name": "General Ledger",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_GeneralLadger"
+          },
+          {
+            "menu_name": "GL Transaction Details",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_GLTD"
+          },
+        
+         {
+            "menu_name": "Balance Sheet",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_BalanceSheet"
+          },
+          {
+            "menu_name": "Profit And Loss A/C",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_ProfitLoss"
+          },
+          {
+            "menu_name": "Weekly Return",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_WeeklyReturn"
+          }
+          
+          ,
+          {
+            "menu_name": "Consolidated Cash Account",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_CdCashAccount"
+          },
+          {
+            "menu_name": "Consolidated Day Book",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_CdDayBook"
+          },
+          {
+            "menu_name": "Consolidated Cash Cum Trial",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "FR_CdCashCumTrial"
+          }
+         
+        ]
+      }
+    ],
+    "show": false
+  },
+  {
+    "menu_name": "Deposits",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "savings",
+    "childMenuConfigs": [
+      {
+        "menu_name": "Transaction",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Account Opening",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DT_OpenAcc"
+          },
+          {
+            "menu_name": "Account Transactions",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DT_AccTrans"
+          },
+          {
+            "menu_name": "Approve Transaction",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DT_ApproveTran"
+          },
+          {
+            "menu_name": "Lien A/C Lock/Unlock",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DT_AccLockUnlock"
+          },
+          {
+            "menu_name": "View Account Details",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DT_OpenAccView"
+          },
+          {
+            "menu_name": "NEFT/RTGS/IMPS Payment",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DT_NEFTPayment"
+          },
+          {
+            "menu_name": "DDS Import/Export",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "childMenuConfigs": [
+              {
+                "menu_name": "DDS Export",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DT_DDEXPORT"
+              },
+              {
+                "menu_name": "DDS Import",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DT_DDIMPORT"
+              },
+              {
+                "menu_name": "DDS Individual Posting",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DT_DDINDPOST"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "menu_name": "Report",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Sub Cash Book",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_SubCashBook"
+          },
+          {
+            "menu_name": "Detail List",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "childMenuConfigs": [
+              {
+                "menu_name": "Detail List SB/CA",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_DLS"
+              },
+              {
+                "menu_name": "Detail List RD",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_DLR"
+              },
+              {
+                "menu_name": "Detail List FD/MIS",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_DLF"
+              },
+              {
+                "menu_name": "Detail List DDS",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_DDS"
+              }
+            ]
+          },
+          {
+            "menu_name": "Account Statement",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "childMenuConfigs": [
+              {
+                "menu_name": "Account Statement SB/CA",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_ASS"
+              },
+              {
+                "menu_name": "Account Statement RD",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_ASR"
+              },
+              {
+                "menu_name": "Account Statement DDS",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_ACCSTMTDDS"
+              },
+              {
+                "menu_name": "Account Statement TD",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "DR_ASF"
+              }
+            ]
+          },
+          {
+            "menu_name": "Near Maturity Report",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_NearMatReport"
+          },
+          {
+            "menu_name": "Open/Closing Register",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_OpenCloseReg"
+          },
+          {
+            "menu_name": "NEFT Inward Report",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_NeftIn"
+          },
+          {
+            "menu_name": "NEFT Outward Report",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_NeftOut"
+          },
+          {
+            "menu_name": "Pass book Printing",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_PbkPrn"
+          },
+          {
+            "menu_name": "Active SI List",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_Act_SI_List"
+          },
+          {
+            "menu_name": "Today SI Executed",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DR_Today_SI_Exec"
+          }
+        ]
+      }
+    ],
+    "show": false
+  },
+  {
+    "menu_name": "Loans",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "real_estate_agent",
+    "childMenuConfigs": [
+      {
+        "menu_name": "Transaction",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Open Loan Account",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LT_OpenLoanAcc"
+          },
+          {
+            "menu_name": "Loan Transaction",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LT_LoanTrans"
+          },
+          {
+            "menu_name": "Approve Transaction",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LT_LoanAprv"
+          },
+          {
+            "menu_name": "Calculate Loan Interest",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LT_CalcIntt"
+          },
+          {
+            "menu_name": "Subsidy Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LT_Subsidy"
+          },
+          {
+            "menu_name": "One Time Settlement",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LT_OTS"
+          }
+        ]
+      },
+      {
+        "menu_name": "Report",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Loan Ledger",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_LoanStmt"
+          },
+          {
+            "menu_name": "Loan Statement",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_LoanStmt"
+          },
+          {
+            "menu_name": "Detail List",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_DtlLst"
+          },
+          {
+            "menu_name": "Defaulter List",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_DflLst"
+          },
+          {
+            "menu_name": "Demand List",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "childMenuConfigs": [
+              {
+                "menu_name": "Member-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_DMLst"
+              },
+              {
+                "menu_name": "Block-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_BMLst"
+              },
+              {
+                "menu_name": "Activity-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_AMLst"
+              }
+            ]
+          },
+          {
+            "menu_name": "Demand Collection List",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_RELst",
+            "childMenuConfigs": [
+              {
+                "menu_name": "Member-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_RELst"
+              },
+              {
+                "menu_name": "Block-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_BWISECol"
+              },
+              {
+                "menu_name": "Activity-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_AWISECol"
+              }
+            ]
+          },
+          {
+            "menu_name": "Advance Recovery Statement",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_AdvRec"
+          },
+          {
+            "menu_name": "Interest Recovery Statement",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_intRec"
+          },
+          {
+            "menu_name": "Loan Disbursement Register",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "childMenuConfigs": [
+              {
+                "menu_name": "Acc-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_DisReg"
+              },
+              {
+                "menu_name": "Member-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_DisNorm"
+              }
+            ]
+          },
+          {
+            "menu_name": "Recovery Register",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_RecReg",
+            "childMenuConfigs": [
+              {
+                "menu_name": "Acc-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_RecReg"
+              },
+              {
+                "menu_name": "Member-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_RecRegNorm"
+              }
+              ,
+              {
+                "menu_name": "Fund-wise",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_RecRegFund"
+              }
+              ,
+              {
+                "menu_name": "Interest Recovery",
+                "show": false,
+                "level_no": 4,
+                "iconName": "star_rate",
+                "ref_page": "LR_RecInterest"
+              }
+              
+            ]
+          },{
+            "menu_name":"Open/Close Register",
+            "show":false,
+            "level_no":3,
+            "ref_page":"LR_openClose"
+          },
+          {
+            "menu_name": "Sub Cash Book",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LR_SubCashBk"
+          },
+          {
+            "menu_name":"NPA List",
+            "show":false,
+            "level_no":3,
+            "ref_page":"LR_NPA"
+
+          }
+        ]
+      },
+      {
+        "menu_name": "Masters",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "KCC Member Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LM_Kccmember"
+          },
+          {
+            "menu_name": "Block Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LM_Blkentry"
+          },
+          {
+            "menu_name": "Service Area Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "Service_Area"
+          },
+          {
+            "menu_name": "Village Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "LM_Villentry"
+          }
+        ]
+      }
+    ],
+    "show": false
+  },
+  {
+    "menu_name": "System",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "settings",
+    "childMenuConfigs": [
+      {
+        "menu_name": "User Maintenance",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Add User",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "UM_AddUsr"
+          },
+          {
+            "menu_name": "Update User Login Status",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "UM_UpLogStatus"
+          }
+        ]
+      },
+      {
+        "menu_name": "Daily Activity",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Day Initialization",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DA_DayInit"
+          },
+          {
+            "menu_name": "Day Completion",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DA_DayCmpl"
+          },
+          {
+            "menu_name": "Year Open",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DA_YearOpn"
+          },
+          {
+            "menu_name": "Year Close",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "DA_YearCls"
+          }
+        ]
+      },
+      {
+        "menu_name": "Parameter",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "System Parameter Update",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "SP_Update"
+          }
+        ]
+      }
+    ],
+    "show": false
+  },
+  {
+    "menu_name": "Transfer",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "transform",
+    "childMenuConfigs": [
+      {
+        "menu_name": "Transaction",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Transfer Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransEntry"
+          },
+          {
+            "menu_name": "Approve Transfer",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransApprove"
+          }
+        ]
+      }
+    ],
+    "show": false
+  },
+  {
+    "menu_name": "Investment",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "switch_access_shortcut_add",
+    "childMenuConfigs": [
+      {
+        "menu_name": "Transaction",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "star_rate",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Transfer Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransEntry"
+          },
+          {
+            "menu_name": "Approve Transfer",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransApprove"
+          }
+        ]
+      }
+    ],
+    "show": false
+  },
+  {
+    "menu_name": "Locker",
+    "level_no": 1,
+    "permission":"Y",
+    "iconName": "lock",
+    "childMenuConfigs": [
+      {
+        "menu_name": "Master",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "admin_panel_settings",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Locker Detail",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "add_to_queue",
+            "ref_page": "locker/loc_dtls"
+          },
+          {
+            "menu_name": "Locker Rent",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "currency_rupee",
+            "ref_page": "locker/loc_rent"
+          }
+        ]
+      },
+      {
+        "menu_name": "Transaction",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "currency_exchange",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Locker Opening",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransEntry"
+          },
+          {
+            "menu_name": "Locker Transaction",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransApprove"
+          },
+          {
+            "menu_name": "Locker Approve",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "lock_clock",
+            "ref_page": "locker/lock_approve"
+          },
+          {
+            "menu_name": "View Locker Details",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "screen_search_desktop",
+            "ref_page": "locker/lock_view"
+          }
+        ]
+      },
+      {
+        "menu_name": "Report",
+        "show": false,
+        "level_no": 2,
+        "permission":"Y",
+        "iconName": "inventory",
+        "childMenuConfigs": [
+          {
+            "menu_name": "Transfer Entry",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransEntry"
+          },
+          {
+            "menu_name": "Approve Transfer",
+            "show": false,
+            "level_no": 3,
+            "permission":"Y",
+            "iconName": "star_rate",
+            "ref_page": "TT_TransApprove"
+          }
+        ]
+      }
+    ],
+    "show": false
+  }
+]

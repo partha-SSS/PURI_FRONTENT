@@ -1,0 +1,65 @@
+<loading *ngIf="isLoading"></loading>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isRetrieve" (click)="retrieve()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isNew" (click)="new()">New</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isSave" (click)="saveuser()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isModify" (click)="updateuser()">Update</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isClear" (click)="clearuser()">Clear</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isDel" (click)="deleteuser()">Delete</button> -->
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+  </div>
+</div>
+ <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3"> 
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <form [formGroup]="addAccMaster" autocomplete="chrome-off" >
+    <div class="form-row">
+      <div class="form-group  col-3">
+        <small for="blk_state">Acc CD<span class="text-danger">*</span></small>
+        <input type="acc_cd"(change)="getAccDtls()" class="form-control form-control-sm" formControlName="acc_cd" id="acc_cd">
+      </div>
+      <div class="form-group col-4">
+        <small for="acc_type">Acc Type<span class="text-danger">*</span></small>
+        <select id="acc_type" class="form-control form-control-sm"  formControlName="acc_type">
+        <option value='0'>Select a type</option>
+        <option  value='1'>Liability</option>
+        <option  value="2">Asset</option>
+        <option  value="3">Revenue</option>
+        <option  value="4">Expanse</option>
+
+        </select>
+      </div>
+       
+          <div class="form-group col-5">
+            <small for="acc_name">Acc Name<span class="text-danger">*</span></small>
+            <input type="text" class="form-control form-control-sm" formControlName="acc_name" id="acc_name">
+          </div>
+    </div>
+    
+  </form>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isRetrieve" (click)="retrieve()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isNew" (click)="new()">New</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isSave" (click)="saveuser()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isModify" (click)="updateuser()">Update</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isClear" (click)="clearuser()">Clear</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isDel" (click)="deleteuser()">Delete</button> -->
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+  </div>
+</div>
+  </div>
+  
+ 

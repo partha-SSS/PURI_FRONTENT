@@ -1,0 +1,299 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <!-- <button mat-raised-button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+
+      </button>
+     
+    </div>
+    <form [formGroup]="reportcriteria">
+      <div>
+        <small for="cust_name">Search Name/Cust code/Phone</small>
+        <div class="input-group">
+          <input type="text" class="form-control form-control-sm mkUpper"  autocomplete="chrome-off" formControlName="cust_name"
+          id="cust_name" (input)="onChangeName()">
+      <div class="input-group-append">
+      <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" style="font-size:x-small" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+      </div>    
+        </div>
+        <div class="suggestions border p-2" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+          <!-- <strong> [ Customer Cd / Phone ] Name </strong> -->
+          <!-- <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+            (click)="SelectCustomer(cust)">{{'[' + cust.cust_cd + ' / '
+            + ((null === cust.phone) ? '' : cust.phone) +'] '
+            + cust.cust_name}}</p> -->
+            <table id="customers1">
+              <tr>
+                <th>
+                  Customer CD / Phone
+                </th>
+                <th>
+                  Name
+                </th>
+                <th>Guardian Name</th>
+                <th>Permanent Address</th>
+              </tr>
+                <tbody *ngFor="let cust of suggestedCustomer">
+                  <tr  (click)="SelectCustomer(cust)">
+                    <td>
+                      {{cust.cust_cd + 
+                         ((null === cust.phone) ? '' : ' / '+cust.phone)}}
+          
+                    </td>
+                    <td>
+                      {{cust.cust_name}}
+                    </td>
+                    <td>
+                      {{cust.guardian_name}}
+                    </td>
+                    <td>
+                      {{cust.permanent_address}}
+                    </td>
+                  </tr>
+                </tbody>
+                
+              
+             
+             
+
+            </table>
+        </div>
+        <div class="suggestions border p-2" style="width: 200%; font-size: small;"
+          *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+          <strong class="text-danger">" {{this.reportcriteria.controls.cust_name.value}} " does not match with any
+            customer</strong>
+        </div>
+        
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="hiddenTab" ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+      <h3>{{ardbName}} {{branchName}}</h3>
+      <h3>Run Date & Time : {{today}} </h3> <br>
+      <h3>Net Worth Statement</h3>
+    </div>
+    <!-- <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+    [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+    (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+  <table class="p-3" id="trialbalance">
+    <tr>
+      <th>UCIC</th>
+      <!-- <th>Type</th> -->
+      <th>Member ID</th>
+      <th >Name</th>
+      <th >Address</th>
+    </tr>
+    <tbody>
+      <tr>
+        <td>{{custCD}}</td>
+        <!-- <td *ngIf="custType=='M'">Member</td>
+        <td *ngIf="custType=='N'">Non-Member</td> -->
+        <td>{{memberID}}</td>
+        <td>{{custName}}</td>
+        <td>{{custAddr}}</td>
+      </tr>
+    </tbody>
+    <br>
+  </table>
+  <div class="row" *ngIf="reportData">
+    <div class="column">
+      <table id="trialbalance">
+          <tr>
+            <th>Acc Type</th>
+            <th>Acc Num</th>
+            <th style="text-align:right">Balance</th>
+            <th >Status</th>
+          </tr>
+            <tbody *ngFor="let i of reportData1; let itr=index;" >
+          <tr>
+            <td> {{i.acc_type_desc}}</td>
+            <!-- <td *ngIf="i.acc_type_cd==1">Savings Deposit</td>
+            <td *ngIf="i.acc_type_cd==2">Fixed Deposit</td>
+            <td *ngIf="i.acc_type_cd==3">DBS</td>
+            <td *ngIf="i.acc_type_cd==4">Cash Certificate</td>
+            <td *ngIf="i.acc_type_cd==5">Monthly Income Scheme</td>
+            <td *ngIf="i.acc_type_cd==6">Recurring Deposit</td>
+            <td *ngIf="i.acc_type_cd==7">Share Account</td>
+            <td *ngIf="i.acc_type_cd==8">{{ardbCD=='2'?'Suspense Deposit':'Flexi Deposit'}}</td>
+            <td *ngIf="i.acc_type_cd==9">{{ardbCD=='2'?'IBSD Suspense':'Loan Suspense'}}</td>
+            <td *ngIf="i.acc_type_cd==11">DSP</td> -->
+            <td>{{i.acc_num}}</td>
+            <td style="text-align:right">{{i.clr_bal | INRCurrency }}</td>
+            <td *ngIf="i.acc_status=='O'">Open</td>
+            <td *ngIf="i.acc_status=='C'">Closed</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="9"> <small>
+              This report is generated through CFS-2022
+             </small> </td>
+          </tr>
+         </tfoot>
+      </table>
+    </div>
+    <div class="column">
+      <table id="trialbalance">
+        <tr>
+          <th>Loan Type</th>
+          <th>Loan ID</th>
+          <th  style="text-align:right">Curr Prn</th>
+          <th  style="text-align:right">Ovd Prn</th>
+          <th style="text-align:right">Curr Intt</th>
+          <th style="text-align:right">Ovd Intt</th>
+          <th style="text-align:right">Penal Intt</th>
+          <th style="text-align:right">Total Outstanding</th>
+          <th>Status</th>
+        </tr>
+          <tbody *ngFor="let i of reportData; let itr=index;"> 
+        <tr>
+          <td>{{i.acc_desc}}</td>
+          <td>{{i.loan_id}}</td>
+          <td style="text-align:right">{{i.curr_prn | INRCurrency}}</td>
+          <td style="text-align:right">{{i.ovd_prn  | INRCurrency}}</td>
+          <td style="text-align:right">{{i.curr_intt  | INRCurrency}}</td>
+          <td style="text-align:right">{{i.ovd_intt  | INRCurrency}}</td>
+          <td style="text-align:right">{{i.penal_intt  | INRCurrency}}</td>
+          <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn  | INRCurrency}}</td>
+          <td *ngIf="i.loan_status=='O'" style="color: rgb(4, 104, 4);">Open</td>
+          <td *ngIf="i.loan_status=='C'" style="color: rgb(187, 6, 6);">Closed</td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+  </div>
+  <div hidden id="hiddenTab">
+    <div class="justify-content-center" style="text-align:center">
+      <h4>{{ardbName}} {{branchName}}</h4>
+      <h4>Run Date & Time : {{today}} </h4> <br>
+    </div>
+    <table class="p-3 mkSmall1" id="trialbalance">
+      <tr>
+        <th>UCIC</th>
+        <!-- <th>Type</th> -->
+        <th>Member ID</th>
+        <th>Name</th>
+        <th>Address</th>
+      </tr>
+      <tbody>
+        <tr>
+          <td>{{custCD}}</td>
+          <!-- <td *ngIf="custType=='M'">Member</td>
+          <td *ngIf="custType=='N'">Non-Member</td> -->
+          <td>{{memberID}}</td>
+          <td>{{custName}}</td>
+          <td>{{custAddr}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <div class="row1" *ngIf="reportData">
+      <div class="column1">
+        <table id="trialbalance">
+            <tr>
+              <th>Acc Type</th>
+              <th>Acc Num</th>
+              <th style="text-align:right">Balance</th>
+              <th>Status</th>
+            </tr>
+              <tbody *ngFor="let i of reportData1; let itr=index;" >
+            <tr>
+            <td >{{i.acc_type_cd}}</td>
+            <!-- <td *ngIf="i.acc_type_cd==1">Savings Deposit</td>
+            <td *ngIf="i.acc_type_cd==2">Fixed Deposit</td>
+            <td *ngIf="i.acc_type_cd==3">DBS</td>
+            <td *ngIf="i.acc_type_cd==4">Cash Certificate</td>
+            <td *ngIf="i.acc_type_cd==5">Monthly Income Scheme</td>
+            <td *ngIf="i.acc_type_cd==6">Recurring Deposit</td>
+            <td *ngIf="i.acc_type_cd==7">Share Account</td>
+            <td *ngIf="i.acc_type_cd==8">Flexi Deposit</td>
+            <td *ngIf="i.acc_type_cd==9">Loan Suspense</td>
+            <td *ngIf="i.acc_type_cd==11">DSP</td> -->
+            <td>{{i.acc_num}}</td>
+            <td style="text-align:right">{{i.clr_bal | INRCurrency}}</td>
+            
+            <td *ngIf="i.acc_status=='O'" style="color: rgb(4, 104, 4);">Open</td>
+              <td *ngIf="i.acc_status=='C'" style="color: rgb(187, 6, 6);">Closed</td>
+          </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="9"><small>&nbsp;</small> </td>
+               <td colspan="9"><small>&nbsp;</small> </td>
+               <td colspan="9"><small>&nbsp;</small> </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="column1">
+        <table id="trialbalance">
+          <tr>
+            <th>Loan ID</th>
+            <th style="text-align:right">Curr Prn</th>
+            <th style="text-align:right">Ovd Prn</th>
+            <th style="text-align:right">Curr Intt</th>
+            <th style="text-align:right">Ovd Intt</th>
+            <th style="text-align:right">Penal Intt</th>
+            <th style="text-align:right">Total Outstanding</th>
+            <th> Status</th>
+          </tr>
+            <tbody *ngFor="let i of reportData; let itr=index;"> 
+          <tr>
+            <td>{{i.loan_id}}</td>
+            <td style="text-align:right">{{i.curr_prn  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.ovd_prn  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.curr_intt  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.ovd_intt  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.penal_intt  | INRCurrency}}</td>
+            <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn  | INRCurrency}}</td>
+            <td *ngIf="i.acc_status=='O'" style="color: rgb(4, 104, 4);">Open</td>
+            <td *ngIf="i.acc_status=='C'" style="color: rgb(187, 6, 6);">Closed</td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+    <footer>
+      <small>
+        This report is generated through CFS-2022
+       </small> 
+     </footer>
+  </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="hiddenTab" ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    </div>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<loading *ngIf="isLoading"></loading>

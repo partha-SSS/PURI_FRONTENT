@@ -1,0 +1,153 @@
+<div *ngIf="show">
+  <loading *ngIf="isLoading"></loading>
+  <form [formGroup]="accDtlsFrm">
+    <h6 style="background-color:lightskyblue">Account Details</h6>
+    <div class="form-row">
+      <div class="form-group col-12">
+        <small for="cust_name">Name</small>
+        <input type="text" class="form-control form-control-sm" formControlName="cust_name" id="cust_name"
+          placeholder="Name" disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="opening_dt">Opening Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="opening_dt" id="opening_dt" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="acctDtls.ShowClose">
+        <small for="acc_close_dt">Acc Close Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="acc_close_dt" id="acc_close_dt"
+          disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="constitution_cd">Constitution</small>
+        <input type="text" class="form-control form-control-sm" formControlName="constitution_cd" id="constitution_cd"
+          hidden disabled>
+        <input type="text" class="form-control form-control-sm" formControlName="constitution_cd_desc"
+          id="constitution_cd_desc" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="!showInterestForRd">
+        <small for="oprn_instr_cd">Operation Instr</small>
+        <input type="text" class="form-control form-control-sm" formControlName="oprn_instr_cd" id="oprn_instr_cd"
+          disabled hidden>
+        <input type="text" class="form-control form-control-sm" formControlName="oprn_instr_cd_desc"
+          id="oprn_instr_cd_desc" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="!showInterestDtls">
+        <small for="clr_bal">Cleared Balance</small>
+        <input type="text" class="form-control form-control-sm" formControlName="clr_bal" id="clr_bal" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="!showInterestDtls">
+        <small for="cheque_facility_flag">Cheque Facility Flag</small>
+        <input type="text" class="form-control form-control-sm" formControlName="cheque_facility_flag"
+          id="cheque_facility_flag" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="!showInterestDtls">
+        <small for="curr_bal">Current Balance</small>
+        <input type="text" class="form-control form-control-sm" formControlName="curr_bal" id="curr_bal" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="!acctDtls.ShowClose">
+        <small for="shadow_bal">Shadow Balance</small>
+        <input type="text" class="form-control form-control-sm" formControlName="shadow_bal" id="shadow_bal" disabled>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-6" *ngIf="showInterestDtls || showInterestForRd">
+        <small for="intt_rt">Interest Rate</small>
+        <input type="text" class="form-control form-control-sm" formControlName="intt_rt" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="showInterestDtls">
+        <small for="intt_trf_type">Interest Type</small>
+        <input type="text" class="form-control form-control-sm" formControlName="intt_trf_type" disabled>
+      </div>
+      <div class="form-group col-6" *ngIf="showInterestForRd">
+        <small for="instl_amt">Installment Amt</small>
+        <input type="text" class="form-control form-control-sm" formControlName="instl_amt" disabled>
+      </div>
+      <div class="form-group col-4" *ngIf="showInterestDtls">
+        <small for="mat_dt">Maturity Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="mat_dt" disabled>
+      </div>
+      <div class="form-group col-4" *ngIf="showInterestDtls">
+        <small for="mat_status">Maturity Status</small>
+        <input type="text" class="form-control form-control-sm" formControlName="mat_status" disabled>
+      </div>
+      <div class="form-group col-4" *ngIf="showInterestDtls">
+        <small for="cert_no">Certificate No.</small>
+        <input type="text" class="form-control form-control-sm" formControlName="cert_no" disabled>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-4" *ngIf="showInterestDtls">
+        <small for="prn_amt">Principal Amt</small>
+        <input type="text" class="form-control form-control-sm" formControlName="prn_amt" disabled>
+      </div>
+      <div class="form-group col-4" *ngIf="showInterestDtls">
+        <small for="intt_amt">Interest Amt</small>
+        <input type="text" class="form-control form-control-sm" formControlName="intt_amt" disabled>
+      </div>
+      <div class="form-group col-4" *ngIf="showInterestDtls">
+        <small for="mat_amt">Maturity Amt</small>
+        <input type="text" class="form-control form-control-sm" formControlName="mat_amt" disabled>
+      </div>
+    </div>
+    <div class="form-row bg-light p-1" *ngIf="showInterestDtls">
+      <div class="form-group col-12 text-center">
+        <small for="dep_period_d">Deposit Period</small>
+      </div>
+      <div class="form-group col-4">
+        <small for="dep_period_y">Year</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period_y" disabled>
+      </div>
+      <div class="form-group col-4">
+        <small for="dep_period_m">Month</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period_m" disabled>
+      </div>
+      <div class="form-group col-4">
+        <small for="dep_period_d">Day</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period_d" disabled>
+      </div>
+    </div>
+    <button type="button" class="btn btn-link" *ngIf="showInterestForRd" (click)="openModal(content)">Show RD
+      Installaments</button>
+    <ng-template #content>
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">RD Installments Details for Acc# {{acctDtls.acc_num}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-dw-rd-instl-view></app-dw-rd-instl-view>
+      </div>
+    </ng-template>
+
+    <!--
+      <div class="form-group col-6">
+        <small for="dep_period">Deposit Period</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period" id="dep_period"
+           disabled>
+      </div>
+
+      <div class="form-group col-6">
+        <small for="intt_rt">Interest Rate</small>
+        <input type="text" class="form-control form-control-sm" formControlName="intt_rt" id="intt_rt"
+           disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="prn_amt">Principal Amount</small>
+        <input type="text" class="form-control form-control-sm" formControlName="prn_amt" id="prn_amt"
+          disabled>
+      </div>
+
+      <div class="form-group col-6">
+        <small for="mat_dt">Maturity Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="mat_dt" id="mat_dt"
+           disabled>
+      </div>
+      <div class="form-group col-6">
+        <small for="intt_amt">Interest Amount</small>
+        <input type="text" class="form-control form-control-sm" formControlName="intt_amt" id="intt_amt"
+           disabled>
+      </div> -->
+
+  </form>
+</div>

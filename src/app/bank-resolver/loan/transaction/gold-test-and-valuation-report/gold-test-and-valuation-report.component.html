@@ -1,0 +1,549 @@
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center">
+ <ng-template #buttonDiv>
+  <div
+  class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+  <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="newAccount()">New</button> -->
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="modifyData()">Modify</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+  
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="dsave" (click)="saveData()">Save</button>
+  <button [disabled]="printType.length==0 || printType=='' " mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="printTable" ngxPrint>Print</button>
+
+  <!-- class="btn btn-primary btn-sm ml-1 mr-1" (click)="openModal(kycContent)" >Kyc</button> -->
+</div>
+ </ng-template>
+ <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+
+
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+
+    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+    <form [formGroup]="GoldTest" autocomplete="chrome-off">
+    <h1></h1>
+    <h4 class="customHeader">Customer Information</h4>
+    <div class="form-row">
+      <div class="form-group col-2">
+        <small for="loan_id">Member/Nominal Member No:</small>
+        <input style="height:25px" type="text" class="form-control form-control-sm "
+        id="Member No" placeholder="Member No" [readonly]="true" formControlName="member_no">
+      </div>
+
+      <div class="form-group col-2">
+        <small for="loan_id">Member Id:</small>
+        <input style="height:25px" type="text" [readonly]="true" class="form-control form-control-sm "
+        id="Member Id" placeholder="Member Id" formControlName="cust_cd">
+      </div>
+      <div class="form-group col-3">
+
+        <small for="cust_name" *ngIf="newClicked">Name</small>
+        <small for="cust_name" *ngIf="!newClicked">Search name code phone</small>
+        <!-- <input [(ngModel)]="suggestedCustomer"
+        [typeahead]="states"
+        class="form-control"> -->
+        <div class="input-group">
+          <input type="text" class="form-control form-control-sm mkUpper"  autocomplete="chrome-off" formControlName="cust_name"
+          id="cust_name" placeholder="Name" (input)="onChangeName()">
+      <div class="input-group-append">
+      <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" style="font-size:x-small" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+
+      </div>    
+        </div>
+     
+      <ng-container>
+        <div class="suggestions border p-2 " style="width: 150%;"
+        *ngIf="suggestedCustomer && suggestedCustomer!=null">
+
+
+            <!-- <strong> [ Customer Cd / Phone ] Name </strong>
+            <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+              (click)="SelectCustomer(cust)">{{'[' + cust.cust_cd + ' / '
+              + ((null === cust.phone) ? '' : cust.phone) +'] '
+              + cust.cust_name}}
+            </p> -->
+            
+          <table id="customers1">
+            <tr>
+              <th> Customer Code / Phone</th>
+              <th> Name</th>
+              <th>Guardian Name</th>
+              <th> Address</th>
+            </tr>
+            <tbody *ngFor="let cust of suggestedCustomer" >
+              <tr  (click)="SelectCustomer(cust)">
+                <td>
+                  {{cust.cust_cd}}  {{((null === cust.phone) ? '' : ' / '+ cust.phone)}}
+                </td>
+                <td>
+                  {{cust.cust_name}}
+                </td>
+                <td>
+                  {{cust.guardian_name}}
+                </td>
+                <td>
+                  {{cust.permanent_address}}
+                </td>
+              </tr>
+            
+            </tbody>
+            
+          </table>
+          </div>
+      </ng-container>
+      
+        <div class="suggestions border p-2 " style="width: 200%; font-size: small;"
+        *ngIf="showNoResult">
+       <strong class="text-danger">" {{this.f.cust_name.value}} " does not match with any customer</strong>
+        </div> 
+      </div>
+      <div class="form-group col-3">
+        <small for="loan_id">Valuation No:</small>
+        <input style="height:25px" type="Number"  class="form-control form-control-sm " (change)="getValuation()"
+        id="valuation No" placeholder="valuation No" formControlName="valuation_no">
+      </div>
+      <div class="form-group col-2">
+        <small for="loan_id">Contact No:</small>
+        <input style="height:25px" type="Number" [readonly]="true" class="form-control form-control-sm "
+        id="Contact No" placeholder="Contact No" formControlName="phone">
+      </div>
+      
+    </div>
+
+
+
+
+    <div class="form-row">
+        <div class="form-group col-3">
+          <small for="value_dt">Date:</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker [(ngModel)]="currDate"
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenDt" (bsValueChange)="setDueDT($event)"
+                formControlName="value_dt" id="value_dt">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="isOpenDt = !isOpenDt">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+          <div class="form-group col-3">
+            <small for="loan_id">Loan Id:</small>
+            <input style="height:25px" type="text" class="form-control form-control-sm "
+            id="Loan id" placeholder="Loan id" formControlName="loan_id">
+          </div>
+          <div class="form-group col-3">
+            <small for="due_date">Due Date:</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker [(ngModel)]="goldDueDt"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenduedt" 
+                  formControlName="due_date" id="due_date">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="isOpenduedt = !isOpenduedt">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-3">
+            <small for="loan_id">V/ Page:</small>
+            <input style="height:25px" type="text" class="form-control form-control-sm "
+            id="v/page" placeholder="V/ Page"  formControlName="lge_page">
+          </div>
+          <div class="form-group col-12">
+            <small for="loan_id">Address:</small>
+            <input style="height:25px" type="text" class="form-control form-control-sm "
+            id="address" placeholder="address" [readonly]="true" formControlName="present_address">
+          </div>
+      </div>
+    </form>
+  </div>
+
+
+  <!-- <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3" *ngIf="tm_loan_all.loan_id != undefined"> -->
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <!-- <div class="table-responsive" class="scroll-when-long">
+        <table class="table table-sm table-hover">
+          <thead>
+            <tr>
+                <th scope="col">SL NO</th>
+                <th scope="col">Description of Valuables</th>
+                <th scope="col">No</th>
+                <th scope="col">Gross Weight (Grams)</th>
+                <th scope="col">Loss Alloy Stones, etc</th>
+                <th scope="col">Net Weight (Grams)</th>
+                <th scope="col">Purity Carat</th>
+                <th scope="col">Equivalent Weight of 22 karat gold Contents (Grams)</th>
+                <th scope="col">Rate per Gram for 22 karat</th>
+                <th scope="col">Value of gold Ornaments(Rs.)</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td></td>
+              
+            </tr>
+            <tr *ngFor="let acctype of valuationList; let i=index" title="Click to Select" style="cursor: pointer;">
+                <td>{{acctype.sl_no}}</td>
+                <td>{{acctype.desc_val}}</td>
+              <td>{{acctype.desc_no}}</td>
+              <td>{{acctype.gross_we}}</td>
+              <td>{{acctype.alloy_stone_we}}</td>
+              <td>{{acctype.net_we}}</td>
+              <td>{{acctype.purity_we}}</td>
+              <td>{{acctype.act_we}}</td>
+              <td>{{acctype.act_rate}}</td>
+              <td>{{acctype.net_value }}</td>
+              
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+      </div> -->
+      <div class="col-12">
+        <h1></h1>
+        <h4 class="customHeader">Jewelry Details</h4>
+        <section *ngFor="let t1 of tdJewelry; let i = index">
+          <div class="form-row ">
+            <div class="form-group col-1">
+              <small for="sl_no">Serial No</small>
+              <input style="height:25px" [readonly]="true" type="text" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.sl_no" placeholder="Serial No" id="sl_no" placeholder="Serial No">
+            </div>
+
+
+            <div class="form-group col-1">
+              <small for="relation">Item Description</small> <br>
+              <select
+                style="height:25px; text-align-last: left; font-size: small; padding-top: 0px; background-color: whitesmoke;"
+                id="relation" [disabled]="disableAll=='Y' " [(ngModel)]="t1.desc_val"
+                 class="form-control form-control-sm">
+                <option [value]="t1.desc_val" selected>{{t1.desc_val}}</option>
+                <option *ngFor="let l of allJewelryType" [value]="l.item_desc">{{l.item_desc}}</option>
+              </select>
+
+            </div>
+            <div class="form-group col-1" hidden>
+              <small for="loan_id">Valuation No:</small>
+              <input style="height:25px" type="Number"  class="form-control form-control-sm " 
+              id="valuation No" placeholder="valuation No" [(ngModel)]="t1.valuation_no">
+            </div>
+            <div class="form-group col-1">
+              <small for="desc_no">Item No</small>
+              <input style="height:25px" [disabled]="disableAll=='Y'" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.desc_no"  id="desc_no" placeholder="Item No" (change)="setAllTotal(t1,1,i)">
+            </div>
+            <div class="form-group col-1">
+              <small for="gross_we">Gross Weight (Grm)</small>
+              <input style="height:25px" [disabled]="disableAll=='Y'" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.gross_we"  id="gross_we" placeholder="Gross Weight" (change)="setAllTotal(t1,2,i)">
+            </div>
+            <div class="form-group col-1">
+              <small for="alloy_stone_we">Loss Alloy Stones, etc</small>
+              <input style="height:25px" [disabled]="disableAll=='Y'" type="text" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.alloy_stone_we" id="alloy_stone_we" placeholder="Loss Alloy Stones" (change)="setAllTotal(t1,3,i)">
+            </div>
+            <div class="form-group col-1">
+              <small for="net_we">Net Weight (Grm)</small>
+              <input style="height:25px" [disabled]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.net_we"  id="net_we" placeholder="Net Weight" (change)="setAllTotal(t1,4,i)">
+            </div>
+            <div class="form-group col-1">
+              <small for="purity_we">Purity Carat</small>
+              <input style="height:25px" [disabled]="disableAll=='Y'" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.purity_we"  id="purity_we" placeholder="Purity Carat" (change)="setAllTotal(t1,5,i)">
+            </div>
+            <div class="form-group col-2">
+              <small for="act_we">Equivalent Weight of 22 krt gold in (Grm)</small>
+              <input style="height:25px" [disabled]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.act_we"  id="act_we" placeholder="Equivalent Weight of 22 krt" (change)="setAllTotal(t1,6,i)">
+            </div>
+            <div class="form-group col-1">
+              <small for="act_rate">Rate/Grm for 22 krt</small>
+              <input style="height:25px" [disabled]="disableAll=='Y'" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.act_rate"  id="act_rate" placeholder="Rate/Grm for 22 krt" (change)="setAllTotal(t1,7,i)">
+            </div>
+            <div class="form-group col-1">
+              <small for="net_value">Value of gold</small>
+              <input style="height:25px" [disabled]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="t1.net_value"  id="net_value" placeholder="Value of gold Ornaments" (change)="setAllTotal(t1,8,i)">
+            </div>
+            <div class="form-group col-1">
+              <button  type="button" style="height: 39px;width: 30px;margin-top: 20px;" class="btn btn-primary btn-sm"
+            (click)="removeJewelry(i)">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+          </button>
+            </div>
+          </div>
+          
+        </section>
+        <hr><br>
+          <div class="form-row ">
+            <div class="form-group col-2">
+              <input style="height:25px" [readonly]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="total" >
+            </div>
+            <div class="form-group col-1">
+              <input style="height:25px" [readonly]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_desc_no "  placeholder="Total Item">
+            </div>
+            <div class="form-group col-1">
+              <input style="height:25px" [readonly]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_gross_we"  id="gross_we" placeholder="Total Gross Weight">
+            </div>
+            <div class="form-group col-1">
+              <input style="height:25px" [readonly]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_alloy_stone_we" id="alloy_stone_we" placeholder="Total Loss Alloy Stones">
+            </div>
+            <div class="form-group col-1">
+              <input style="height:25px" [readonly]="true" type="Number" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_net_we"  id="net_we" placeholder="Total Net Weight">
+            </div>
+            <div class="form-group col-1">
+              <!-- <input style="height:25px" [readonly]="true" type="text" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_purity_we"  id="purity_we" placeholder="Total Purity Carat"> -->
+            </div>
+            <div class="form-group col-2">
+              <input style="height:25px" [readonly]="true" type="text" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_act_we"  id="act_we" placeholder="Total Equivalent Weight of 22 krt">
+            </div>
+            <div class="form-group col-1">
+              <!-- <input style="height:25px" [readonly]="true" type="text" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_act_rate"  id="act_rate" placeholder="Total Rate/Grm for 22 krt"> -->
+            </div>
+            <div class="form-group col-1">
+              <input style="height:25px" [readonly]="true" type="text" class="form-control form-control-sm text-capitalize"
+                [(ngModel)]="tot_net_value"  id="net_value" placeholder="Total Value of gold Ornaments">
+            </div>
+            <div class="form-group col-1">
+              <button  type="button" style="height: 39px;width: 30px;" class="btn btn-primary btn-sm"
+              (click)="addJewelry()">
+              <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+            </div>
+          </div>
+        <!-- <div class="text-right mb-3">
+          <button type="button" style=" max-height: 27px;" class="btn btn-primary btn-sm mr-2"
+            (click)="addJewelry()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+          </button>
+
+          <button  type="button" style="max-height: 27px;" class="btn btn-primary btn-sm"
+            (click)="removeJewelry()">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+          </button>
+        </div> -->
+        <div class="form-row">
+        <table #tbl style="width: 25%;">
+        
+        <tr>
+          <td>Loan eligibility of RS.</td>
+          <td>{{this.tot_eligibility| number : '1.2-2'}}</td>
+        </tr>
+        <tr>
+          <td>Loan Sectioned of RS.</td>
+          <td>{{this.tot_sanction | number : '1.2-2'}}</td>
+        </tr>
+        </table>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <div class="form-group col-4">
+          <small for="fundType">Set Printing Type</small>
+          <select id="fundType" class="form-control form-control-sm" [(ngModel)]="printType">
+            <option [readonly]="true">Choose</option>
+            <option value="OR">Original Copy</option>
+            <option value="D">Duplicate Copy</option>
+            <option value="T">Triplicate Copy</option>
+            <option value="OF">Office Copy</option>
+            <option value="N">Normal Copy</option>
+
+          </select>
+        </div>
+      </div>
+        <hr>
+        <div id="printTable" class="container" hidden>
+          <table style="width:100%;margin-left: 20px!important;" >
+            <div class="justify-content-center" style="text-align:center">
+              <h4>{{ardbName}} </h4>
+              <h4>Date & Time : {{today}} , REG NO.10 CONT.</h4> 
+              <h4 *ngIf="ardbCD=='2'">Contai, Purba Mediniipur, PIN- 721401</h4> 
+              <h4>{{branchName}}</h4>
+              <h4> <u> Recept Test and Valuation Report</u> &nbsp;&nbsp;&nbsp;&nbsp;
+              <u>{{printType=='OF'?'Ofice Copy':
+              printType=='OR'?'Original Copy':
+              printType=='D'?'Duplicate Copy':
+              printType=='T'?'Triplicate Copy':'Normal Copy'}}</u></h4>
+           </div><br><br>
+           <div class="row" style="width:90%">
+            <div class="col-6" style="padding: 10px;">
+              <table>
+                <tr>
+                  <td>Member/Nominal Member No:</td>
+                  <td>{{singleData?.member_no}}</td>
+                  <td>Valuation No:</td>
+                  <td>{{singleData?.valuation_no}}</td>
+                  
+                </tr>
+                <tr>
+                  <td>Member ID:</td>
+                  <td>{{singleData?.cust_cd}}</td>
+                  <td>Date:</td>
+                  <td>{{singleData?.value_dt?.substr(0,10)}}</td>
+                  
+                </tr>
+                <tr>
+                  <td>Name:</td>
+                  <td>{{singleData?.cust_name}}</td>
+                  <td>Loan ID:</td>
+                  <td>{{singleData?.loan_id}}</td>
+                </tr>
+                <tr>
+                  <td>Contact No:</td>
+                  <td>{{singleData?.phone}}</td>
+                  <td>V/Page:</td>
+                  <td>{{singleData?.lge_page}}</td>
+                </tr>
+                <tr>
+                  <td>Address:</td>
+                  <td>{{singleData?.present_address}}</td>
+                  <td>Due Date:</td>
+                  <td>{{singleData?.due_dt?.substr(0,10)}}</td>
+                </tr>
+                
+                
+               </table>
+            </div>
+            <div class="col-12" style="padding: 10px; ">
+              <table style="border: 2px solid #34723A;">
+                <tr>
+                  <td>
+                 <div style="padding: 8px;">Member/Nominal Member of the Bank, the undermentioned valuables as pledge for a loan advance to him/her today with the condition that the Bank Reserves the right to sell off pledged valuables if the loanee fails to pay up the loan with interest within the stipulated time on clear fortnight's registered notice.</div>
+    
+                  </td>
+                </tr>
+               </table>
+            </div>
+           </div>
+           <br>
+           <div class="col-12" style="width:100%">
+            <table style="border: 1px solid rgb(85, 85, 85);">
+              <tr style="text-align: center;">
+                  <th>Sl No</th>
+                  <th style="width: 150px!important;">Item Description</th>
+                  <th>Desc No.</th>
+                  <th>Gross Weight (Grm)</th>
+                  <th>Loss Alloy Stones, etc</th>
+                  <th>Net Weight (Grm)</th>
+                  <th>Purity Carat</th>
+                  <th>Equivalent Weight of 22 krt gold in (Grm)</th>
+                  <th>Rate/Grm for 22 krt</th>
+                  <th>Value of gold Ornaments(Rs.)</th>
+              </tr>
+              <tr  *ngFor="let l of valuationList" style="text-align: center;">
+                  <td>{{l.sl_no}}</td>
+                  <td>{{l.desc_val}}</td>
+                  <td>{{l.desc_no}}</td>
+                  <td>{{l.gross_we| number : '1.2-2'}}</td>
+                  <td>{{l.alloy_stone_we| number : '1.2-2'}}</td>
+                  <td>{{l.net_we| number : '1.2-2'}}</td>
+                  <td>{{l.purity_we| number : '1.2-2'}}</td>
+                  <td>{{l.act_we| number : '1.2-2'}}</td>
+                  <td>{{l.act_rate | number : '1.2-2'}}</td>
+                  <td>{{l.net_value | number : '1.2-2'}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td colspan="2">Total</td>
+                  <td>{{tot_desc_no}}</td>
+                  <td>{{tot_gross_we| number : '1.2-2'}}</td>
+                  <td>{{tot_alloy_stone_we| number : '1.2-2'}}</td>
+                  <td>{{tot_net_we| number : '1.2-2'}}</td>
+                  <td></td>
+                  <td>{{tot_act_we| number : '1.2-2'}}</td>
+                  <td></td>
+                  <td>{{tot_net_value | number : '1.2-2'}}</td>
+              </tr>
+             </table>
+          </div><br>
+          
+            <div class="col-12">
+              <div>Loan eligibility of Rs. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>{{this.tot_eligibility| number : '1.2-2'}}</b></div>
+            </div>
+            <div class="col-12">
+              <div><p class="amountToWord">{{this.tot_eligibility | amountToWord}}</p></div>
+            </div>
+            <div class="col-12">
+              <div>Loan Sectioned of Rs.</div>
+            </div>
+            <div class="col-12">
+              <br>
+              <div><p>Rs.......................................................................................................................................... only</p></div>
+            </div>
+          <div class="col-12">
+            <p>Certified that I have tested the aforesaid valuables with most care and found the same to be genuine to the best of judgement.</p>
+          </div>
+          <br>
+          <br>
+          <br>
+          <div class="row">
+            <div class="col-3 text-center">
+             <b> Member Signature</b>
+            </div>
+            <div class="col-3 text-center">
+              <b>Appraise Signature</b>
+            </div>
+            <div class="col-3 text-center">
+              <b>Chief Cashier / Cashier</b>
+            </div>
+            <div class="col-3 text-center">
+             <b> Junior Officer / Manager</b>
+            </div>
+          </div>
+          </table>
+        </div>
+      
+
+      </div>
+    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="newAccount()">New</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="modifyData()">Modify</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData('N')">Save</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" >Delete</button>
+    <button mat-raised-button type="button" [disabled]="!kycEnable" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(kycContent)">Kyc</button>
+   
+  </div> -->
+  <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+
+
+</div>
+
+
+

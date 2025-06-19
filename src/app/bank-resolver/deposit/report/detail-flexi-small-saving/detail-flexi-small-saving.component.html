@@ -1,0 +1,207 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <!-- <div class="form-group col-6">
+            <small for="acc_type_cd">Account Type</small>
+            <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+            (change)="onAccountTypeChange()">
+              <option disabled>Choose</option>
+              <option [value]="2">2 - Fixed Deposit</option>
+              <option [value]="3">3 - DBS</option>
+              <option [value]="4">4 - Term Deposit</option>
+              <option [value]="5">5 - MIS</option>
+            </select>
+          </div> -->
+          <div class="form-group col-12">
+            <small for="constitution_cd">Constitution</small>
+            <select id="constitution_cd" class="form-control form-control-sm"
+            formControlName="constitution_cd" (change)="sendData()">
+              <option disabled>Choose</option>
+              <option *ngFor="let cc of constitutionListToBind" [value]="cc.constitution_cd">{{cc.constitution_cd +' - ' +cc.constitution_desc}}</option>
+            </select>
+          </div>
+          <div class="form-group col-12">
+            <label for="fromDate">As on</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+    [useExistingCss]="true"
+     printSectionId="trial111" 
+     ngxPrint>Print</button>
+     <button mat-raised-button class="btn btn-primary" (click)="onLoadScreen(content)">Retrieve</button>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+    </div>
+    </div>
+
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+   
+  
+  <div class="mat-elevation-z8" id="trial111">
+    <table mat-table [dataSource]="dataSource" >
+      <ng-container matColumnDef="constitution">
+        <th mat-header-cell *matHeaderCellDef ></th>
+        <td *matCellDef="let row"style="padding-top:20px;">  <b style="font-size:16px; padding-left:6%;"><u>Agent Name:- {{row.agentname}}</u></b>
+          <table >
+            <ng-container>
+              <thead>
+                <tr mat-cell style="height: 40px;">
+                  <th mat-header-cell style="text-align:center!important;">A/c No.</th>
+                  <th mat-header-cell style="text-align:left!important; width: 20%!important;">Customer Name</th> 
+                  <th mat-header-cell style="text-align:center!important;">Opening DT</th>
+                  <th mat-header-cell style="text-align:center!important;">Maturity Dt</th>
+                  <th mat-header-cell style="text-align:right!important;">Prn Amt</th>
+                </tr>
+              </thead>
+              <tbody>
+                        <tr *ngFor="let dds of row.ttsbcadtllist">
+                          <th mat-header-cell style="text-align:center!important;">{{dds.acc_num}} </th>
+                          <th mat-header-cell style="text-align:left!important;width: 20%!important;">{{dds.cust_name}}</th>
+                          <th mat-header-cell style="text-align:center!important;">{{dds.opening_dt .substr(0,10)}} </th>
+                          <th mat-header-cell style="text-align:center!important;">{{dds.mat_dt.substr(0,10)}} </th>
+                          <th mat-header-cell style="text-align:right!important;">{{dds.prN_AMT |currency:'INR'}} </th>
+                          
+                        </tr>
+                        <tr mat-cell>
+                          <td mat-cell colspan="2" style="padding-left:6%!important;"><b>Total Account Count.{{row.tot_count}}</b> </td>
+                          <td mat-cell colspan="2" style="text-align:right!important;"><b>Total Balance</b> </td>
+                          
+                          <td mat-cell style="text-align:right!important;"><b>{{row.tot_prn|currency:'INR'}}</b></td>
+                        </tr>
+           </tbody>
+            </ng-container>
+          </table>
+      </td>
+      </ng-container>
+
+
+    
+      <ng-container matColumnDef="Header">
+        <th mat-header-cell *matHeaderCellDef >
+          <div class="justify-content-center" style="text-align:center">
+            <br><h4>{{ardbName}} ({{branchName}})</h4>
+            
+            <h4>Run Date & Time : {{today}} </h4>
+            <h4> <u>  Detail List Flexi Small Saving as on {{fromdate.toDateString()| date: 'dd/MM/yyyy'}}</u></h4>
+            <h4> <u> Account Type: {{accType}} </u>/<u> Constitution: {{constType}} </u></h4>
+          </div>
+        </th>
+      </ng-container>
+     
+      
+      
+      <!-- Footer column -->
+      <!-- <ng-container matColumnDef="Total">
+        <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: left;">
+          <b>Total</b>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="space">
+        <td mat-footer-cell *matFooterCellDef colspan="3" >
+           <b></b>
+        </td>
+       </ng-container>
+      
+       <ng-container matColumnDef="Total2">
+        <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: left;">
+           <b>{{prnamt | currency:"INR"}}</b>
+        </td>
+       </ng-container> -->
+       
+       
+        
+      <tr mat-header-row *matHeaderRowDef="['Header']"
+       class="example-second-header-row">
+      </tr>
+      
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <!-- <tr mat-footer-row *matFooterRowDef="['Total','space','Total2']" class="example-second-footer-row"></tr> -->
+      
+      <!-- Row shown when there is no matching data. -->
+      <tfoot>
+        <tr>
+         <td>&nbsp;</td>
+         <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         </tr>
+       
+      </tfoot>
+    </table>
+    <table>
+      <tr>
+        <td style="text-align: left;padding-left: 6%;"><b>Overall Total Account Count.{{counter}}</b> </td>
+        <td style="text-align: right;"><b>Overall Total Prn Amt</b></td>
+        <td style="width:18%;text-align: right;" ><b>{{prvamt|currency:'INR'}}</b></td>
+        
+        <td style="text-align: right;"></td>
+        
+        </tr>
+    </table>
+    <footer><small>
+      This report is generated through CFS-2022
+     </small></footer>
+  </div>
+  <!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[20, 30, 50, 100,pageLength]" aria-label="Select page of users"></mat-paginator> -->
+  
+  </div>
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+  [useExistingCss]="true"
+   printSectionId="trial111" 
+   ngxPrint>Print</button>
+   <button mat-raised-button class="btn btn-primary" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

@@ -1,0 +1,611 @@
+
+<loading *ngIf="isLoading"></loading>
+<div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+  <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+   'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+    <strong>{{showMsg.Message}}</strong>
+    <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</div>
+<br>
+<div class="mt-1 col-xs-12 col-sm-12  d-flex justify-content-center align-items-center" style="margin-bottom: 20px">
+    
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" #saveBtn (click)="onSaveClick()">Save</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onDeleteClick()"
+    *ngIf="editDeleteMode">Delete</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onResetClick()">Reset</button>
+  
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  
+</div>
+<br>
+<div class="row" [hidden]="ShowHide">
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 ">
+    <form [formGroup]="accDtlsFrm">
+      <h4 class="customHeader mt-2">Account Details</h4>
+      <div class="form-row">
+        <div class="form-group col-6" >
+          <small for="bank_nm">Bank Name</small>
+          <input type="text" class="form-control form-control-sm" formControlName="bank_nm" [readonly]="true">
+        </div>
+          <div class="form-group col-6" >
+            <small for="branch_nm">Branch Name</small>
+            <input type="text" class="form-control form-control-sm" formControlName="branch_nm" [readonly]="true">
+          </div>
+      </div>
+      <div class="form-row">
+        
+        <div class="form-group col-4">
+          <small for="opening_dt">Opening Date</small>
+          <input type="text" class="form-control form-control-sm" formControlName="opening_dt" id="opening_dt"
+            [readonly]="true">
+        </div>
+        <div class="form-group col-4">
+          <small for="constitution_cd">Constitution</small>
+          <input type="text" class="form-control form-control-sm" formControlName="constitution_cd"
+            id="constitution_cd" hidden [readonly]="true">
+          <input type="text" class="form-control form-control-sm" formControlName="constitution_cd_desc"
+            id="constitution_cd_desc" [readonly]="true">
+        </div>
+        <div class="form-group col-4" >
+          <small for="oprn_instr_cd">Operation Instr</small>
+          <input type="text" class="form-control form-control-sm" formControlName="oprn_instr_cd" id="oprn_instr_cd"
+            [readonly]="true" hidden>
+          <input type="text" class="form-control form-control-sm" formControlName="oprn_instr_desc"
+            id="oprn_instr_desc" [readonly]="true">
+        </div>
+      </div>
+      <div class="form-row">
+        
+        <div class="form-group col-4" >
+          <small for="intt_trf_type">Interest Type</small>
+          <input type="text" class="form-control form-control-sm" formControlName="intt_trf_type" [readonly]="true">
+        </div>
+        <div class="form-group col-2" >
+          <small for="intt_rt">Interest Rate</small>
+          <input type="text" class="form-control form-control-sm" formControlName="intt_rt" [readonly]="true">
+        </div>
+        <div class="form-group col-3" >
+          <small for="prn_amt">Principal Amt</small>
+          <input type="text" class="form-control form-control-sm" formControlName="prn_amt" [readonly]="true">
+        </div>
+        
+        <div class="form-group col-3" >
+          <small for="intt_amt">Interest Amt</small>
+          <input type="text" class="form-control form-control-sm" formControlName="intt_amt" [readonly]="true">
+        </div>
+    </div>
+    <div class="form-row bg-light p-1">
+      <div class="form-group col-12 text-center">
+        <small for="dep_period_d">Deposit Period</small>
+      </div>
+      <div class="form-group col-4">
+        <small for="dep_period_y">Year</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period_y" [readonly]="true">
+      </div>
+      <div class="form-group col-4">
+        <small for="dep_period_m">Month</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period_m" [readonly]="true">
+      </div>
+      <div class="form-group col-4">
+        <small for="dep_period_d">Day</small>
+        <input type="text" class="form-control form-control-sm" formControlName="dep_period_d" [readonly]="true">
+      </div>
+    </div> 
+    <div class="form-row">
+      <div class="form-group col-6" >
+        <small for="mat_dt">Maturity Date</small>
+        <input type="text" class="form-control form-control-sm" formControlName="mat_dt" [readonly]="true">
+      </div>
+        <div class="form-group col-6" >
+          <small for="mat_amt">Maturity Amt</small>
+          <input type="text" class="form-control form-control-sm" formControlName="mat_amt" [readonly]="true">
+        </div>
+    </div>
+    
+    <!-- *ngIf="showRdInstalment" (click)="openModal(content)" -->
+      <button type="button" class="btn btn-link" [hidden]="showIns">Show Installments
+      </button>
+      <!-- *ngIf="accTransFrm.controls.acc_type_cd.value == 11" (click)="openModal(PreContent1)" -->
+      <button type="button" class="btn btn-link"  [hidden]="showPTrns">Previous Transaction
+    </button> 
+     
+    </form>
+    
+  </div>
+  
+  <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 ">
+    <form [formGroup]="tdDefTransFrm" *ngIf="showTranDtlRe">
+      <h4 class="customHeader mt-2">Transaction Details</h4>
+      <div class="form-row">
+        <div class="form-group col-2" [hidden]="editDeleteMode==false">
+          <small for="trans_cd">Tran Cd</small>
+          <input type="text" class="form-control form-control-sm" [readonly]="true" formControlName="trans_cd" id="trans_cd">
+        </div>
+        <div class="form-group col-3">
+          <small for="acc_type_cd">Account Type</small>
+          <input type="text" hidden class="form-control form-control-sm" [readonly]="true" formControlName="acc_type_cd"
+            id="acc_type_cd">
+          <input type="text" class="form-control form-control-sm" [readonly]="true" formControlName="acc_type_desc"
+            id="acc_type_desc">
+        </div>
+        
+        <div class="form-group col-3">
+          <small for="acc_num">A/C</small>
+          <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="acc_num" id="acc_num">
+        </div>
+        <div class="form-group col-3">
+          <small for="trans_type">Transaction Type <span class="text-danger">*</span> </small>
+          <input type="text" class="form-control form-control-sm" formControlName="trans_type_key" hidden
+            id="trans_type_key">
+          <input type="text" class="form-control form-control-sm" formControlName="trans_type" [readonly]="true"
+            id="trans_type">
+        </div>
+        <!-- *ngIf="showTransModeForR||showtransmodeforC" -->
+          <div class="form-group col-2">
+            <small for="trans_mode1">Trans Mode</small>
+            <input type="text" [readonly]="true" [value]="showTranDtlRe? 'Renewal':'Close'"
+              class="form-control form-control-sm" formControlName="trans_mode1" id="trans_mode1">
+          </div>
+          <div class="form-group col-2" hidden>
+            <small for="trans_mode">Trans Mode</small>
+            <input type="text" [readonly]="true" [value]="showTranDtlRe? 'R':'C'"
+              class="form-control form-control-sm" formControlName="trans_mode" id="trans_mode">
+          </div>
+          <div class="form-group col-3">
+            <small for="dbs_acc_open_dt">Voucher Date</small>
+            
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker
+            [ngModel]="voucher_dt" formControlName="voucher_dt"
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" #VDate [isOpen]="isOpenVDT"
+              >
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="isOpenVDT = !isOpenVDT">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>  
+          <!-- (change)="onTransTypeChange()" -->
+        <div class="form-group col-2" >
+          <small for="trf_type">Transaction  Type <span class="text-danger">*</span></small>
+          <select id="trf_type" class="form-control form-control-sm" formControlName="trf_type"
+          (change)="onTransTypeChange()">
+            <option  [readonly]="true">Choose</option>
+            <option  value="C">Cash</option>
+            <option  value="T">Transfer</option>
+          </select>
+        </div>
+        <div class="form-group col-2" >
+          <small for="amount">Prev Principal Amt</small>
+          <input  type="text" class="form-control form-control-sm" [readonly]="true" formControlName="prev_prn_amt" >
+        </div>
+        <div class="form-group col-2" >
+          <small for="amount">Interest Amt</small>
+          <input  type="text" class="form-control form-control-sm" [readonly]="true" (keyup)="ChangeRenewintt($event)" formControlName="prev_intt_amt" >
+        </div>
+        <div class="form-group col-2">
+          <small for="ovd_intt_recov">TDS</small>
+          <input type="text" (change)="applyTDS()" class="form-control form-control-sm"
+            formControlName="ovd_intt_recov" id="ovd_intt_recov">
+        </div>
+        <!-- (focusout)="onAmtChngDuringRenewal(); processInterest()" -->
+        <div class="form-group col-3">
+          <small for="amount">Total Principal Amt<span class="text-danger">*</span> </small>
+          <input  type="text" class="form-control form-control-sm" formControlName="amount" id="amount" 
+          (focusout)="onAmtChngDuringRenewal(); processInterest()" >
+        </div>
+        <div class="form-group col-2" >
+          <small for="curr_intt_recov">Ext Interest</small>
+          <!-- (change)="inttCalOnClose()" -->
+          <input type="number"   class="form-control form-control-sm"(keyup)="AddExtraIntt($event)"
+            [(ngModel)]="exeintt">
+        </div>
+        <div class="form-group col-2" [hidden]="!showBalance && manualInterestPut">
+          <small for="amount">Balance</small>
+          <input  type="text" class="form-control form-control-sm" [readonly]="true" formControlName="balance" id="balance" >
+        </div>
+        
+        
+      <div class="form-row" >
+        <div class="form-group col-3">
+          <small for="constitution_cd">Constitution</small>
+          <input type="text" class="form-control form-control-sm" formControlName="constitution_cd"
+            id="constitution_cd" hidden [readonly]="true">
+          <input type="text" class="form-control form-control-sm" formControlName="constitution_cd_desc"
+            id="constitution_cd_desc" [readonly]="true">
+        </div>
+        <div class="form-group col-3">
+          <small for="opening_dt">Opening Date</small>
+          <!-- (change)="compareDate($event)" -->
+          <input type="text" class="form-control form-control-sm"  formControlName="opening_dt" id="opening_dt"
+          (change)="compareDate($event)" >
+           
+        </div>
+        <div class="form-group col-3">
+          <small for="mat_dt">Maturity Date</small>
+          <input type="text" class="form-control form-control-sm" formControlName="mat_dt" [readonly]="true">
+        </div>
+        <div class="form-row bg-light">
+          <div class="form-group col-12 text-center">
+            <small for="dep_period_d">Deposit Period</small>
+          </div>
+          <div class="form-group col-4">
+            <small for="dep_period_y">Year</small>
+            <input type="text" 
+              class="form-control form-control-sm" formControlName="dep_period_y" (change)="onDepositePeriodChange()" (focusout)="processInterest()">
+          </div>
+          <div class="form-group col-4">
+            <small for="dep_period_m">Month</small>
+            <input type="text" 
+              class="form-control form-control-sm" formControlName="dep_period_m" (change)="onDepositePeriodChange()" (focusout)="processInterest()">
+          </div>
+          <div class="form-group col-4">
+            <small for="dep_period_d">Day</small>
+            <input type="text" 
+
+              class="form-control form-control-sm" formControlName="dep_period_d" (change)="onDepositePeriodChange()" (focusout)="processInterest()">
+            
+      <!-- (change)="onDepositePeriodChange()" (focusout)="processInterest()" -->
+          </div>
+        </div>
+        <div class="form-group col-3">
+          <small for="intt_trf_type">Interest Type</small>
+          <!-- (change)="processInterest()" -->
+          <select class="form-control form-control-sm" [readonly]="true" formControlName="intt_trf_type"  (change)="processInterest()">
+            <option [readonly]="true">Choose</option>
+            <option value="M">Monthly</option>
+            <option value="Q">Quarterly</option>
+            <option value="H">Half-Yearly</option>
+            <option value="Y">Yearly</option>
+            <option value="O">On-Maturity</option>
+          </select>
+        </div>
+        <div class="form-group col-3">
+          <small for="intt_rate">Interest Rate</small>
+          <!-- (focusout)="processInterest()" -->
+          <input type="text"  class="form-control form-control-sm"
+          (focusout)="processInterest()" formControlName="intt_rate">
+        </div>
+        <div class="form-group col-3 bg-light">
+          <small for="interest">Interest</small>
+          <input type="text" class="form-control form-control-sm" formControlName="interest" [readonly]="true">
+        </div>
+        <div class="form-group col-3 bg-light" >
+          <small for="matVal">Mature value</small>
+          <input type="text" class="form-control form-control-sm" [value]="mat_val" formControlName="mat_val" [readonly]="true" id="matVal">
+        </div>
+      </div>
+
+      
+      
+      </div>
+    </form>
+    <!-- for close -->
+    <form [formGroup]="tdDefTransFrmC" *ngIf="showTranDtlCl">
+      <h4 class="customHeader mt-2">Transaction Details</h4>
+      <div class="form-row">
+        <div class="form-group col-2" [hidden]="editDeleteMode==false">
+          <small for="trans_cd">Tran Cd</small>
+          <input type="text" class="form-control form-control-sm" [readonly]="true" formControlName="trans_cd" id="trans_cd">
+        </div>
+        <div class="form-group col-3">
+          <small for="acc_type_cd">Account Type</small>
+          <input type="text" hidden class="form-control form-control-sm" [readonly]="true" formControlName="acc_type_cd"
+            id="acc_type_cd">
+          <input type="text" class="form-control form-control-sm" [readonly]="true" formControlName="acc_type_desc"
+            id="acc_type_desc">
+        </div>
+        <div class="form-group col-3">
+          <small for="acc_num">A/C</small>
+          <input type="text" [readonly]="true" class="form-control form-control-sm" formControlName="acc_num" id="acc_num">
+        </div>
+        <div class="form-group col-3">
+          <small for="trans_type">Transaction Type <span class="text-danger">*</span> </small>
+          <input type="text" class="form-control form-control-sm" formControlName="trans_type_key" hidden
+            id="trans_type_key">
+          <input type="text" class="form-control form-control-sm" formControlName="trans_type" [readonly]="true"
+            id="trans_type">
+        </div>
+        <!-- *ngIf="showTransModeForR||showtransmodeforC" -->
+          <div class="form-group col-2"
+           >
+            <small for="trans_mode">Trans Mode</small>
+            <input type="text" [readonly]="true" [value]="showTranDtlRe? 'Renewal':'Close'"
+              class="form-control form-control-sm" formControlName="trans_mode1" id="trans_mode1">
+          </div>
+          <div class="form-group col-2" hidden>
+            <small for="trans_mode">Trans Mode</small>
+            <input type="text" [readonly]="true" [value]="showTranDtlRe? 'R':'C'"
+              class="form-control form-control-sm" formControlName="trans_mode" id="trans_mode">
+          </div>
+          <div class="form-group col-4">
+            <small for="dbs_acc_open_dt">A/C Closing Date</small>
+            
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker
+            [ngModel]="acc_close_dt" formControlName="acc_close_dt"
+              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" #OpDate [isOpen]="isOpenODT"
+              >
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="isOpenODT = !isOpenODT">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-4">
+          <small for="dbs_acc_open_dt">Voucher Date</small>
+          
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control form-control-sm" bsDatepicker
+          [ngModel]="voucher_dt" formControlName="voucher_dt"
+            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" #VDate [isOpen]="isOpenVDT"
+            >
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary btn-sm" type="button" (click)="isOpenVDT = !isOpenVDT">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+          <!-- (change)="onTransTypeChange()" -->
+        <div class="form-group col-2" >
+          <small for="trf_type">Transaction Type <span class="text-danger">*</span></small>
+          <select id="trf_type" class="form-control form-control-sm" formControlName="trf_type" 
+          (change)="onTransTypeChange()" >
+            <option  [readonly]="true">Choose</option>
+            <option  value="C">Cash</option>
+            <option  value="T">Transfer</option>
+          </select>
+        </div>
+        <!-- (focusout)="onAmtChngDuringRenewal(); processInterest()" -->
+        <div class="form-group col-3">
+          <small for="amount">Principal Amt<span class="text-danger">*</span> </small>
+          <input  type="text" class="form-control form-control-sm" [readonly]="true" formControlName="amount" id="amount"
+            >
+        </div>
+        <div class="form-group col-2" >
+          <small for="curr_intt_recov">Interest</small>
+          <!-- (change)="inttCalOnClose()" -->
+          <input type="text"   class="form-control form-control-sm"(change)="ChangeinttClose()"
+            formControlName="curr_intt_recov" id="curr_intt_recov">
+        </div>
+        <div class="form-group col-2">
+          <small for="ovd_intt_recov">TDS</small>
+          <input type="text" (change)="applyTDSonclose()" class="form-control form-control-sm"
+            formControlName="ovd_intt_recov" id="ovd_intt_recov">
+        </div>
+        <!-- <div class="form-group col-2">
+          <small for="ovd_intt_recov">Default Penalty</small>
+          <input type="text" class="form-control form-control-sm"
+            formControlName="ovd_intt_recov" id="ovd_intt_recov">
+        </div> -->
+        <!-- marker -->
+
+        <div class="form-group col-2" >
+          <small for="curr_prn_recov">Bonus</small>
+          <input type="text" class="form-control form-control-sm"
+            formControlName="curr_prn_recov" id="curr_prn_recov">
+        </div>
+        <div class="form-group col-3 bg-light" >
+          <small for="matVal">Mature value</small>
+          <input type="text" class="form-control form-control-sm"  [readonly]="true" formControlName="matVal" id="matVal">
+        </div>
+        <div class="form-group col-2" *ngIf=" !isMat ">
+          <small for="penal_rt">Penal Intt. Rate</small>
+          <input type="text" class="form-control form-control-sm" formControlName="penal_rt" id="penal_rt">
+        </div>
+        <div class="form-group col-2 mksml" *ngIf="!isMat && effInt">
+          <small for="eff_intt" >Effective Intt. Rate</small>
+          <input type="number" formControlName="eff_intt" #effint (change)="inttCalOnClose()" [value]="effInt" 
+            class="form-control form-control-sm mksml" id="eff_intt">
+        </div>
+        <!-- curr_intt_rate -->
+    </div>
+    </form>
+    <div class="row" *ngIf="td.trf_type.value !== ''||this.tdDefTransFrmC.controls.trf_type.value!== ''">
+      <div class="col-12 col-sm-6 col-md-12 mt-2">
+       
+        <div *ngIf="showtransdetails && !manualInterestPut">
+          <h4 class="customHeader">Transfer Details</h4>
+          <section *ngFor="let l of td_deftranstrfList; let i=index">
+            <div class="form-row">
+              <div class="form-group col-3">
+                <small for="credit_ac_name">GL Code</small>
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-sm "
+                    [disabled]="undefined !== l.cust_acc_type && l.cust_acc_type.length > 0" [(ngModel)]="l.gl_acc_code"
+                    placeholder="Enter GL-Code"  id="debit_gl_ac" (keyup)="hidetab($event)">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-sm"
+                        (click)="checkAndSetDebitAccType('gl_acc', l)">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                </div>
+                <div class="suggestionsTrfGl" [hidden]="hidegl">
+                  <table class="table table-hover table-bordered table-sm w-auto small" id="customers1" [hidden]="hidegl"  >
+                    <thead>
+                      <tr>
+                        <th scope="col">GL-Code</th>
+                        <th scope="col">GL-Head</th>
+                      </tr>
+                    </thead>
+                    <tbody >
+                      <tr *ngFor="let cust of acc_master"  (click)="setGLCode(cust.acc_cd,cust.acc_name,i,cust)">
+                        <td style="width: 200px" scope="row">{{cust.acc_cd}}</td>
+                        <td style="width: 200px">{{cust.acc_name}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+                  *ngIf="acc_master && !(acc_master.length > 0) && indxsuggestedCustomerCr==i">
+                  <strong class="text-danger"> does not match with any Gl-Code</strong>
+                </div> -->
+              </div>
+
+              <div class="form-group col-4">
+                <small for="debit_gl_head">GL Head</small>
+                <input type="text" [readonly]="true" [(ngModel)]="l.gl_acc_desc"
+                  class="form-control form-control-sm text-capitalize" id="debit_gl_head">
+              </div>
+
+              <div class="form-group col-3">
+                <small for="Inst_num">Instrument Num</small>
+                <input type="text" class="form-control form-control-sm text-capitalize" id="Inst_num" [disabled]="!(undefined !== l.cust_acc_type && l.cust_acc_type.length > 0)
+                  && !(undefined !== l.gl_acc_code && l.gl_acc_code.length > 0)">
+              </div>
+              <button mat-raised-button
+                *ngIf="td_deftranstrfList.length > 1 && (undefined !== l.cust_acc_type || undefined !== l.gl_acc_code  )"
+                type="button" style="height:22px; padding-top: 0px;" class="btn btn-danger btn-sm mt-4"
+                (click)="removeTransfer(l)">
+                <i class="fa fa-minus-circle" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-2">
+                <small for="credit_ac">Account Type</small>
+                <select id="credit_ac" class="form-control form-control-sm" [(ngModel)]="l.cust_acc_type"
+                 [readonly]="true"
+                  (focusout)="checkAndSetDebitAccType('cust_acc', l)">
+                  <option *ngIf="accountTypeList" [readonly]="true">Choose</option>
+                  <option *ngFor="let acctType of accountTypeList" [value]="acctType.acc_type_cd">
+                    {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group col-3">
+                <small for="credit_ac_name">Acc Holder Name</small>
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-sm " [readonly]="true"
+                    [(ngModel)]="l.cust_name"
+                    type="text" placeholder="Enter Acc# / Customer Name / Phone number" (input)="onChangeTrf(i)"
+                    name="x-field-1" autocomplete="new-field-1">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary btn-sm" [disabled]="disabledTrfOnNull"
+                      (click)="suggestCustomerCr(i)">
+                      <i class="fa fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="suggestionsTrf"
+                  *ngIf="suggestedCustomerCr && suggestedCustomerCr.length > 0 && indxsuggestedCustomerCr==i ">
+                  <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                    <!-- <thead> -->
+                      <tr>
+                        <th scope="col">Acc#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Guardian Name</th>
+                        <th scope="col">Address</th>
+                      </tr>
+                    <!-- </thead> -->
+                    <tbody>
+                      <tr *ngFor="let cust of suggestedCustomerCr"
+                        (click)="setCustDtlsCr(cust.acc_num,cust.cust_name,i,cust)">
+                        <td scope="row">{{cust.acc_num}}</td>
+                        <td>{{cust.cust_name}}</td>
+                        <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                        <td>{{cust.guardian_name}}</td>
+                        <td>{{cust.present_address}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+                  *ngIf="suggestedCustomerCr && !(suggestedCustomerCr.length > 0) && indxsuggestedCustomerCr==i">
+                  <strong class="text-danger"> does not match with any customer</strong>
+                </div>
+              </div>
+
+              <div class="form-group col-3">
+                <small for="debit_ac_no">Account Number</small>
+                <input type="text" [(ngModel)]="l.cust_acc_number" [readonly]="true" (change)="setDebitAccDtls(l)"
+                  
+                  class="form-control form-control-sm text-capitalize" id="debit_ac_no">
+              </div>
+
+              <!-- <div class="form-group col-3">
+                <small for="debit_ac_name">Acc Holder Name</small>
+                <input type="text" [readonly]="true" [(ngModel)]="l.cust_name"
+                  [disabled]="undefined !== l.gl_acc_code && l.gl_acc_code.length > 0"
+                  class="form-control form-control-sm text-capitalize" id="debit_ac_name">
+              </div> -->
+
+              <div class="form-group col-2">
+                <small for="debit_amount">Amount</small>
+                <input type="text" [(ngModel)]="l.amount" (change)="checkDebitBalance(l)"
+                  class="form-control form-control-sm text-capitalize" id="debit_amount">
+                    
+              </div>
+
+            </div>
+            
+            <hr />
+          </section>
+          <div class="form-row text-right">
+            <div class="form-group col-4 offset-6">
+              <small for="trf_total_amt">Total</small>
+              <input type="text" [readonly]="true" [(ngModel)]="TrfTotAmt"
+                class="form-control form-control-sm text-capitalize" id="trf_total_amt">
+            </div>
+            <button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm mr-1 mt-4"
+              (click)="addTransfer()" title="Add transfer">
+              <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+
+<div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+  <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+   'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+    <strong>{{showMsg.Message}}</strong>
+    <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</div>
+<br>
+<hr>
+<br>
+<div class="mt-1 col-xs-12 col-sm-12  d-flex justify-content-center align-items-center" style="margin-bottom: 20px">
+    
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" #saveBtn (click)="onSaveClick()">Save</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onDeleteClick()"
+    *ngIf="editDeleteMode">Delete</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onResetClick()">Reset</button>
+  
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  
+</div>
+<br>
+<br>
+<ng-template #preClose>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left customHeader">It will be a premature closing for {{diff}} days with interest accrued :
+      &#8377;{{closeInt}}
+    </h4>
+    <!-- <button mat-raised-button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <div>
+      <div class="col-12 scroll-when-long">
+
+      </div>
+    </div>
+    <button mat-raised-button type="button" class="btn btn-default" (click)="hideModalForClose()">Cancel</button> &nbsp;
+    <button mat-raised-button type="button" class="btn btn-primary float-right" (click)="hideModalForClose()">OK</button>
+  </div>
+</ng-template>

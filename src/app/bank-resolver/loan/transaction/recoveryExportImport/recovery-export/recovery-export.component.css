@@ -1,0 +1,45 @@
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    /* height: 300px;
+    overflow: auto; */
+  }
+ td,th {
+    text-align: left;
+    /* padding: 8px; */
+  }
+  td{
+    width:25%;
+  }
+  th{
+    border: 1px solid #000000;
+    width: 25%;
+    color: #000000;
+    /* text-align: center; */
+    /* padding: 1px; */
+    font-size: small;
+    font-weight: 800;
+
+  
+  }
+  .inputBld{
+    font-size: small !important;
+    border:solid 1px black !important;
+    font-weight:800 !important;
+    color: black !important;
+  }
+  .inputBld #agent_lbl{
+    margin-left:-2px !important;
+  }
+  .inputBld #agent_nm{
+    margin-left:-4px !important;
+  }
+  .mkColBlk{
+    color: #000000 !important;
+  }
+  .mkColBlk #custNm{
+    font-size: small !important;
+  }
+  
+  

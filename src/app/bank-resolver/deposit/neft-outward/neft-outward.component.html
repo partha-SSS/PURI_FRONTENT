@@ -1,0 +1,384 @@
+<ng-template #ifsc let-modal bd-example-modal-lg>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">IFSC Code Details</h4>
+    <button type="button" class="close" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- Default inline 1-->
+    <table class="table table-sm table-hover">
+      <tr><td>IFSC       #</td><td>{{__ifsc}}</td></tr>
+      <tr><td>Bank Name  #</td><td>{{__ifscbank}}</td></tr>
+      <tr><td>Branch Name#</td><td>{{__ifscbranch}}</td></tr>
+      <tr><td>Address    #</td><td>{{__ifscaddress}}</td></tr>
+      <tr><td>City       #</td><td>{{__ifsccity}}</td></tr>
+    </table>
+  </div>
+  <div class="modal-footer">
+  <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<ng-template #kycContent>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Signature Details
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-kyc></app-kyc>
+  </div>
+</ng-template>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center">
+  <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="this.neftPayRet.bank_dr_acc_no ==null || this.neftPayRet.bank_dr_acc_no=='0000'" (click)="kyc(kycContent)">Kyc</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+    <button mat-raised-button type="button" [disabled]="disableSave || neftPayRet.bene_acc_no !== confirm_bene_acc_no" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData()">Save</button>
+    <button mat-raised-button type="button" [disabled]="this.neftPayRet.approval_status =='A'" class="btn btn-primary btn-sm ml-1 mr-1" (click)="approveData()">Approve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="deleteData()">Delete</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+  </div>
+
+
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{alertMsgType}}: </strong>
+      {{alertMsg}}
+      <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlertMsg()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <h1></h1>
+    <h4 class="customHeader">NEFT/RTGS/IMPS Payment Window </h4>
+
+    <div class="form-row">
+      <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
+        <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+         'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+          <strong>{{showMsg.Message}}</strong>
+          <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      <div class="form-group col-4">
+        <small for="brn_cd">Branch Code</small>
+        <input  [disabled]="true" [(ngModel)]="neftPayRet.brn_cd" type="text"
+          class="form-control form-control-sm text-capitalize" id="brn_cd" >
+      </div>
+      <div class="form-group col-4">
+        <small for="dr_acc_no">Dr Acc No<span class="text-danger">*</span></small>
+        <input  [(ngModel)]="neftPayRet.dr_acc_no" type="number"  [disabled]="true"
+         class="form-control form-control-sm text-capitalize" id="dr_acc_no" >
+      </div>
+      <div class="form-group col-4">
+        <small for="trans_dt">Trans Date</small>
+        <!-- <input  [disabled]="true" [(ngModel)]="neftPayRet.trans_dt " type="text"
+          class="form-control form-control-sm text-capitalize" id="trans_dt" placeholder="Trans Date"> -->
+          <input type="text" style="height:37px;" placeholder="dd/mm/yyyy" class="form-control"
+          [ngModel]="neftPayRet.trans_dt" [readonly]="true" bsDatepicker
+          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }">
+      </div>
+      <div class="form-group col-4">
+        <small for="trns_cd">Trans Code</small> <small style="display: inline;" class="form-text text-muted">
+        
+        </small>
+        <input  [disabled]="isRetrieve" [(ngModel)]="neftPayRet.trans_cd" type="text" 
+          class="form-control form-control-sm text-capitalize" id="trns_cd" >
+          <!-- (keydown.Tab)="GetNeftOutDtls()" -->
+      </div>
+      <div class="form-group col-4">
+        <small for="trans_type">Payment Type<span class="text-danger">*</span></small> <br>
+        <select  disabled
+          style="font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+          [(ngModel)]="neftPayRet.payment_type"   (change)="setPaymentType($event.target.value)"
+          id="payment_type" class="form-control form-control-sm">
+          <!-- <option [value]="neftPayRet.payment_type" selected>{{neftPayRet.payment_type}}-{{neftPayRet.payment_type}}</option>
+          <option *ngFor="let l of paymenttypelist" [value]="l.lockMode">{{l.paytype}}-{{l.paytyprdesc}} </option>
+          -->
+                    <option value="">Select..</option>
+                    <option value="N">NEFT</option>
+                    <option value="R">RTGS</option>
+                    <option value="I">IMPS</option>
+        </select>
+      </div>
+      <div class="form-group col-4">
+        <small for="bene_name">Beneficiary Name<span class="text-danger">*</span></small>
+        <input  [(ngModel)]="neftPayRet.bene_name" type="text" appUppercase [disabled]="!isRetrieve"
+          class="form-control form-control-sm text-capitalize" id="bene_name" >
+      </div>
+      <div class="form-group col-2">
+        <small for="amount">Amount<span class="text-danger">*</span></small>
+        <input   [(ngModel)]="neftPayRet.amount" type="text"  [disabled]="!isRetrieve"
+        (focusout)="setCharge($event.target.value)"  class="form-control form-control-sm text-capitalize" id="trns_cd" >
+      </div>
+      <div class="col-4">
+        <small for="amount">Amount in Word</small>
+        <p class="amountToWord">{{neftPayRet.amount | amountToWord}}</p>
+        <!-- <b style="font-size:18px;" *ngIf="neftPayRet.amount<1">AMOUNT IN WORD</b> -->
+      </div>
+      <div class="form-group col-2">
+        <small for="charge_ded">Charges</small>
+        <input  [(ngModel)]="neftPayRet.charge_ded" type="text"  [disabled]="!isRetrieve"
+          class="form-control form-control-sm text-capitalize" id="charge_ded" >
+      </div>
+      <div class="form-group col-4">
+        <small for="date_of_payment">Date of Payment<span class="text-danger">*</span></small>
+        <!-- <input   [(ngModel)]="neftPayRet.date_of_payment" type="text"
+          class="form-control form-control-sm text-capitalize" id="date_of_payment" placeholder="Date of Payment"> -->
+          <div class="input-group">
+          <input type="text" style="height:37px;" placeholder="dd/mm/yyyy" class="form-control"  [disabled]="true"
+          [(ngModel)]="neftPayRet.date_of_payment"  bsDatepicker
+          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" style="height:39px;"  type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-3">
+        <small for="bene_acc_no">Bene Acc No<span class="text-danger">*</span></small>
+        <!-- <input   [(ngModel)]="neftPayRet.bene_acc_no" type="text"  [disabled]="!isRetrieve" appNumericOnly required
+          class="form-control form-control-sm text-capitalize" id="bene_acc_no" > -->
+          <input 
+          *ngIf="!isAccountNumber1Masked" 
+          type="text" 
+          id="bene_acc_no" 
+          [(ngModel)]="neftPayRet.bene_acc_no" 
+          name="bene_acc_no" 
+          [disabled]="!isRetrieve" required
+          class="form-control form-control-sm text-capitalize"
+          (blur)="maskAccountNumber1()">
+        
+        <input 
+          *ngIf="isAccountNumber1Masked" 
+          type="text" 
+          id="maskedAccountNumber1" 
+          [value]="maskedAccountNumber1" 
+          [disabled]="!isRetrieve" required
+          class="form-control form-control-sm text-capitalize"
+          (focus)="unmaskAccountNumber1()"> 
+      </div>
+      <div class="form-group col-3">
+        <small for="bene_acc_no">Confirm Bene Acc No<span class="text-danger">*</span></small>
+        <input   [(ngModel)]="confirm_bene_acc_no" type="text"  [disabled]="!isRetrieve"  required
+          class="form-control form-control-sm text-capitalize" id="bene_acc_no2" [appMatchAccountNumbers]="['bene_acc_no', 'bene_acc_no2']" >
+          <div *ngIf="neftPayRet.bene_acc_no !== confirm_bene_acc_no">
+            <small><span class="text-danger">Confirm Bene Account Numbers must be match.</span></small> 
+          </div> 
+      </div>
+      <!-- <div class="form-group col-4">
+        <small for="bene_ifsc_code">Bene Ifsc Code<span class="text-danger">*</span></small>
+        <input   [(ngModel)]="neftPayRet.bene_ifsc_code" type="text"
+          class="form-control form-control-sm text-capitalize" id="bene_ifsc_code" placeholder="Bene Ifsc Code">
+      </div> -->
+      <div class="form-group col-6">
+        <small for="bene_ifsc_code">Search by IFSC#<span class="text-danger">*</span></small>
+          <span mat-raised-button type="button" class="badge badge-warning pull-right" *ngIf="__ifscbranch||__ifsc"
+            (click)="openModal()" matTooltip="Click here to see full details">
+           
+              BANK:{{__ifscbank}},  BRANCH:{{__ifscbranch}},  CITY:{{__ifsccity}}
+
+       
+          </span>
+          <!-- <div (click)="openModal()" matBadge="IFSC Details" matBadgeOverlap="false" class="demo-section">Text with a badge</div> -->
+        <div class="input-group">
+          <input type="text" class="form-control form-control-sm " (keypress)="suggestedIfsc=null" [disabled]="!isRetrieve"
+          [(ngModel)]="neftPayRet.bene_ifsc_code" id="bene_ifsc_code" appUppercase
+           name="x-field-1" autocomplete="new-field-1" #beneIfsc (input)="clearFields('bene_ifsc_code')">
+          <div class="input-group-append">
+            <button class="btn btn-primary btn-sm" (click)="suggestIfsc(beneIfsc.value)">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
+         
+          <div class="suggestions" *ngIf="ifscView">
+            <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+              <!-- <thead> -->
+                <tr>
+                  <th scope="col">IFSC#</th>
+                  <th scope="col">Bank</th>
+                  <th scope="col">Branch</th>
+                  <th scope="col">Address</th>
+                  <th scope="col">City</th>
+                </tr>
+              <!-- </thead> -->
+              <tbody>
+                <tr  (click)="SelectedIfsc(suggestedIfsc)">
+                  <td scope="row">{{suggestedIfsc.IFSC}}</td>
+                  <td>{{suggestedIfsc.BANK}}</td>
+                  <td>{{((null === suggestedIfsc.BRANCH) ? '' : suggestedIfsc.BRANCH)}}</td>
+                  <td>{{suggestedIfsc.ADDRESS}}</td>
+                  <td>{{suggestedIfsc.CITY}}</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+        <!-- <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+        *ngIf="suggestedIfsc && !(suggestedIfsc.length > 0)">
+        <strong class="text-danger">" {{neftPayRet.bene_ifsc_code}} " does not match with any IFSC</strong>
+        </div> -->
+               
+      </div>
+      
+      <div class="form-group col-4">
+        <small for="bank_dr_acc_type">Bank A/C Type or (GL-CODE)<span class="text-danger">*</span></small>
+        <div class="input-group">
+        <input  [(ngModel)]="neftPayRet.bank_dr_acc_type" type="text"  [disabled]="!isRetrieve"
+        (focusout)="checkAndSetDebitAccType($event.target.value)" (input)="clearFields('bank_dr_acc_type')"
+          class="form-control form-control-sm text-capitalize" id="bank_dr_acc_type" >
+          <!-- <div class="input-group-append" [hidden]="neftPayRet.bank_dr_acc_type<1000000 ||neftPayRet.bank_dr_acc_type==null">
+            <button class="btn btn-primary btn-sm"  (click)="suggestGL($event.target.value)">
+              <i class="fa fa-search"></i>
+            </button>
+          </div> -->
+        </div>
+        <div class="suggestionsTrfGl" [hidden]="hidegl">
+          <table class="table table-hover table-bordered table-sm w-auto small" id="customers1" [hidden]="hidegl"  >
+            <thead>
+              <tr>
+                <th scope="col">GL-Code</th>
+                <th scope="col">GL-Head</th>
+              </tr>
+            </thead>
+            <tbody >
+              <!-- (click)="setGLCode(cust.acc_cd,cust.acc_name,i,cust)" -->
+              <tr *ngFor="let cust of this.acc_master2" (click)="setGLCode(cust.acc_cd)">
+                <td style="width: 200px" scope="row">{{cust.acc_cd}}</td>
+                <td style="width: 200px">{{cust.acc_name}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="form-group col-4">
+        <small for="bank_dr_acc_no">Bank Dr Acc No<span class="text-danger">*</span></small>
+      <span class="badge badge-warning pull-right" *ngIf="clearBalance"> 
+      Balance:  {{clearBalance | INRCurrency}}
+      </span>
+        <!-- <input  [(ngModel)]="neftPayRet.bank_dr_acc_no" type="text"  [disabled]="!isRetrieve"
+          class="form-control form-control-sm text-capitalize" id="bank_dr_acc_no" placeholder="Bank Dr Acc No"> -->
+         <div class="input-group">
+          <input type="text" [disabled]="!isRetrieve || disableAccNo" class="form-control form-control-sm " (keypress)="suggestedCustomer=null"
+          [(ngModel)]="neftPayRet.bank_dr_acc_no" id="bank_dr_acc_no" placeholder="Enter Acc# / Customer Name / Phone number"
+              name="x-field-1" autocomplete="new-field-1" (input)="clearFields('bank_dr_acc_no')">
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" [disabled]="disableAccNo" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+         </div>
+         
+         
+              <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+                <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                  <!-- <thead> -->
+                    <tr>
+                      <th scope="col">Acc#</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Phone</th>
+                      <th scope="col">Gurdian Name</th>
+                      <th scope="col">Address</th>
+                    </tr>
+                  <!-- </thead> -->
+                  <tbody>
+                    <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                      <td scope="row">{{cust.acc_num}}</td>
+                      <td>{{cust.cust_name}}</td>
+                      <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                      <td>{{cust.guardian_name}}</td>
+                      <td>{{cust.present_address}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+        
+      </div>
+
+
+      <div class="form-group col-4">
+        <small for="bank_dr_acc_name">Bank Dr Acc Name<span class="text-danger">*</span></small>
+        <input  [(ngModel)]="neftPayRet.bank_dr_acc_name" type="text"  [disabled]="true"
+          class="form-control form-control-sm text-capitalize" id="bank_dr_acc_name" >
+      </div>
+      <div class="form-group col-4">
+        <small for="credit_narration">Credit Narration<span class="text-danger">*</span></small>
+        <input  [(ngModel)]="neftPayRet.credit_narration" type="text"  [disabled]="!isRetrieve"
+          class="form-control form-control-sm text-capitalize" id="credit_narration" >
+      </div>
+
+
+    </div>
+  </div>
+
+  <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Modify</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="this.neftPayRet.bank_dr_acc_no ==null || this.neftPayRet.bank_dr_acc_no=='0000'" (click)="kyc(kycContent)">Kyc</button>
+
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+    <button mat-raised-button type="button" [disabled]="disableSave || neftPayRet.bene_acc_no !== confirm_bene_acc_no" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData()">Save</button>
+    <button mat-raised-button type="button" [disabled]="this.neftPayRet.approval_status =='A'" class="btn btn-primary btn-sm ml-1 mr-1" (click)="approveData()">Approve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="deleteData()">Delete</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+  </div>
+</div>
+
+  
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">ALL UNAPPROVED NEFT / RTGS</h3>
+    <button type="button"  class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <table class="table table-hover table-bordered table-sm small" id="customers1">
+      <tr>
+        <th>Trans ID</th>
+        <th>Amount</th>
+        <th>Beneficiary Name</th>
+        <th>Beneficiary A/c No</th>
+      </tr>
+      <tr *ngFor="let item of allNEFT; let i = index;"title="Click to Select"  (click)="GetNeftOutDtls(item)" style="cursor: pointer;">
+        <td>{{item.trans_cd}}</td>
+        <td>{{item.amount|currency:"INR"}}</td>
+        <td>{{item.bene_name}}</td>
+        <td>{{item.bene_acc_no}}</td>
+      </tr>
+    </table>
+
+    <!-- <form [formGroup]="reportCriteria" (ngSubmit)="GetNeftOutDtls()">
+      <div class="form-row">
+        <label for="neftID">Enter ID</label>
+        <input [(ngModel)]="this.neftPayRet.trans_cd" type="text" id="neftID" class="form-control" formControlName="neftID">
+        <small class="text-danger" *ngIf="reportCriteria.controls.neftID.errors?.required"> ID is required </small>
+      </div>
+
+
+   
+  <div class="modal-footer clearfix">
+    <button mat-raised-button class="btn btn-primary btn-sm float-left" type="submit">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light btn-sm float-right" (click)="modalRef.hide();reportCriteria.reset()">Close</button>
+
+  </div>
+</form> -->
+</div>
+</ng-template>

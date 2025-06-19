@@ -1,0 +1,518 @@
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" [disabled]="undefined === selectedVm" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(Appconfirm)">Approve</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Set Filter</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Remove Filter</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+    (click)="onClickRefreshList()">Refresh List</button>
+    <!-- <button mat-raised-button type="button" [disabled]="undefined === selectedVm"
+    class="btn btn-primary btn-sm ml-1 mr-1" (click)="onDeleteClick()">Delete</button> -->
+   
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+
+      <div *ngIf="showMsg && showMsg.Show" class="col-12">
+        <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+         'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+          <strong>{{showMsg.Message}}</strong>
+          <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+
+   
+    <div class="row" >
+      <div class="col-4">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Unapproved Transaction List</h4>
+            <div class=" row">
+              <div class="form-row" *ngIf="filteredVm.length">
+                <div class="form-group col-5 offset-1" >
+                  <small ><i class="fa fa-filter" aria-hidden="true"></i> Tran CD / Acc. No.</small>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="toFltrTrnCd" placeholder="Tran Cd or Account No"
+                  (input)="acctNumberAndTrnCdFilter($event.target.value)">
+                </div>
+                <div class="form-group col-5">
+                  <small ><i class="fa fa-filter" aria-hidden="true"></i> Account Type</small>
+                  <select id="title" class="form-control form-control-sm"
+                  (change)="onChangeAcctType($event.target.value)" [(ngModel)]="toFltrAccountTyp">
+                  <option *ngIf="uniqueAccTypes" selected value="-99">All</option>
+                  <option *ngFor="let accType of uniqueAccTypes " [value]="accType.acc_type_cd">
+                    {{accType.acc_type_cd +' ' +accType.acc_type_desc}}</option>
+                </select>
+                </div>
+
+              </div>
+            </div>
+            <hr>
+            <div class="table-responsive" class="scroll-when-long">
+              <table *ngIf="filteredVm.length" class="table table-sm table-hover customers" style="font-size:11px">
+                <!-- <thead> -->
+                  <tr>
+                    <th scope="col">Tran CD</th>
+                    <th scope="col">Account</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Acc Type</th>
+                    <th scope="col">Trf Type</th>
+                    <th scope="col">Trans Type</th>
+                  </tr>
+                <!-- </thead> -->
+                <tbody>
+                  <!-- list coming from unapproved deptrans -->
+                  <tr *ngFor="let unApprovedTran of filteredVm" #tooltip="matTooltip"
+                  matTooltip="Click to select" style="cursor: pointer;"
+                    (click)="selectTransaction(unApprovedTran)"
+                    [class.table-active]="unApprovedTran.td_def_trans_trf.trans_cd === selectedTransactionCd">
+                    <td>{{unApprovedTran.td_def_trans_trf.trans_cd}}</td>
+                    <td>{{unApprovedTran.td_def_trans_trf.acc_num}}</td>
+                    <td>{{unApprovedTran.td_def_trans_trf.amount? (unApprovedTran.td_def_trans_trf.trans_mode=='R'?(unApprovedTran.td_def_trans_trf.ovd_prn_recov+unApprovedTran.td_def_trans_trf.amount):unApprovedTran.td_def_trans_trf.amount):unApprovedTran.td_def_trans_trf.ovd_prn_recov  }}</td>
+                    <td>{{unApprovedTran.mm_acc_type.acc_type_desc}}</td>
+                    <td *ngIf="unApprovedTran.td_def_trans_trf.trf_type=='C'">Cash</td>
+                    <td *ngIf="unApprovedTran.td_def_trans_trf.trf_type=='T'">Transfer</td>
+                    <td *ngIf="unApprovedTran.td_def_trans_trf.trans_type=='D'">Deposit</td>
+                    <td *ngIf="unApprovedTran.td_def_trans_trf.trans_type=='W'">Withdraw</td>
+                  </tr>
+                </tbody>
+              </table>
+              <span *ngIf="!filteredVm.length">
+                  No unapproved transactions
+              </span>
+              <hr>
+            </div>
+          </div>
+          <!-- <div class="col-12">
+
+          </div> -->
+        </div>
+      </div>
+      <div class="col-4">
+          <h1></h1>
+          <h4 class="customHeader">Locker Opening</h4>
+          <!-- <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3"> -->
+  
+          <div class="form-row">
+              
+            <div class="form-group col-6">
+              <small for="cust_name">Customer Name</small>
+              <input disabled style="height:25px" type="text" 
+                class="form-control form-control-sm text-capitalize" id="cust_name" placeholder="Customer Name"
+                [(ngModel)]="tm_locker.name"  name="x-field-1"
+                autocomplete="new-field-1">
+              
+               
+            </div>
+  
+            <div class="form-group col-6">
+              <small for="cust_type">Opening Date</small>
+              <input disabled style="height:25px"  type="date" class="form-control form-control-sm text-capitalize"
+                id="cust_type" [(ngModel)]="tm_locker.agreement_dt" placeholder="Opening Date">
+            </div>
+          </div>
+  
+          
+  
+          <div class="form-row">
+              <div class="form-group col-6">
+                  <small >Agreement No</small>
+                  <input disabled style="height:25px"  type="text" class="form-control form-control-sm text-capitalize" 
+                    id="agreement_no" [(ngModel)]="tm_locker.agreement_no" placeholder="Agreement No">
+                </div>
+                <div class="form-group col-6">
+                  <small >Locker Key</small>
+                  <input disabled style="height:25px"  type="text" class="form-control form-control-sm text-capitalize" 
+                    id="key_no" [(ngModel)]="tm_locker.key_no" placeholder="Key No">
+                </div>
+            <div class="form-group col-6">
+              <small>Phone</small>
+              <input disabled style="height:25px"  type="text" class="form-control form-control-sm text-capitalize"  
+                [(ngModel)]="tm_locker.phone" placeholder="Customer Phone">
+            </div>
+  
+            <div class="form-group col-6">
+              <small for="cust_occup">Occupation</small>
+              <input disabled style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                   [(ngModel)]="tm_locker.occupation" placeholder="Occupation"
+                  id="Occupation" class="form-control form-control-sm">
+                 
+                
+            </div>
+          </div>
+  
+          <div class="form-row">
+            <div class="form-group col-12">
+              <small for="cust_addr">Present Address</small>
+              <input disabled  type="text" class="form-control form-control-sm text-capitalize"
+                id="cust_addr" [(ngModel)]="tm_locker.present_address" placeholder="Cust Present Address">
+            </div>
+          </div>
+          <div class="form-row">
+              <div class="form-group col-6">
+                <small for="trans_type">Acc Type</small> <br>
+                <input disabled style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                  [(ngModel)]="tm_locker.acc_type_cd"
+                  id="account_type" class="form-control form-control-sm">
+                  
+              </div>
+    
+              <div class="form-group col-6">
+                <small for="acc_no">Acc Number</small>
+                <input disabled style="height:25px"
+                   [(ngModel)]="tm_locker.acc_num" type="text"
+                  class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number">
+              </div>
+    
+              <div class="form-group col-6">
+                  <small for="trans_type">Security Acc Type</small> <br>
+                  <input
+disabled                     style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                    [(ngModel)]="tm_locker.ind_acc_type_cd"
+                    id="account_type" class="form-control form-control-sm">
+                    
+                </div>
+      
+                <div class="form-group col-6">
+                  <small for="acc_no">Security Acc Number</small>
+                  <input disabled style="height:25px" 
+                     [(ngModel)]="tm_locker.ind_acc_num" type="text"
+                    class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number">
+                </div>
+    
+            </div>
+            <div class="form-row">
+              <div class="form-group col-6">
+                  <small for="acc_no">Locker ID</small>
+                  <input disabled style="height:25px"
+                     [(ngModel)]="tm_locker.locker_id" type="text"
+                    class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Locker ID">
+                </div>
+                
+                <div class="form-group col-6">
+                  <small for="acc_no">Rented Till</small>
+                  <input disabled style="height:25px"  
+                     [(ngModel)]="tm_locker.rented_till" type="date" 
+                    class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Account Number">
+                </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-12">
+                  <small for="acc_no">Remerks</small>
+                  <input disabled style="height:25px" 
+                     [(ngModel)]="tm_locker.narration" type="text" 
+                    class="form-control form-control-sm text-capitalize" id="acc_no" placeholder="Enter Remerks">
+                </div>
+                
+            </div>
+  
+       </div>
+      <div class="col-4">
+        <div class="12">
+          <!-- Mst/GetAccountTypeMaster -->
+          <!-- <app-transaction-details></app-transaction-details> -->
+          <form [formGroup]="transactionDtlsFrm">
+            <h4 class="customHeader">Transaction Details</h4>
+            <div class="form-row">
+              <div class="form-group col-6">
+                <small for="acc_type_cd">Account Type</small>
+                <input type="text" class="form-control form-control-sm" formControlName="acc_type_cd" id="acc_type_cd" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="acc_num">A/C</small>
+                <input type="text" class="form-control form-control-sm" formControlName="acc_num" id="acc_num" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="trans_type">Transaction Type</small>
+                <input type="text" class="form-control form-control-sm" formControlName="trans_type" id="trans_type" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="trans_mode">Transaction Mode</small>
+                <input type="text" class="form-control form-control-sm" formControlName="trans_mode" id="trans_mode" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="amount">Amount </small>
+                <input type="text" class="form-control form-control-sm" formControlName="amount" id="amount" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="curr_intt_recov">Interest</small>
+                <input type="text" class="form-control form-control-sm" formControlName="curr_intt_recov" id="curr_intt_recov"
+                  disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="ovd_intt_recov">18% GST</small>
+                <input type="text" class="form-control form-control-sm" formControlName="ovd_intt_recov" id="ovd_intt_recov" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="curr_prn_recov">Bonus Amt.</small>
+                <input type="text" class="form-control form-control-sm" formControlName="curr_prn_recov" id="curr_prn_recov" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="tot_amount">Total Amount</small>
+                <input type="text" class="form-control form-control-sm" formControlName="tot_amount" id="tot_amount" disabled>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-6">
+                <small for="instrument_dt">Instrument Date</small>
+                <input type="text" class="form-control form-control-sm" formControlName="instrument_dt" id="instrument_dt"
+                  disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="instrument_num">Instrument Number</small>
+                <input type="text" class="form-control form-control-sm" formControlName="instrument_num" id="instrument_num"
+                  disabled>
+              </div>
+              <div class="form-group col-12">
+                <small for="paid_to">Paid To</small>
+                <input type="text" class="form-control form-control-sm" formControlName="paid_to" id="paid_to" disabled>
+              </div>
+              <div class="form-group col-6">
+                <small for="trf_type">Transaction Type</small>
+                <input type="text" class="form-control form-control-sm" formControlName="trf_type" id="trf_type" disabled>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-6">
+                <small for="approval_status">Approval Status</small>
+                <input type="text" class="form-control form-control-sm" formControlName="approval_status" id="approval_status"
+                  disabled>
+              </div>
+            </div>
+            <button  type="button" class="btn btn-link" *ngIf="undefined !== tmDenominationTransLst && tmDenominationTransLst.length > 0" (click)="openModal(content)">
+              Denomination Details
+            </button>
+            <!-- <button  type="button" class="btn btn-link" *ngIf="undefined !== tranferDetails && tranferDetails.length > 0" (click)="openModal(trfcontent)">
+              Transfer Details
+            </button> -->
+            <ng-template #content>
+              <div class="modal-header text-center">
+                <h4 class="modal-title customHeader">Denomination Details for Acc#
+                  <strong>{{selectedVm.tm_deposit.acc_num}}</strong> and Tran Cd
+                  <strong>{{selectedVm.td_def_trans_trf.trans_cd}}</strong>
+                </h4>
+                <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <table class="table table-sm table-hover customers">
+                  <!-- <thead> -->
+                    <tr>
+                      <th scope="col">&#8377;</th>
+                      <th scope="col">Count</th>
+                      <th scope="col">Total &#8377;</th>
+                    </tr>
+                  <!-- </thead> -->
+                  <tbody>
+                    <tr *ngFor="let denomination of tmDenominationTransLst">
+                      <td>&#8377;{{denomination.rupees}}</td>
+                      <td>{{denomination.count}}</td>
+                      <td>&#8377;{{denomination.total}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td><strong>Total</strong></td>
+                      <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-template>
+            <!-- <ng-template #trfcontent>
+              <div class="modal-header text-center">
+                <h5 class="modal-title pull-left">Transfer Details for Acc#
+                 <strong>{{selectedVm.tm_deposit.acc_num}}</strong> and Tran Cd
+                 <strong>{{selectedVm.td_def_trans_trf.trans_cd}}</strong>
+                </h5>
+                <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <table class="table table-sm table-hover customers">
+                    <tr>
+                      <th scope="col">Acc Typ / Acc No</th>
+                      <th scope="col">GL Head</th>
+                      <th scope="col">Amount</th>
+                    </tr>
+                  <tbody>
+                    <tr *ngFor="let transfer of tranferDetails">
+                      <td *ngIf="transfer.acc_num !== '0000'">{{transfer.acc_type_cd +' - ' +
+                        transfer.remarks +' / ' +transfer.created_by + '(' +transfer.acc_num + ')'}}</td>
+                      <td *ngIf="transfer.acc_num === '0000'"></td>
+                      <td *ngIf="transfer.acc_num !== '0000'"></td>
+                      <td *ngIf="transfer.acc_num === '0000'">{{transfer.acc_type_cd + ' - ' + transfer.acc_name}}</td>
+                      <td>&#8377;{{transfer.amount}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td><strong>Total</strong></td>
+                      <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-template> -->
+          </form>
+          <hr>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="col-12" *ngIf="trfDtls">
+      <table class="table table-sm table-hover customers">
+        <!-- <thead> -->
+          <tr>
+            <th scope="col">Transfer Details:</th>
+            <th scope="col" style="text-align: center!important;">Acc Typ / Acc No</th>
+            <th scope="col">GL Head</th>
+            <th scope="col">Amount</th>
+          </tr>
+        <!-- </thead> -->
+        <tbody>
+          <tr *ngFor="let transfer of tranferDetails">
+            <td>&nbsp;</td>
+            <td style="text-align: center!important;" *ngIf="transfer.acc_num !== '0000'">{{transfer.acc_type_cd +' - ' +
+              transfer.remarks +' / ' +transfer.created_by + '(' +transfer.acc_num + ')'}}</td>
+            <td *ngIf="transfer.acc_num === '0000'"></td>
+            <td *ngIf="transfer.acc_num !== '0000'"></td>
+            <td *ngIf="transfer.acc_num === '0000'">{{transfer.acc_type_cd + ' - ' + transfer.acc_name}}</td>
+            <td>&#8377;{{transfer.amount}}</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td style="text-align: center!important;"><strong>Total</strong></td>
+            <td><strong>&#8377;{{totalOfDenomination}}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="showMsg && showMsg.Show" class="col-12">
+      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+        <strong>{{showMsg.Message}}</strong>
+        <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" [disabled]="undefined === selectedVm" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(Appconfirm)">Approve</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Set Filter</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1">Remove Filter</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClickRefreshList()">Refresh List</button>
+    <!-- <button mat-raised-button type="button" [disabled]="undefined === selectedVm"
+    class="btn btn-primary btn-sm ml-1 mr-1" (click)="onDeleteClick()">Delete</button> -->
+    
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+
+<ng-template #kycContent >
+  <div class="modal-header">
+    <h4 class="modal-title pull-left customHeader">KYC details for Acc# {{selectedVm.tm_deposit.acc_num}}
+    </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-kyc></app-kyc>
+  </div>
+</ng-template>
+<ng-template #Appconfirm >
+  <div class="modal-body text-center" >
+    <p>'Are you sure, you want to <b style="color: rgb(8, 148, 55);">APPROVE</b> this Transaction</p>
+    <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+    <button mat-raised-button type="button" class=" btn btn-primary" (click)="onApproveClick()" >Yes</button>
+    
+  </div>
+</ng-template>
+<!-- <loading *ngIf="isLoading"></loading>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 shadow-lg mb-4 bg-white p-3">
+    <div style="display: inline-block;" class="col-xs-12 col-sm-12 col-md-2 col-lg-2 shadow-sm mb-4 bg-white p-3">
+      <table>
+        <tr *ngFor="let item of tdDepTransGroup;let i=index">
+          <td size=12 no-padding>
+            <button mat-raised-button class="btn btn-primary px-3" (click)="toggleSelection(i)" detail-none [ngClass]="{'section-active': item.open,'section':!item.open}">
+              <i class="fab fa-android" aria-hidden="true" item-left name="arrow-forward" *ngIf="!item.open"></i>
+              <i class="fab fa-android" aria-hidden="true" item-left name="arrow-down" *ngIf="item.open"></i>
+              {{item.acc_type_cd}}
+            </button>
+          </td>
+           <td size=12 no-padding *ngIf="item.open" >
+               <table>
+                  <tr *ngFor="let child of tdDepTransGroup[i].events; let j=index">
+                   <td>
+                     <label><h2>{{child.trans_cd}}-{{child.acc_num}}{{child.amount}}</h2></label>
+                   </td>
+                  </tr>
+                </table>
+           </td>
+            </tr>
+      </table>
+      <div id="accordion">
+        <div class="card">
+          <div *ngFor="let item of tdDepTransGroup;let i=index">
+            <div class="card-header" id="'header'+i">
+              <h5 class="mb-0">
+                <button mat-raised-button class="btn btn-link" data-toggle="collapse" data-target="'col'+i" aria-expanded="true"
+                  aria-controls="collapseOne">
+                  {{item.acc_type_cd}}
+                </button>
+              </h5>
+            </div>
+
+            <div id="'col'+i" class="collapse show" aria-labelledby="'header'+i" data-parent="#accordion">
+              <div class="card-body">
+                <table class="table table-bordered table-striped">
+                  <tr (click)="OnSelectTransaction(child)" *ngFor="let child of tdDepTransGroup[i].events; let j=index">
+                    <td>
+                      <label>{{child.trans_cd}}-{{child.acc_num}}{{child.amount}}</label>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+    </div>
+    <div style="display: inline-block;" class="col-xs-12 col-sm-12 col-md-10 col-lg-10 shadow-sm mb-4 bg-white p-3">
+
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1">Download PDF</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1">Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"
+          style="position: absolute;right: 10px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div> -->

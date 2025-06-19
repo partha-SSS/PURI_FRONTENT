@@ -1,0 +1,329 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div>
+          <label for="fromDate">As on Date</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+        
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="mattable" 
+     ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+    
+    </div>
+    </div>
+  <!-- {{ReportUrl}} -->
+  
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    <!-- <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+      <h6>{{ardbName}} {{branchName}}</h6>
+  
+      <h6>Run Date & Time : {{today}} </h6> <br>
+      <h6> <u> Detail List as on  {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h6>
+      <p>
+        <b>
+          Loan Type : {{loanNm}}</b>
+      </p>
+  
+   </div> -->
+   <br>
+   
+  
+  <div class="mat-elevation-z8" id="mattable">
+  <table mat-table cdkDropListGroup [dataSource]="dataSource" class="mat-elevation-z8" matSort >
+  <!-- Position Column -->
+  <ng-container matColumnDef="mainHeader">
+    <th mat-header-cell colspan="14" *matHeaderCellDef>
+      <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+        <h4>{{ardbName}} ({{branchName}})</h4>
+    
+        <h4>Run Date & Time : {{today}} </h4> <br>
+        <h4> <u> NPA Summary as on  {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+        
+    
+     </div>
+   </th>
+  </ng-container>
+  <ng-container matColumnDef="acc_cd">
+  <th mat-header-cell *matHeaderCellDef mat-sort-header>Acc Name
+    </th>
+   <td mat-cell *matCellDef="let element"> {{element.acc_desc}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="total_count" style="width: 100%;">
+  
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Count
+    
+    </th>
+   <td mat-cell *matCellDef="let element"> {{element.total_count}} </td>
+  </ng-container>
+  <ng-container matColumnDef="stan_count">
+  
+    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align:center!important">Stan Count
+    
+    </th>
+   <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.stan_count}} </td>
+  </ng-container>
+  
+  <ng-container matColumnDef="stan_prn">
+  
+    <th mat-header-cell *matHeaderCellDef mat-sort-header >Stan Prn
+    
+    </th>
+   <td mat-cell *matCellDef="let element"> {{element.stan_prn| currency:'INR'}} </td>
+  </ng-container>
+  
+  <!-- Name Column -->
+  <ng-container matColumnDef="substan_count">
+  
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Substan Count
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.substan_count}} </td>
+  </ng-container>
+  
+  <!-- Weight Column -->
+  
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="substan_prn">
+  
+     <th mat-header-cell *matHeaderCellDef mat-sort-header>Substan Prn
+     
+     </th>
+   <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.substan_prn| currency:'INR'}} </td>
+   </ng-container>
+  <ng-container matColumnDef="d1_count">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header >D1 Count
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.d1_count}} </td>
+  </ng-container>
+  <ng-container matColumnDef="d1_prn">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > D1 Prn
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.d1_prn| currency:'INR'}} </td>
+  </ng-container>
+  <ng-container matColumnDef="d2_count">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > D2 Count
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.d2_count }} </td>
+  </ng-container>
+  
+  
+  <ng-container matColumnDef="d2_prn">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > D2 Prn
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.d2_prn| currency:'INR'}} </td>
+  </ng-container>
+  <ng-container matColumnDef="d3_count">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > D3 Count
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:center"> {{element.d3_count}} </td>
+  </ng-container>
+  <ng-container matColumnDef="d3_prn">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > D3 prn
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.d3_prn| currency:'INR'}} </td>
+  </ng-container>
+  <ng-container matColumnDef="total_NPA">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > Total NPA
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:right"> {{(element.total_amt-element.stan_prn)| currency:'INR'}} </td>
+  </ng-container>
+  <ng-container matColumnDef="out">
+   
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > Total Outstanding
+    </th>
+  
+    <td mat-cell *matCellDef="let element" style="text-align:right"> {{element.total_amt| currency:'INR'}} </td>
+  </ng-container>
+  
+    
+    <!-- <td mat-footer-cell *matFooterCellDef >Hello</td> -->
+    <!-- <td mat-footer-cell *matFooterCellDef >{{crSum | number : '1.2-2'}}</td> -->
+  
+  <ng-container matColumnDef="disclaimer1">
+    <td mat-footer-cell *matFooterCellDef colspan="2" 
+    style="font-size: small;
+      text-align: center;
+      font-weight: 450;">
+    Total
+    </td>
+  
+  </ng-container>
+  <ng-container matColumnDef="disclaimer2" >
+    <td mat-footer-cell *matFooterCellDef  colspan="2" 
+    style="font-size: small;
+      text-align: right;
+      font-weight: 450;">
+      {{stan_prn | currency:'INR'}}
+    </td>
+    
+  </ng-container>
+  <ng-container matColumnDef="disclaimer3">
+    <td mat-footer-cell *matFooterCellDef colspan="2" 
+    style="font-size: small;
+      text-align: right;
+      font-weight: 450;">
+      {{substan_prn | currency:'INR'}}
+    </td>
+    
+  </ng-container>
+  <ng-container matColumnDef="disclaimer4" >
+    <td mat-footer-cell *matFooterCellDef colspan="2" 
+    style="font-size: small;
+      text-align: right;
+      font-weight: 450;">
+      {{d1_prn | currency:'INR'}}
+    </td>
+    
+  </ng-container>
+  
+  <ng-container matColumnDef="disclaimer5" >
+    <td mat-footer-cell *matFooterCellDef  colspan="2" 
+    style="font-size: small;
+      text-align: right;
+      font-weight: 450;">
+      {{d2_prn | currency:'INR'}}
+    </td>
+    
+  </ng-container>
+  <ng-container matColumnDef="disclaimer6">
+    <td mat-footer-cell *matFooterCellDef colspan="2" 
+    style="font-size: small;
+      text-align: right;
+      font-weight: 450;">
+      {{d3_prn | currency:'INR'}}
+    </td>
+    
+  </ng-container>
+  <ng-container matColumnDef="disclaimer7">
+    <td mat-footer-cell *matFooterCellDef  
+    style="font-size: small;
+      text-align: right;
+      font-weight: 450;">
+      {{(this.totAmt-this.substan_prn)| currency:'INR'}}
+    </td>
+    
+  </ng-container>
+  <ng-container matColumnDef="disclaimer8">
+    <td mat-footer-cell *matFooterCellDef  
+    style="font-size: small;
+      text-align: right;
+      font-weight: 450;">
+      {{(this.totAmt)| currency:'INR'}}
+    </td>
+    
+  </ng-container>
+  <ng-container matColumnDef="space1">
+    <th mat-header-cell *matHeaderCellDef colspan="2"></th>
+  </ng-container>
+  <ng-container matColumnDef="stan">
+    <th mat-header-cell *matHeaderCellDef colspan="2"><b>Standard Upto 1yr</b></th>
+  </ng-container>
+  <ng-container matColumnDef="substan">
+    <th mat-header-cell *matHeaderCellDef colspan="2"><b>Sub-Standard Upto 3yr</b></th>
+  </ng-container>
+  <ng-container matColumnDef="d1">
+    <th mat-header-cell *matHeaderCellDef colspan="2"><b>Doubtful-I Upto 4yr</b></th>
+  </ng-container>
+  <ng-container matColumnDef="d2">
+    <th mat-header-cell *matHeaderCellDef colspan="2"><b>Doubtful-II Upto 6yr</b></th>
+  </ng-container>
+  <ng-container matColumnDef="d3">
+    <th mat-header-cell *matHeaderCellDef colspan="2"><b>Doubtful-III Above 6yr</b></th>
+  </ng-container>
+  <ng-container matColumnDef="space2" colspan="2">
+    <th mat-header-cell *matHeaderCellDef ></th>
+  </ng-container>
+
+  <tr mat-footer-row *matFooterRowDef="['disclaimer1','disclaimer2','disclaimer3','disclaimer4','disclaimer5','disclaimer6','disclaimer7','disclaimer8']" class="example-second-footer-row"></tr>
+  <!-- <tr mat-header-row *matHeaderRowDef="['header0','header1','header2','header3','header4','header5','header6','header7','header8']"></tr> -->
+  <tr mat-header-row *matHeaderRowDef="['mainHeader']"></tr>
+  <tr mat-header-row *matHeaderRowDef="['space1','stan', 'substan','d1','d2','d3','space2']"
+          class="example-second-header-row">
+      </tr>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  
+  <tr mat-row *matRowDef="let element; columns: displayedColumns;"></tr>
+   </table>
+  <footer>
+  <small>
+    This report is generated through CFS-2022
+   </small>
+  </footer>
+  </div>
+  <!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+  
+  
+  <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  </div>
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

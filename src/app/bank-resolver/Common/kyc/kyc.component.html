@@ -1,0 +1,83 @@
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center">
+  <!-- <div *ngIf="showMsg " class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div> -->
+  <!-- <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="getImage(cust_cd,'SIGNATURE')">Signature</button>
+    <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="getImage(cust_cd,'PHOTO')">Photo</button>
+    <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="getImage(cust_cd,'KYC')">Kyc</button>
+    <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="getImage(cust_cd,'ADDRESS')">Address</button>
+  </div> -->
+  <div class="col-6">
+    <figure class="figure" *ngIf="PHOTO">
+      <img  src="{{PHOTO}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block" >
+      <figcaption class="figure-caption">Picture</figcaption>
+    </figure>
+    <small class="text-danger" *ngIf="!PHOTO"> No Picture Available</small>
+  </div>
+  <div class="col-6" >
+    <figure class="figure" *ngIf="SIGNATURE">
+      <img src="{{SIGNATURE}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block" >
+      <figcaption class="figure-caption">Signature</figcaption>
+    </figure>
+    <small class="text-danger" *ngIf="!SIGNATURE"> No Signature Available</small>
+  </div>
+  <hr>
+  <div class="col-6" >
+    <figure class="figure" *ngIf="ADDRESS">
+      <img src="{{ADDRESS}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block" >
+      <figcaption class="figure-caption">Photo ID</figcaption>
+    </figure>
+    <small class="text-danger" *ngIf="!ADDRESS"> No Photo ID Available</small>
+  </div>
+  <div class="col-6" >
+    <figure class="figure" *ngIf="KYC">
+      <img src="{{KYC}}" class="figure-img img-fluid img-thumbnail rounded mx-auto d-block" >
+      <figcaption class="figure-caption">Address ID</figcaption>
+    </figure>
+    <small class="text-danger" *ngIf="!KYC"> No Address ID Available</small>
+  </div>
+
+  
+  <!-- <div class="col-6">
+    <h6></h6>
+    <img class="img-fluid img-thumbnail rounded mx-auto d-block" >
+  </div>
+  <div class="col-6">
+    <h6>Signature</h6>
+    <img class="img-fluid img-thumbnail rounded mx-auto d-block" src="{{SIGNATURE}}">
+  </div>
+  <hr>
+  <div class="col-12">
+    <h6>Address</h6>
+    <img class="img-fluid img-thumbnail rounded mx-auto d-block" src="{{}}">
+  </div>
+  <hr>
+  <div class="col-12">
+    <h6>KYC</h6>
+    <img class="img-fluid img-thumbnail rounded mx-auto d-block" src="{{KYC}}">
+  </div>
+  <hr> -->
+  <!-- <div class="col-xs-12 ">
+  <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+    (click)="getImage(cust_cd,'SIGNATURE')">Signature</button>
+  <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+    (click)="getImage(cust_cd,'PHOTO')">Photo</button>
+  <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+    (click)="getImage(cust_cd,'KYC')">Kyc</button>
+  <button type="button" class="btn btn-primary btn-sm ml-1 mr-1"
+    (click)="getImage(cust_cd,'ADDRESS')">Address</button>
+</div> -->
+</div>

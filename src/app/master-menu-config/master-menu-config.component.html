@@ -1,0 +1,266 @@
+<div *ngIf="spinner" class="rox d-flex justify-content-center">
+  <div class="spinner-border text-info" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
+
+
+<div *ngIf="!spinner">
+  <div class="container" class="divc4">
+
+    <table class="table ml-2 mb-0">
+      <tr class="divc5">
+        <td style="width: 5%;">
+          <button type="button" class="btn btn-primary" (click)="navigateBack()">
+            <i class="fa fa-arrow-circle-left fa-1x "></i></button>
+        </td>
+        <td style="width: 95%; text-align: center;">
+          <h4> Master Menu Configuration
+          </h4>
+        </td>
+      </tr>
+    </table>
+
+    <table>
+      <tr *ngIf="showAlert2 || showAlert ">
+        <div *ngIf="showAlert2" style="width:1200px;">
+          <div class="alert alert-danger alert-dismissible fade show ml-1 " role="alert">
+            <strong>Error!</strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="showAlert" style="width:1200px;">
+          <div class="alert alert-success alert-dismissible fade show ml-2 w" role="alert">
+            <strong>Info!</strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </tr>
+    </table>
+
+
+    <div>
+      <table class="table ml-2">
+        <!-- <p>-----------------MODULE---Level1--------------------------</p> -->
+        <tr>
+          <td style="width: 15%">
+            <div class="divc0">
+              <strong class="mg1">Module</strong>
+              <section *ngFor="let t1 of menuConfigLevel1List">
+                <input class="inp1" placeholder="Enter Module Name.." [(ngModel)]="t1.menu_name" type="text">
+
+                <!-- <label> Act
+                  <input class="chk" type="checkbox" [checked]="t1.active_flag == 'Y'"
+                    (change)="t1.active_flag = $event.target.checked ? 'Y' : 'N' " />
+                </label> -->
+
+                <button type="button" class="btn btn-primary btn-sm"
+                  (click)="filterMenuList(t1.menu_id  , 2 , t1.menu_name )"> <i
+                    class="fa fa-arrow-circle-right fa-x "></i></button>
+              </section>
+
+              <section *ngIf="createModuleFlg">
+                <input class="inp1" placeholder="Enter Module Name.." [(ngModel)]="menuConfigLevel1Temp.menu_name"
+                  type="text">
+              </section>
+
+              <p></p>
+              <button *ngIf="!createModuleFlg" type="button" class="btn btn-primary btn-sm ml-5"
+                (click)="createModule()">Add</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createModuleFlg"
+                (click)="acceptModule()">Accept</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createModuleFlg"
+                (click)="cancelCreateModule()">Cancel</button>
+
+            </div>
+            <p></p>
+          </td>
+
+          <!-- <p>-----------------MENU--Level2---------------------------</p> -->
+          <td style="width: 15%">
+
+            <div class="divc1" *ngIf="showLevel2Flg">
+              <strong class="mg1">Menu: {{menuName}}</strong>
+
+              <section *ngFor="let t2 of menuConfigLevel2List">
+                <input class="inp3" placeholder="Enter Menu Name.." [(ngModel)]="t2.menu_name" type="text">
+
+                <button type="button" class="btn btn-primary btn-sm"
+                  (click)="filterMenuList(t2.menu_id, 3, t2.menu_name)"><i
+                    class="fa fa-arrow-circle-right fa-1x "></i></button>
+              </section>
+
+              <section *ngIf="createMenuFlg">
+                <input class="inp3" placeholder="Enter Menu.." [(ngModel)]="menuConfigLevel2Temp.menu_name" type="text">
+              </section>
+
+              <p></p>
+              <button *ngIf="!createMenuFlg" type="button" class="btn btn-primary btn-sm ml-5"
+                (click)="createMenu()">Add</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createMenuFlg"
+                (click)="acceptMenu()">Accept</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createMenuFlg"
+                (click)="cancelCreateMenu()">Cancel</button>
+
+            </div>
+            <p></p>
+
+          </td>
+          <!-----------------------SUB-MEMU/SCREEN1-----Level3---------------------->
+          <td style="width: 35%">
+            <div class="divc2" *ngIf="showLevel3Flg">
+              <strong class="mg1">SubMenu / Screen: {{screenName1}}</strong>
+
+              <section *ngFor="let t3 of menuConfigLevel3List">
+                <input class="inp3" placeholder="Enter Screen Name" [(ngModel)]="t3.menu_name" type="text">
+
+                <label> IsScr
+                  <input class="chk" type="checkbox" [checked]="t3.is_screen == 'Y'"
+                    (change)="t3.is_screen = $event.target.checked ? 'Y' : 'N' " />
+                </label>
+
+                <input [disabled]="t3.is_screen != 'Y'" class="inp3" placeholder="Enter Page Name"
+                  [(ngModel)]="t3.ref_page" type="text">
+
+                <button [disabled]="t3.is_screen == 'Y'" type="button" class="btn btn-primary btn-sm"
+                  (click)="filterMenuList(t3.menu_id, 4, t3.menu_name)"><i
+                    class="fa fa-arrow-circle-right fa-1x "></i></button>
+              </section>
+
+              <section *ngIf="createSubMenuFlg">
+                <input class="inp3" placeholder="Enter Screen Name.." [(ngModel)]="menuConfigLevel3Temp.menu_name"
+                  type="text">
+                <label> IsScr
+                  <input class="chk" type="checkbox" [checked]="menuConfigLevel3Temp.is_screen == 'Y'"
+                    (change)="menuConfigLevel3Temp.is_screen = $event.target.checked ? 'Y' : 'N' " />
+                </label>
+
+                <input [disabled]="menuConfigLevel3Temp.is_screen != 'Y'" class="inp3" placeholder="Enter Page Name.."
+                  [(ngModel)]="menuConfigLevel3Temp.ref_page" type="text">
+              </section>
+
+              <p></p>
+              <button *ngIf="!createSubMenuFlg" type="button" class="btn btn-primary btn-sm ml-5"
+                (click)="createSubMenu()">Add</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createSubMenuFlg"
+                (click)="acceptSubMenu()">Accept</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createSubMenuFlg"
+                (click)="cancelCreateSubMenu()">Cancel</button>
+            </div>
+            <p></p>
+
+          </td>
+
+          <!-----------------------SCREEN2--------------------------->
+          <td style="width: 25%">
+            <div class="divc3" *ngIf="showLevel4Flg">
+              <strong class="mg1">Screen: {{screenName2}}</strong>
+
+              <section *ngFor="let t4 of menuConfigLevel4List">
+                <input class="inp3" placeholder="Enter Screen Name" [(ngModel)]="t4.menu_name" type="text">
+
+                <label> IsScr
+                  <input class="chk" type="checkbox" [checked]="t4.is_screen == 'Y'"
+                    (change)="t4.is_screen = $event.target.checked ? 'Y' : 'N' " />
+                </label>
+
+                <input [disabled]="t4.is_screen != 'Y'" class="inp3" placeholder="Enter Page Name"
+                  [(ngModel)]="t4.ref_page" type="text">
+              </section>
+
+              <section *ngIf="createScreenFlg">
+                <input class="inp3" placeholder="Enter Screen Name.." [(ngModel)]="menuConfigLevel4Temp.menu_name"
+                  type="text">
+                <label> IsScr
+                  <input class="chk" type="checkbox" [checked]="menuConfigLevel4Temp.is_screen == 'Y'"
+                    (change)="menuConfigLevel4Temp.is_screen = $event.target.checked ? 'Y' : 'N' " />
+                </label>
+
+                <input [disabled]="menuConfigLevel4Temp.is_screen !='Y'" class="inp3" placeholder="Enter Page Name.."
+                  [(ngModel)]="menuConfigLevel4Temp.ref_page" type="text">
+              </section>
+
+              <p></p>
+              <button *ngIf="!createScreenFlg" type="button" class="btn btn-primary btn-sm ml-5"
+                (click)="createScreen()">Add</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createScreenFlg"
+                (click)="acceptScreen()">Accept</button>
+
+              <button type="button" class="btn btn-primary btn-sm m-1" *ngIf="createScreenFlg"
+                (click)="cancelCreateScreen()">Cancel</button>
+
+            </div>
+            <p></p>
+
+          </td>
+        </tr>
+
+        <tr>
+          <div *ngIf="!saveAllFlg">
+            <button type="button" class="btn btn-primary btn-sm ml-3 mb-3" (click)="resetListAndFlag()">Cancel</button>
+          </div>
+        </tr>
+
+      </table>
+
+
+      <div *ngIf="saveAllFlg">
+        <table class="table ml-2">
+          <tr>
+            <button type="button" class="btn btn-primary btn-sm ml-2 mb-1" (click)="insertMenuConfigList()">Save
+              All</button>
+            <button type="button" class="btn btn-primary btn-sm ml-2 mb-1" (click)="resetListAndFlag()">Cancel</button>
+          </tr>
+
+          <tr class="divc6">
+            <td style="width: 35%"><b>Bank Name</b></td>
+            <td style="width: 25%"><b>Module / Menu / Sub-Menu</b></td>
+            <td style="width: 25%"><b>Screen</b></td>
+            <td style="width: 15%"><b>Status</b></td>
+          </tr>
+
+          <tr *ngFor="let c1 of menuConfigInsertList">
+            <td>{{c1.bank_name}}</td>
+            <td>{{c1.menu_name}}</td>
+            <td>{{c1.ref_page}}</td>
+            <td>
+              <label> Active
+                <input class="chk" type="checkbox" [checked]="c1.active_flag == 'Y'"
+                  (change)="c1.active_flag = $event.target.checked ? 'Y' : 'N' " />
+              </label>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <button type="button" class="btn btn-primary btn-sm ml-2" (click)="insertMenuConfigList()">Save
+                All</button>
+              <button type="button" class="btn btn-primary btn-sm ml-2" (click)="resetListAndFlag()">Cancel</button>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+
+        </table>
+
+      </div>
+
+
+
+    </div>
+  </div>
+</div>

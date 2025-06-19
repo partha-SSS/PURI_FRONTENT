@@ -1,0 +1,183 @@
+
+<loading *ngIf="isLoading"></loading>
+<!-- <ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add New activity</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+   
+    <form [formGroup]="activity">
+      <div class="col-12">
+        <div class="form-row">
+          <div class="form-group col-4">
+            <small for="acc_type">activity Type<span class="text-danger">*</span></small>
+              <select  style="border-radius: 1.25rem!important;"  class="form-control form-control-sm custom-scrollbar"  formControlName="l_type" >
+                  <option *ngFor="let l_type of activity_type" [value]="l_type.id">{{ l_type.type }}</option>
+                  </select>
+            </div>
+            <div class="form-group col-4">
+            <small for="acc_type">activity ID<span class="text-danger">*</span></small>
+              <input type="text" style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="l_id">
+            </div>
+            <div class="form-group col-4">
+              <small for="acc_type">activity Status<span class="text-danger">*</span></small>
+              <select  style="border-radius: 1.25rem!important;"   class="form-control form-control-sm custom-scrollbar" formControlName="l_status" >
+                  <option *ngFor="let l_type of activity_status" [value]="l_type.id">{{ l_type.type }}</option>
+                  </select>
+            </div>
+          </div>
+      </div>
+    </form>
+    
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="Saveactivity()">Save</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template> -->
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Get</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="Addactivity()">Add activity</button> -->
+
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-12 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Activity Details</h4>
+            
+            <div class="table-responsive" class="scroll-when-long">
+              
+                  <div class="form-row">
+                     <div class="form-group col-1">
+                      Sector
+                     </div>
+                     <div class="form-group col-1">
+                      Activity
+                     </div>
+                     <div class="form-group col-1">
+                      Category
+                     </div>
+                     <div class="form-group col-1">
+                      Term
+                     </div>
+                     <div class="form-group col-1">
+                      Moratorium
+                     </div>
+                     <div class="form-group col-1">
+                      Total Year
+                     </div>
+                     <div class="form-group col-2">
+                      Loan Type
+                     </div>
+                     <div class="form-group col-1">
+                      Periodicity
+                     </div>
+                     <div class="form-group col-1">
+                      Instl No
+                     </div>
+                     <div class="form-group col-1">
+                      Grace Month
+                     </div>
+                     <div class="form-group col-1">
+                     Edit & Save
+                     </div>
+                  </div>
+                    <div class="form-row" *ngFor="let activity of reportData;let i = index" >
+                      <div class="form-group col-1">
+                        <input type="text" [(ngModel)]="activity.sector_desc" style="border-radius: 1.25rem!important;" disabled [value]="activity.sector_desc" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-1">
+                        <input type="text" [(ngModel)]="activity.activity_desc" style="border-radius: 1.25rem!important;" disabled [value]="activity.activity_desc" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-1">
+                        <select [disabled]="!isRowEditable(i)" [(ngModel)]="activity.category" style="border-radius: 1.25rem!important;"   class="form-control form-control-sm custom-scrollbar" (change)="categoryChange($event, i)" >
+                          <option>Select</option>
+                          <option *ngFor="let cate of actCategory" [selected]="cate.activitywise_category==activity.category" [value]="cate.activitywise_category">{{ cate.activitywise_category }}</option>
+                            </select>
+                      </div>
+                      <div class="form-group col-1">
+                        <input [disabled]="!isRowEditable(i)"  [(ngModel)]="activity.term" type="text" style="border-radius: 1.25rem!important;"  [value]="activity.term" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-1">
+                        <input [disabled]="!isRowEditable(i)"   [(ngModel)]="activity.moratorium" type="text" style="border-radius: 1.25rem!important;"  [value]="activity.moratorium" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-1">
+                        <input [disabled]="!isRowEditable(i)"  [(ngModel)]="activity.total_yr" type="text" style="border-radius: 1.25rem!important;"  [value]="activity.total_yr" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-2">
+                        <select [disabled]="!isRowEditable(i)"  [(ngModel)]="activity.acc_cd" style="border-radius: 1.25rem!important;"   class="form-control form-control-sm custom-scrollbar" (change)="categoryChange($event, i)" >
+                          <option>Select</option>
+                          <option *ngFor="let acc of accountTypeList" [selected]="acc.acc_type_cd==activity.acc_cd" [value]="acc.acc_type_cd">{{ acc.acc_type_desc }}</option>
+                        </select>
+                      </div>
+                      <div class="form-group col-1">
+                        <select [disabled]="!isRowEditable(i)"  [(ngModel)]="activity.periodicity" style="border-radius: 1.25rem!important;"   class="form-control form-control-sm custom-scrollbar" (change)="categoryChange($event, i)" >
+                          <option>Select</option>
+                          <option *ngFor="let acc of periodicityList" [selected]="acc.code==activity.periodicity" [value]="acc.code">{{ acc.name }}</option>
+                        </select>
+                      </div>
+                      <div class="form-group col-1">
+                        <input [disabled]="!isRowEditable(i)"  [(ngModel)]="activity.instl_no" type="text" style="border-radius: 1.25rem!important;"  [value]="activity.instl_no" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-1">
+                        <input [disabled]="!isRowEditable(i)"  [(ngModel)]="activity.grace_month" type="text" style="border-radius: 1.25rem!important;"  [value]="activity.grace_month" class="form-control form-control-sm custom-scrollbar" tabindex="1"  >
+                      </div>
+                      <div class="form-group col-1">
+                        <button class="btn btn-warning btn-sm" style="font-size:x-small" [disabled]="false" (click)="enableRowEdit(i)">
+                          <i class="fa fa-pencil"></i>
+                        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-primary btn-sm" style="font-size:x-small" [disabled]="false" (click)="onUpdateClick(activity,i)">
+                          <i class="fa fa-save"></i>
+                        </button>
+                      </div>
+                    </div>
+                 
+              <hr>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+        </div>
+  </div>
+
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Get</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="Addactivity()">Add activity</button> -->
+
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>

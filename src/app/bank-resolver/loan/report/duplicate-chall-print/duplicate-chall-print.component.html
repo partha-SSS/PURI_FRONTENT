@@ -1,0 +1,467 @@
+ <div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="ConfrmModal(Conformation)">Marged</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onReset()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <button mat-raised-button type="button" 
+    class="ml-2 btn btn-primary btn-primary-spacing btn-sm" 
+    [useExistingCss]="true"
+    printSectionId="_voucher" 
+    ngxPrint>Print</button>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-12 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Recovery Details</h4>
+           
+            <div class="container">
+              <!-- Search Input -->
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Search</mat-label>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Search anything..." />
+              </mat-form-field>
+              <!-- <mat-radio-group aria-label="Select an option"  [value]="selectedFilter" (change)="onFilterChange($event)">
+                <mat-radio-button value="C">
+                  <label style="margin-top: 10px;">Credit</label>
+                </mat-radio-button>
+                <mat-radio-button value="D"> 
+                  <label style="margin-top: 10px;">Debit</label>
+                </mat-radio-button>
+                <mat-radio-button value="B"> 
+                  <label style="margin-top: 10px;">Both</label>
+                </mat-radio-button>
+              </mat-radio-group> -->
+              <!-- Responsive Material Table -->
+              <div class="table-responsive" id="_voucher">
+                <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+            
+                  <!-- Index Column -->
+                  <ng-container matColumnDef="index">
+                    <th mat-header-cell *matHeaderCellDef>#</th>
+                    <td mat-cell *matCellDef="let element; let i = index"> {{ i + 1 }} </td>
+                  </ng-container>
+            
+                  <!-- Transaction Code Column -->
+                  <ng-container matColumnDef="trans_cd">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;">Trans Code</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: center;"> {{ element.trans_cd }} </td>
+                  </ng-container>
+            
+                  <!-- Voucher ID Column -->
+              
+            
+                  <!-- Transaction Type Column -->
+                  <ng-container matColumnDef="trans_type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">Trans Type</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.trans_type }} </td>
+                  </ng-container>
+            
+                  <!-- Account Type Column -->
+                  <ng-container matColumnDef="acc_type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">A/C Type</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.loan_type }} </td>
+                  </ng-container>
+            
+                  <!-- Account Number Column -->
+                  <ng-container matColumnDef="acc_num">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">Loan ID</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.loan_id }} </td>
+                  </ng-container>
+            
+                  <!-- Customer Name Column -->
+                  <ng-container matColumnDef="cust_name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: left;">Customer Name</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: left;"> {{ element.cust_name }} </td>
+                  </ng-container>
+                  <ng-container matColumnDef="guardian_name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;">Guardian Name</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: center;"> {{ element.guardian_name }} </td>
+                  </ng-container>
+                  <!-- Amount Column -->
+                  <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;">Total Recovery</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: right;"> {{ element.total_recovery | number : '1.2-2'  }} </td>
+                  </ng-container>
+            
+              
+            
+                  <!-- Print Column -->
+                  <ng-container matColumnDef="print">
+                    <th mat-header-cell *matHeaderCellDef style="text-align: center;">Print</th>
+                    <td mat-cell *matCellDef="let element" style="text-align: center;">
+                      <mat-icon style="cursor: pointer;" title="Click to Show Details" (click)="openModal(contentLoanStmt,element)">print</mat-icon>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="Header">
+                    <th mat-header-cell *matHeaderCellDef colspan="10">
+                      <div class="justify-content-center" style="text-align:center">
+                        <br><h2>{{ardbName}}</h2>
+                        
+                        <h3><b>All Transaction As on {{this.fromdate.toDateString()| date: 'dd/MM/yyyy'}}, Branch {{this.sys.BranchCode}}</b></h3>
+                        <!-- <h4> <u> Cash Account from {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} to  {{todate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4> -->
+                     </div>
+                    </th>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="['Header']"
+                  class="example-second-header-row">
+                 </tr>
+                  <!-- Table Header & Row Definitions -->
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            
+                </table>
+              </div>
+            </div>
+            
+          </div>
+         
+        </div>
+      </div>
+        </div>
+  </div>
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="ConfrmModal(Conformation)">Marged</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onReset()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+    <button mat-raised-button type="button" 
+    class="ml-2 btn btn-primary btn-primary-spacing btn-sm" 
+    [useExistingCss]="true"
+    printSectionId="_voucher" 
+    ngxPrint>Print</button>
+  </div>
+</div>
+
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<ng-template #contentLoanStmt let-modal bd-example-modal-xl>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left customHeader" style="padding-right: 10px;">Recovery Challan </h4>
+    
+    <button  type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row " id="challan2" hidden>
+      <div class="col-12 container" >
+        <div style="border: 1px solid #b7b4b4;">
+          <div>
+            <div class="justify-content-center" style="text-align:center" *ngIf="fullCustData">
+              <h4>Customer Receipt</h4>
+              <h5>{{ardbName}} </h5>
+              <h5>Run Date & Time : {{today}} </h5>             
+              <h5>{{branchName}}</h5>
+          </div>
+          </div>
+          <br>
+          <div class="row" style="padding-left: 10px;padding-right: 10px;font-size: larger;" >
+            <div class="col-6">
+            <b>Trans Date:</b> {{sys?.CurrentDate | date:'dd/MM/yyyy'}}
+            </div>
+            <div class="col-6 text-right">
+              <b>Trans ID:</b> {{fullCustData.trans_cd}}
+            </div>
+          </div>
+          <div class="row" style="padding-left: 10px;padding-right: 10px; font-size: larger;">
+            <div class="col-8">
+              <b>Loan Account:</b> {{fullCustData.loan_type}}<br>
+              <b>Name:</b> {{fullCustData.cust_name}}
+            </div>
+            <div class="col-4 text-right">
+              
+              <b>Loan ID: {{fullCustData.loan_id}}</b><br>
+              <b>Operated By:</b> {{fullCustData.created_by}}
+              
+            </div>
+          </div>
+          <div class="row" style="padding-left: 10px;padding-right: 10px; font-size: larger;">
+            <div class="col-12">
+              <b>Address:</b> {{fullCustData.address}}
+            </div>
+          </div>
+          <div class="row" style="padding-left: 10px;padding-bottom: 10px;padding-right: 10px; font-size: larger;">
+            <div class="col-6">
+              <b>Purpose:</b> {{fullCustData.purpose}}
+              <br>
+              <b>Curr & Ovd Intt Rt. :</b> {{fullCustData.curr_intt_rate}} & {{fullCustData.ovd_intt_rate}}
+             
+            </div>
+            <div class="col-6 text-right">
+              
+              
+              <b>Operation:</b> Recovery By  {{fullCustData.trf_type=='C'?"Cash":"Transfer"}}
+              <br>
+              
+              <b>Intt Recov Till:</b> {{fullCustData.intt_till_dt?.substr(0,10)}}
+            </div>
+          </div>
+          <img src="./assets/images/ardb.png" width="350" height="350"  class="noticeLogo"/>
+          <div>
+            <table style="width: 95%;border: 1px solid gray;">
+              <thead><tr style="border-bottom:1px solid #969494;">
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important"><b>Prn / Intt Typ</b></td>
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; width: 35%!important;text-align: right; "><b>Principal</b></td>
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; "><b>Interest</b></td>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #969494;">
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Current</td>
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{fullCustData.curr_prn_recov| number : '1.2-2'}}</b></td>
+                <td style="padding:5px;font-size: larger;text-align: right;"><b>{{fullCustData.curr_intt_recov| number : '1.2-2'}}</b></td>
+                </tr>
+                <tr style="border-bottom:1px solid #969494;">
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Overdue</td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; text-align: right;width: 35%!important"><b> {{fullCustData.ovd_prn_recov| number : '1.2-2'}}</b></td>
+                  <td style="padding:5px;font-size: larger;text-align: right;"><b> {{fullCustData.ovd_intt_recov| number : '1.2-2'}}</b></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #969494;">
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Advance/Penal</td>
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{fullCustData.adv_prn_recov| number : '1.2-2'}}</b></td>
+                    <td style="padding:5px;font-size: larger;text-align: right;"><b>{{fullCustData.penal_intt_recov| number : '1.2-2'}}</b></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #969494;">
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Total</td>
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{fullCustData.curr_prn_recov+fullCustData.ovd_prn_recov+fullCustData.adv_prn_recov | number : '1.2-2'}}</b></td>
+                      <td style="padding:5px;font-size: larger;text-align: right;"><b>{{fullCustData.curr_intt_recov+fullCustData.ovd_intt_recov+fullCustData.penal_intt_recov | number : '1.2-2'}}</b></td>
+                      </tr>
+              </tbody>
+              
+            </table>
+            
+            <div class="row" style="margin-left:2%; font-size: larger;">
+              <b style="text-align: left;">Total Amount:{{fullCustData.total_recovery| number : '1.2-2'}}</b> (<b class="amountToWord">{{fullCustData.amt_word}} ONLY</b>)
+             </div>
+             <!-- <div class="row" style="margin-left:2%;font-size:2vw;">
+              
+             </div> -->
+             <br>
+            <table style="margin-left:20%; width: 60%;border: 1px solid gray;">
+              <tr>
+                <th style="border-right: 1px solid #808080;padding:5px;font-size: larger;" colspan="2">Outstanding Principal</th>
+                <th style="border-right: 1px solid #808080;padding:5px;font-size: larger;" colspan="3">Outstanding Interest</th>
+              </tr>
+              <tr style="border: 1px solid gray;width: 100%;">
+                <th style="border-right: 1px solid #808080;padding:5px;text-align: right; "><b>Curr Prn</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Ovd Prn</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Curr Intt</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Ovd Intt</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Penal Intt</b></th>
+              </tr>
+              <tr style="border: 1px solid gray;width: 100%;">
+                <td style="border-right: 1px solid #808080;padding:5px;text-align: right;  "><b>{{fullCustData.curr_prn_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px;text-align: right; "><b>{{fullCustData.ovd_prn_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>{{fullCustData.curr_intt_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>{{fullCustData.ovd_intt_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px; text-align: right; "><b>{{fullCustData.penal_intt_bal| number : '1.2-2'}}</b></td>
+              </tr>
+            </table>
+            <br><br><br>
+            <div class="row" >
+              <div class="col-3" style="text-align: center;font-size: large; "><b>DEPOSITOR</b> </div>
+              <div class="col-3" style="text-align: center;font-size: large; "><b>CASHIER</b> </div>
+              <div class="col-3" style="text-align: center;font-size: large; "><b>J.O.(ACCTS.)</b></div>
+              <div class="col-3" style="text-align: center;font-size: large; "><b>MANAGER</b></div>
+            </div>
+            <br>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-12 container" >
+        <div style="border: 1px solid #b7b4b4;">
+          <div>
+            <div class="justify-content-center" style="text-align:center" *ngIf="fullCustData">
+              <h4>Bank Receipt</h4>
+              <h5>{{ardbName}} </h5>
+              <h5>Run Date & Time : {{today}} </h5>             
+              <h5>{{branchName}}</h5>
+          </div>
+          </div>
+          <br>
+          <div class="row" style="padding-left: 10px;padding-right: 10px;font-size: larger;" >
+            <div class="col-6">
+            <b>Trans Date:</b> {{sys?.CurrentDate | date:'dd/MM/yyyy'}}
+            </div>
+            <div class="col-6 text-right">
+              <b>Trans ID:</b> {{fullCustData.trans_cd}}
+            </div>
+          </div>
+          <div class="row" style="padding-left: 10px;padding-right: 10px; font-size: larger;">
+            <div class="col-8">
+              <b>Loan Account:</b> {{fullCustData.loan_type}}<br>
+              <b>Name:</b> {{fullCustData.cust_name}}
+            </div>
+            <div class="col-4 text-right">
+              
+              <b>Loan ID: {{fullCustData.loan_id}}</b><br>
+              <b>Operated By:</b> {{fullCustData.created_by}}
+              
+            </div>
+          </div>
+          <div class="row" style="padding-left: 10px;padding-right: 10px; font-size: larger;">
+            <div class="col-12">
+              <b>Address:</b> {{fullCustData.address}}
+            </div>
+          </div>
+          <div class="row" style="padding-left: 10px;padding-bottom: 10px;padding-right: 10px; font-size: larger;">
+            <div class="col-6">
+              <b>Purpose:</b> {{fullCustData.purpose}}
+              <br>
+              <b>Curr & Ovd Intt Rt. :</b> {{fullCustData.curr_intt_rate}} & {{fullCustData.ovd_intt_rate}}
+             
+            </div>
+            <div class="col-6 text-right">
+              
+              
+              <b>Operation:</b> Recovery By  {{fullCustData.trf_type=='C'?"Cash":"Transfer"}}
+              <br>
+              
+              <b>Intt Recov Till:</b> {{fullCustData.intt_till_dt?.substr(0,10)}}
+            </div>
+          </div>
+          <img src="./assets/images/ardb.png" width="350" height="350"  class="noticeLogo"/>
+          <div>
+            <table style="width: 95%;border: 1px solid gray;">
+              <thead><tr style="border-bottom:1px solid #969494;">
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important"><b>Prn / Intt Typ</b></td>
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; width: 35%!important;text-align: right; "><b>Principal</b></td>
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; "><b>Interest</b></td>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #969494;">
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Current</td>
+                <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{fullCustData.curr_prn_recov| number : '1.2-2'}}</b></td>
+                <td style="padding:5px;font-size: larger;text-align: right;"><b>{{fullCustData.curr_intt_recov| number : '1.2-2'}}</b></td>
+                </tr>
+                <tr style="border-bottom:1px solid #969494;">
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Overdue</td>
+                  <td style="border-right: 1px solid #969494;padding:5px;font-size: larger; text-align: right;width: 35%!important"><b> {{fullCustData.ovd_prn_recov| number : '1.2-2'}}</b></td>
+                  <td style="padding:5px;font-size: larger;text-align: right;"><b> {{fullCustData.ovd_intt_recov| number : '1.2-2'}}</b></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #969494;">
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Advance/Penal</td>
+                    <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{fullCustData.adv_prn_recov| number : '1.2-2'}}</b></td>
+                    <td style="padding:5px;font-size: larger;text-align: right;"><b>{{fullCustData.penal_intt_recov| number : '1.2-2'}}</b></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #969494;">
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: center; width: 35%!important">Total</td>
+                      <td style="border-right: 1px solid #969494;padding:5px;font-size: larger;text-align: right; width: 35%!important"><b> {{fullCustData.curr_prn_recov+fullCustData.ovd_prn_recov+fullCustData.adv_prn_recov | number : '1.2-2'}}</b></td>
+                      <td style="padding:5px;font-size: larger;text-align: right;"><b>{{fullCustData.curr_intt_recov+fullCustData.ovd_intt_recov+fullCustData.penal_intt_recov | number : '1.2-2'}}</b></td>
+                      </tr>
+              </tbody>
+              
+            </table>
+            
+            <div class="row" style="margin-left:2%; font-size: larger;">
+              <b style="text-align: left;">Total Amount:{{fullCustData.total_recovery| number : '1.2-2'}}</b> (<b class="amountToWord">{{fullCustData.amt_word}} ONLY</b>)
+             </div>
+             <!-- <div class="row" style="margin-left:2%;font-size:2vw;">
+              
+             </div> -->
+             <br>
+            <table style="margin-left:20%; width: 60%;border: 1px solid gray;">
+              <tr>
+                <th style="border-right: 1px solid #808080;padding:5px;font-size: larger;" colspan="2">Outstanding Principal</th>
+                <th style="border-right: 1px solid #808080;padding:5px;font-size: larger;" colspan="3">Outstanding Interest</th>
+              </tr>
+              <tr style="border: 1px solid gray;width: 100%;">
+                <th style="border-right: 1px solid #808080;padding:5px;text-align: right; "><b>Curr Prn</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Ovd Prn</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Curr Intt</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Ovd Intt</b></th>
+                <th style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>Penal Intt</b></th>
+              </tr>
+              <tr style="border: 1px solid gray;width: 100%;">
+                <td style="border-right: 1px solid #808080;padding:5px;text-align: right;  "><b>{{fullCustData.curr_prn_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px;text-align: right; "><b>{{fullCustData.ovd_prn_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>{{fullCustData.curr_intt_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px;text-align: right;  "><b>{{fullCustData.ovd_intt_bal| number : '1.2-2'}}</b></td>
+                <td style="border-right: 1px solid gray;padding:5px; text-align: right; "><b>{{fullCustData.penal_intt_bal| number : '1.2-2'}}</b></td>
+              </tr>
+            </table>
+            <br><br><br>
+            <div class="row" >
+              <div class="col-3" style="text-align: center;font-size: large; "><b>DEPOSITOR</b> </div>
+              <div class="col-3" style="text-align: center;font-size: large; "><b>CASHIER</b> </div>
+              <div class="col-3" style="text-align: center;font-size: large; "><b>J.O.(ACCTS.)</b></div>
+              <div class="col-3" style="text-align: center;font-size: large; "><b>MANAGER</b></div>
+            </div>
+            <br>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h4>Are you want to print this transaction challan?</h4>
+  </div>
+  <div class="modal-footer">
+    <div class="print">
+        <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [useExistingCss]="true" 
+        class="btn btn-rounded btn-primary m-1" 
+        printSectionId="challan2" ngxPrint (click)="modalRef.hide()">Print Challan</button>
+    </div>
+  </div>
+
+
+  </ng-template>

@@ -1,0 +1,175 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="row">
+        <div class="col-6">
+          <label for="fromDate">From Date</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+        <div class="col-6">
+            <label for="fromDate">From Date</label>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="todate" disabled bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div >
+          <small for="acc_type_cd">Loan Type</small>
+           <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd">
+             <option *ngIf="AcctTypes" disabled>Choose</option>
+             <option  (change)="takeLoanVal(acctType)" *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+               {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+             </option>
+           </select>
+        </div> -->
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  
+  <!-- {{ReportUrl}} -->
+  <!-- <ng-template #printDiv> -->
+    <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+       <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+       <button mat-raised-button type="button" 
+       class="btn btn-rounded btn-primary m-1" 
+       [useExistingCss]="true"
+       printSectionId="mattable" 
+       ngxPrint>Print</button>
+       <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+      
+      </div>
+      </div>
+  <!-- </ng-template> -->
+  <!-- <ng-container *ngTemplateOutlet="printDiv"></ng-container> -->
+  
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+   <!-- <pagination style="float:right;"
+  [totalItems]="reportData?.length"  
+  [itemsPerPage]="itemsPerPage"
+  [boundaryLinks]="true"
+  [directionLinks]="true"
+  [maxSize]="5"
+  [(ngModel)]="currentPage"
+  name="currentPage"
+  (pageChanged)="pageChanged($event)"
+  (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+
+  <!-- <mat-form-field appearance="outline" >
+    <mat-label>Search sub cash book</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+  </mat-form-field> -->
+  <!-- <mat-form-field appearance="outline" style="width:10%">
+    <mat-label>Search Demand List</mat-label>
+    <input matInput id="myInput" (keyup)="applyFilter0($event)" placeholder="Ex. abc / 123">
+  </mat-form-field> &nbsp;
+   <br>
+   -->
+  <div class="mat-elevation-z8" id="mattable">
+    
+    
+  <div class="justify-content-center" style="text-align:center">
+    <br><h4>{{ardbName}} ({{branchName}})</h4>
+    
+    <h4>Run Date & Time : {{today}} </h4>
+      <h4> <u> Loan Disbursement Summary from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+    
+ </div><br>
+ <div *ngFor="let group of groupedData">
+  <h4 style="margin-left: 10%;"><b>{{ group.group_name }}</b></h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Activity Name</th>
+        <th>Disbursed Amount</th>
+        <th>No. of Disbursement</th>
+        <th>No. of party</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let loan of group.loans">
+        <td>{{ loan.activity_name }}</td>
+        <td style="text-align: right;">{{ loan.disb_amt | INRCurrency}}</td>
+        <td>{{ loan.no_of_loans }}</td>
+        <td>{{ loan.no_of_cust }}</td>
+      </tr>
+      <tr>
+        <td><strong>Total</strong></td>
+        <td style="text-align: right;"><strong>{{ group.total_disb_amt | INRCurrency}}</strong></td>
+        <td><strong>{{ group.total_no_of_loans }}</strong></td>
+        <td><strong>{{ group.total_no_of_cust }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+    <footer>
+      <small>
+        This report is generated through CFS-2022
+       </small>
+      </footer>
+  </div>
+  <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100,this.totCount, this.reportData?.length]" aria-label="Select page of users"></mat-paginator> -->
+  
+ 
+   
+  </div>
+  
+  <!-- <ng-container *ngTempleteOutlet="printDiv"></ng-container> -->
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+       printSectionId="mattable" 
+       ngxPrint>Print</button>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    
+    </div>
+    </div>
+ 
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

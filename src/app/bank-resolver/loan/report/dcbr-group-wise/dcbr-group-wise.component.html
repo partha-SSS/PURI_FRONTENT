@@ -1,0 +1,390 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp" >
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-12">
+            <small for="fundType">Fund Type</small>
+            <select id="fundType" class="form-control form-control-sm" formControlName="fundType">
+              <option disabled>Choose</option>
+              <option value="O">Deposit Scheme Fund</option>
+              <option value="N">Borrowed Fund</option>
+  
+            </select>
+          </div>
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+   
+      <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+     
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" printSectionId="mattable2"
+          ngxPrint 
+          [printStyle]="{ '@page': { size: 'landscape !important' } }"
+          >Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex.123/Abc" #input>
+      </mat-form-field>
+      
+    
+      
+      <div class="mat-elevation-z8" id="mattable2" >
+    
+        <table mat-table [dataSource]="dataSource" matSort >
+          
+         <!-- ID Column -->
+         <!-- <ng-container matColumnDef="acc_name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Account Type	</th>
+          <td mat-cell *matCellDef="let row" >  {{row.acc_name}} </td>
+        </ng-container> -->
+          <!-- <ng-container matColumnDef="block_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Block	</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">  {{row.block_name}} </td>
+          </ng-container> -->
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="block_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Block Name </th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">
+                <ng-container *ngIf="row.trans_cd==9999">
+                    <div class="fontStyle">{{row.block_name}} </div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.trans_cd!=9999">
+                     <div class="fontStyle">{{row.block_name}} </div> 
+                   </ng-container>
+                </td>
+          </ng-container>
+          <ng-container matColumnDef="service_area_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Area Name </th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;"> 
+                <ng-container *ngIf="row.trans_cd==9999">
+                    <div class="fontStyle">{{row.service_area_name}} </div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.trans_cd!=9999">
+                     <div class="fontStyle">{{row.service_area_name}} </div> 
+                   </ng-container>
+               </td>
+          </ng-container>
+          <ng-container matColumnDef="vill_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Village Name </th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;"> 
+                <ng-container *ngIf="row.trans_cd==9999">
+                    <div class="fontStyle">{{row.vill_name}} </div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.trans_cd!=9999">
+                     <div class="fontStyle">{{row.vill_name}} </div> 
+                   </ng-container>
+               </td>
+          </ng-container>
+          <!-- Fruit Column -->
+          <ng-container matColumnDef="activity_cd">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Purpose </th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.activity_cd}}</td>
+          </ng-container>
+          <ng-container matColumnDef="loan_id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Loan ID </th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.loan_id}}</td>
+          </ng-container>
+          <ng-container matColumnDef="lf_no">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header > Ledger Folio No</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.loan_acc_no}}</td>
+          </ng-container>
+          <!-- <ng-container matColumnDef="lf_no">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >L/F No.</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.loan_acc_no}}</td>
+          </ng-container> -->
+          <!-- Progress Column -->
+          <ng-container matColumnDef="cust_name" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Customer Name</th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;"> {{row.cust_name}} </td>
+          </ng-container>
+          <ng-container matColumnDef="guardian_name" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Guardian Name</th>
+            <td mat-cell *matCellDef="let row" style="text-align: left;"> {{row.guardian_name}} </td>
+          </ng-container>
+          <ng-container matColumnDef="phone" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone No</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;"> {{row.phone}} </td>
+          </ng-container>
+          <!-- ID Column -->
+          <ng-container matColumnDef="disb_dt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Disb Date</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.disb_dt?.substr(0,10) }}</td>
+          </ng-container>
+      
+          <ng-container matColumnDef="intt_rt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Rate of Interest</th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">{{row.upto_1}}</td>
+          </ng-container>
+          <ng-container matColumnDef="disb_amt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Disbursement Amount</th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">{{row.disb_amt| currency:"INR"}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="outstanding_prn" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Outstanding Principal</th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">
+                <ng-container *ngIf="row.above_3==9999">
+                    <div class="fontStyle">{{row.outstanding_prn| currency:"INR" }}</div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.above_3!=9999">
+                     <div >{{row.outstanding_prn| currency:"INR" }}</div> 
+                   </ng-container>
+                </td>
+          </ng-container>
+      
+          <!-- ID Column -->
+          <ng-container matColumnDef="curr_prn" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Principal</th>
+            <td mat-cell *matCellDef="let row" style="max-width: 70px!important;text-align: right;">
+                <ng-container *ngIf="row.above_3==9999">
+                    <div class="fontStyle">{{row.curr_prn | currency:"INR" }}</div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.above_3!=9999">
+                     <div >{{row.curr_prn | currency:"INR" }}</div> 
+                   </ng-container>
+                </td>
+          </ng-container>
+      
+      
+          <!-- Name Column -->
+          <ng-container matColumnDef="ovd_prn" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Overdue Principal </th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">
+                <ng-container *ngIf="row.above_3==9999">
+                    <div class="fontStyle">{{row.ovd_prn | currency:"INR"}}</div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.above_3!=9999">
+                     <div>{{row.ovd_prn | currency:"INR"}}</div> 
+                   </ng-container>
+                </td>
+          </ng-container>
+          <ng-container matColumnDef="curr_intt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Interest </th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">
+                <ng-container *ngIf="row.above_3==9999">
+                    <div class="fontStyle">{{row.curr_intt | currency:"INR"}}</div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.above_3!=9999">
+                     <div>{{row.curr_intt | currency:"INR"}}</div> 
+                   </ng-container>
+                </td>
+          </ng-container>
+          <ng-container matColumnDef="ovd_intt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Overdue Interest </th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">
+                <ng-container *ngIf="row.above_3==9999">
+                    <div class="fontStyle">{{row.ovd_intt | currency:"INR"}}</div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.above_3!=9999">
+                     <div>{{row.ovd_intt | currency:"INR"}}</div> 
+                   </ng-container>
+                </td>
+          </ng-container>
+          <ng-container matColumnDef="penal_intt" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Penal Interest </th>
+            <td mat-cell *matCellDef="let row" style="text-align: center;">
+                <ng-container *ngIf="row.above_3==9999">
+                    <div class="fontStyle">{{row.penal_intt | currency:"INR"}}</div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.above_3!=9999">
+                     <div >{{row.penal_intt | currency:"INR"}}</div> 
+                   </ng-container>
+                </td>
+          </ng-container>
+          <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total </th>
+            <td mat-cell *matCellDef="let row" style="text-align: right;">
+                <ng-container *ngIf="row.above_3==9999">
+                    <div class="fontStyle"> {{row.ovd_intt+row.penal_intt+row.curr_intt+row.ovd_prn+row.curr_prn | currency:"INR"}}</div> 
+                   </ng-container>
+                   <ng-container *ngIf="row.above_3!=9999">
+                     <div > {{row.ovd_intt+row.penal_intt+row.curr_intt+row.ovd_prn+row.curr_prn | currency:"INR"}}</div> 
+                   </ng-container>
+                  </td>
+          </ng-container>
+          
+          <!-- Header column -->
+          <ng-container matColumnDef="Header">
+            <th mat-header-cell *matHeaderCellDef colspan="19">
+              <div class="justify-content-center" style="text-align:center">
+                <h4>{{ardbName}} {{branchName}}</h4>
+                <h4>Run Date & Time : {{today}} </h4>
+          <!-- <h6> <u> Near Maturity Details from {{reportcriteria.controls.fromDate.value?.toDateString()}} to {{ this.reportcriteria.controls.toDate.value?.toDateString()}}</u></h6> -->
+          <h4> <u>DCBR List from {{reportcriteria.controls.fromDate.value?.toDateString() | date:
+              'dd/MM/yyyy'}} to
+              {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+              </div>
+            </th>
+          </ng-container>
+         <!-- Footer column -->
+          <!-- <ng-container matColumnDef="Total">
+            <td mat-footer-cell *matFooterCellDef colspan="7" style="text-align: center; border-right:1 px solid rgb(172,170,170)!important;">
+              <b>Total</b>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Total0">
+            <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: center;border-right:1 px solid rgb(172,170,170)!important;">
+               <b>{{totOutstanding | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+          <ng-container matColumnDef="Total1">
+            <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: center;border-right:1 px solid rgb(172,170,170)!important;">
+               <b>{{currPrnSum | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="Total2">
+            <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: center;border-right:1 px solid rgb(172,170,170)!important;">
+               <b>{{ovdPrnSum | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="Total3">
+            <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: center;border-right:1 px solid rgb(172,170,170)!important;">
+               <b>{{currInttSum | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           
+           <ng-container matColumnDef="Total4">
+            <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: center;border-right:1 px solid rgb(172,170,170)!important;">
+               <b>{{ovdInttSum | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="Total5">
+            <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: center;border-right:1 px solid rgb(172,170,170)!important;">
+               <b>{{penalInttSum | currency:"INR"}}</b>
+            </td>
+           </ng-container>
+           <ng-container matColumnDef="Total6">
+            <td mat-footer-cell *matFooterCellDef colspan="" style="text-align: center;border-right:1 px solid rgb(172,170,170)!important;" >
+               <b>{{totalSum | currency:"INR"}}</b>
+            </td>
+           </ng-container> -->
+          <tr mat-header-row *matHeaderRowDef="['Header']"
+           class="example-second-header-row">
+          </tr>
+          <ng-container matColumnDef="header0" >
+            <td mat-header-cell *matHeaderCellDef  style="text-align:left;font-weight: 800;" colspan="10">
+             
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="header1" >
+            <td mat-header-cell *matHeaderCellDef style="text-align:center;font-weight: 600;border-left: 1px solid rgb(202, 199, 199);
+            border-top: 1px solid rgb(202, 199, 199);" colspan="9">
+              Demand
+            </td>
+          </ng-container>
+          <!-- <ng-container matColumnDef="header2" >
+            <td mat-header-cell *matHeaderCellDef style="text-align:center;font-weight: 600;border-left: 1px solid rgb(202, 199, 199);
+            border-top: 1px solid rgb(202, 199, 199);" >
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="header3" >
+            <td mat-header-cell *matHeaderCellDef style="text-align:center;font-weight: 600;border-left: 1px solid rgb(202, 199, 199);
+            border-top: 1px solid rgb(202, 199, 199);" colspan="3">
+             Principal Collection
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="header4" >
+            <td mat-header-cell *matHeaderCellDef style="text-align:center;font-weight: 600;border-left: 1px solid rgb(202, 199, 199);
+            border-top: 1px solid rgb(202, 199, 199);" colspan="3">
+            Interest Collection
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="header5" >
+            <td mat-header-cell *matHeaderCellDef style="text-align:center;font-weight: 600;border-left: 1px solid rgb(202, 199, 199);
+            border-top: 1px solid rgb(202, 199, 199);" >
+            </td>
+          </ng-container> -->
+        <tr mat-header-row *matHeaderRowDef="['header0','header1']"></tr>
+          
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <!-- <tr mat-footer-row *matFooterRowDef="['Total','Total0','Total1','Total2','Total3','Total4','Total5','Total6']" class="example-second-footer-row"></tr> -->
+          
+          <!-- Row shown when there is no matching data. -->
+          
+        </table>
+       
+        <footer>
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+          <small>
+          This report is generated through CFS-2022
+         </small></footer>
+      </div>
+ 
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+     
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true" printSectionId="mattable2"
+          ngxPrint 
+          [printStyle]="{ '@page': { size: 'landscape !important' } }"
+          >Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

@@ -1,0 +1,274 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+  <button type="button" 
+  class="btn btn-rounded btn-primary m-1" 
+  [useExistingCss]="true"
+  printSectionId="hiddenTab" 
+  ngxPrint>Print</button>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+ </div>
+</div>
+<div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+  <div class="justify-content-center" style="text-align:center">
+    <h4>{{ardbName}} {{branchName}}</h4>
+
+    <h4>Run Date & Time : {{today}} </h4> <br>
+    <h4> <u> Balance sheet as on  {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+ </div>
+ <!-- <pagination style="float:right;"
+ [totalItems]="reportData?.length"  
+ [itemsPerPage]="itemsPerPage"
+ [boundaryLinks]="true"
+ [directionLinks]="true"
+ [maxSize]="5"
+ [(ngModel)]="currentPage"
+ name="currentPage"
+ (pageChanged)="pageChanged($event)"
+ (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+
+ <div class="row" *ngIf="reportData">
+  <div class="column">
+   
+    <table id="trial">
+    <tr>
+      <th colspan="3">Liability</th>
+    </tr>
+        <tr>
+          <th>Acc CD</th>
+          <th>Account Name</th>
+          <th style="text-align:right">Balance</th>
+          <!-- <th>Type</th> -->
+        </tr>
+        <!-- <tbody *ngFor="let i of pagedItems; let itr=index;" > -->
+          <tbody *ngFor="let i of reportData; let itr=index;" >
+        <tr *ngIf="i.type=='Liability'">
+          <td>{{i.acc_cd}}</td>
+          <td>{{i.acc_name}}</td>
+          <td style="text-align:right">{{i.curr_bal | number : '1.2-2'}}</td>
+          
+          <!-- <td>{{i.type}}</td> -->
+        </tr>
+       
+        <tr *ngIf="i.type=='Liability' && i.acc_cd==lastLi">
+          <td colspan="2">Total:</td>
+          <td style="text-align:right; font-weight:800">{{opdrSum  | number : '1.2-2'}}</td>
+          <!-- <td style="text-align:left">{{i.curr_bal}}</td> -->
+          <!-- <td>{{i.type}}</td> -->
+       
+      </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="9"> <small>
+            This report is generated through Synergic Banking
+           </small> </td>
+        </tr>
+        
+       </tfoot>
+      
+    </table>
+  </div>
+  <div class="column">
+    <table id="trial">
+      <tr>
+        <th colspan="3">Asset</th>
+      </tr>
+      <tr>
+        <th>Acc CD</th>
+        <th>Account Name</th>
+        <th style="text-align:right">Balance</th>
+        <!-- <th>Type</th> -->
+      </tr>
+      <!-- <tbody *ngFor="let i of pagedItems; let itr=index;">  -->
+        <tbody *ngFor="let i of reportData; let itr=index;"> 
+      <tr *ngIf="i.type=='Asset'">
+        <td>{{i.acc_cd}}</td>
+        <td>{{i.acc_name}}</td>
+        <td style="text-align:right">{{i.curr_bal  | number : '1.2-2'}}</td>
+        <!-- <td>{{i.type}}</td> -->
+      </tr>
+      <tr *ngIf="i.type=='Asset' && i.acc_cd==lastAss">
+        <td colspan="2"> Total: </td>
+        <td style="text-align:right; font-weight:800">{{opdrSum  | number : '1.2-2'}}</td>
+        <!-- <td style="text-align:left">{{i.curr_bal}}</td> -->
+        <!-- <td>{{i.type}}</td> -->
+     
+    </tr>
+    </tbody>
+    
+    </table>
+  </div>
+</div>
+
+ 
+ <div hidden id="hiddenTab">
+  <div class="justify-content-center" style="text-align:center">
+    <h4>{{ardbName}} {{branchName}}</h4>
+
+    <h4>Run Date & Time : {{today}} </h4> <br>
+    <h4> <u> Balance sheet as on  {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+ </div>
+ <div class="row1">
+  <div class="column1">
+    <table id="trial1" class="mkSmall">
+    <thead>
+      <tr>
+        <th colspan="3">Liability</th>
+      </tr>
+      <tr>
+        <th>Acc CD</th>
+        <th>Account Name</th>
+        <th style="text-align:right">Balance</th>
+        <!-- <th>Type</th> -->
+      </tr>
+    </thead>
+        
+        <tbody *ngFor="let i of reportData">
+        <tr *ngIf="i.type=='Liability'">
+          <td>{{i.acc_cd}}</td>
+          <td>{{i.acc_name}}</td>
+          <td style="text-align:right">{{i.curr_bal  | number : '1.2-2'}}</td>
+          <!-- <td>{{i.type}}</td> -->
+        </tr>
+       
+          <tr *ngIf="i.type=='Liability' && i.acc_cd==lastLi">
+            <td colspan="2">Total:</td>
+            <td style="text-align:right; font-weight:800">{{opdrSum  | number : '1.2-2'}}</td>
+            <!-- <td style="text-align:left">{{i.curr_bal}}</td> -->
+            <!-- <td>{{i.type}}</td> -->
+         
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         </tr>
+       
+      </tfoot>
+    </table>
+  </div>
+  <div class="column1">
+    <table id="trial1" class="mkSmall">
+      <thead>
+        <tr>
+          <th colspan="3">Asset</th>
+        </tr>
+        <tr>
+          <th>Acc CD</th>
+          <th>Account Name</th>
+          <th style="text-align:right">Balance</th>
+          <!-- <th>Type</th> -->
+        </tr>
+      </thead>
+      
+      <tbody *ngFor="let i of reportData">
+      <tr *ngIf="i.type=='Asset'">
+        <td>{{i.acc_cd}}</td>
+        <td>{{i.acc_name}}</td>
+        <td style="text-align:right">{{i.curr_bal  | number : '1.2-2'}}</td>
+        <!-- <td>{{i.type}}</td> -->
+      </tr>
+      <tr *ngIf="i.type=='Asset' && i.acc_cd==lastAss">
+        <td colspan="2">Total:</td>
+        <td style="text-align:right; font-weight:800">{{opdrSum  | number : '1.2-2'}}</td>
+        <!-- <td style="text-align:left">{{i.curr_bal}}</td> -->
+        <!-- <td>{{i.type}}</td> -->
+     
+    </tr>
+    </tbody>
+   
+      <tfoot>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         </tr>
+       
+      </tfoot>
+   
+   
+    <!-- <tfoot>
+      <tr>
+        <td colspan="5" style="border:0px;">
+         <small>
+          This report is generated through Synergic Banking
+         </small> 
+        </td>
+      </tr>
+     
+    </tfoot> -->
+    </table>
+  
+  </div>
+</div>  <footer>
+  <small>
+    This report is generated through Synergic Banking
+   </small> 
+ </footer>
+  </div> 
+ <button hidden id="chngPage" (click)="setPage(1)"></button>
+
+<div>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+ <button type="button" 
+ class="btn btn-rounded btn-primary m-1" 
+ [useExistingCss]="true"
+ printSectionId="hiddenTab" 
+ ngxPrint>Print</button>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+</div>
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

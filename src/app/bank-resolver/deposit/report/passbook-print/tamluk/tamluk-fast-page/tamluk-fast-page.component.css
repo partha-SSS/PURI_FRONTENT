@@ -1,0 +1,28 @@
+@media print{
+    #fastPage{
+        page-break-after: avoid!important;
+        page-break-before: avoid!important;
+        font-size: 20px!important;
+        
+    }
+    #NPfastPage{
+        page-break-after: avoid!important;
+        page-break-before: avoid!important;
+        font-size:x-large!important;
+        
+    }
+    
+    #fastPage,b{font-weight: 600!important;font-size: 20px!important;}
+}
+#fastPage{
+    font-weight: 600!important;
+}b{
+    font-size: 20px!important;
+    
+}
+#NPfastPage{
+    font-weight: 600!important;
+}b{
+    font-size:large!important;
+    
+}

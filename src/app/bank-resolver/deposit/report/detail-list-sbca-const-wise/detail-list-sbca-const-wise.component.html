@@ -1,0 +1,218 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+        <div class="form-group col-12">
+          <label for="fromDate">As on</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+        <div class="form-group col-6">
+            <small for="acc_type_cd">Account Type</small>
+            <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+            (change)="onAccountTypeChange()">
+            <option *ngIf="AcctTypes" disabled>Choose</option>
+            <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+              {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+            </option>
+          <!--<option disabled>Choose</option>
+              <option [value]="2">2 - Fixed Deposit</option>
+              <option [value]="3">3 - DBS</option>
+              <option [value]="4">4 - Term Deposit</option>
+              <option [value]="5">5 - MIS</option> -->
+            </select>
+          </div>
+        <div class="form-group col-6">
+          <small for="constitution_cd">Constituion</small>
+          <select id="constitution_cd" class="form-control form-control-sm"
+          formControlName="constitution_cd" (change)="sendData()">
+            <option disabled>Choose</option>
+            <option *ngFor="let cc of constitutionListToBind" [value]="cc.constitution_cd">{{cc.constitution_cd +' - ' +cc.constitution_desc}}</option>
+          </select>
+        </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="trial111" 
+     ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadpdf()">Export as PDF</button>
+ 
+    
+    </div>
+    </div>
+  
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+  
+   
+   <mat-form-field appearance="outline">
+    <mat-label>Search Detail List</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+  </mat-form-field>
+  
+  <div class="mat-elevation-z8" id="trial111">
+    
+    <table mat-table [dataSource]="dataSource" matSort >
+      
+        <ng-container matColumnDef="slNo" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> # </th>
+            <td mat-cell *matCellDef="let row; let i=index;"> {{row.ardb_cd}} </td>
+          </ng-container>
+      <!-- Fruit Column -->
+      <ng-container matColumnDef="acc_num" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> A/c No. </th>
+        <td mat-cell *matCellDef="let row"> {{row.acc_num}}</td>
+      </ng-container>
+      <!-- Fruit Column -->
+      <ng-container matColumnDef="cust_name" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header >Name</th>
+        <td mat-cell *matCellDef="let row" >{{row.cust_name}}</td>
+      </ng-container>
+      
+      <!-- Progress Column -->
+      <ng-container matColumnDef="opening_dt" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Opening DT</th>
+        <td mat-cell *matCellDef="let row" > {{row.opening_dt.substr(0,10)}} </td>
+      </ng-container>
+      <!-- ID Column -->
+      <ng-container matColumnDef="bal" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Balance Amount</th>
+        <td mat-cell *matCellDef="let row">{{row.balance | number : '1.2-2'}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Header">
+        <th mat-header-cell *matHeaderCellDef colspan="12">
+          <div class="justify-content-center" style="text-align:center">
+            <br><h4>{{ardbName}} ({{branchName}})</h4>
+            
+            <h4>Run Date & Time : {{today}} </h4>
+            <h4> <u>  Detail List SB/CA - {{accType}} - Constitution Wise as on {{fromdate.toDateString()| date: 'dd/MM/yyyy'}}</u></h4>
+          </div>
+        </th>
+      </ng-container>
+     
+      
+      
+      <!-- Footer column -->
+      <!-- <ng-container matColumnDef="Total">
+        <td mat-footer-cell *matFooterCellDef colspan="3" style="text-align: right;">
+          <b>Overall Total Balance</b>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="Total1">
+        <td mat-footer-cell *matFooterCellDef colspan="5" style="text-align: center;">
+           <b>{{suminstL_AMT | currency:"INR"}}</b>
+        </td>
+       </ng-container> -->
+       
+        
+      <tr mat-header-row *matHeaderRowDef="['Header']"
+       class="example-second-header-row">
+      </tr>
+      
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <!-- <tr mat-footer-row *matFooterRowDef="['Total','Total1']" class="example-second-footer-row"></tr> -->
+      
+      <!-- Row shown when there is no matching data. -->
+      <tfoot>
+        <tr>
+         <td>&nbsp;</td>
+         <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+         </tr>
+       
+      </tfoot>
+    </table>
+  
+    <table>
+      <tr style="font-size: small;">
+        <td style="width: 76%;text-align: center;"><b >Overall Total Balance</b></td>
+        <td style="width: 4%!important;"  style="text-align: left;"><b>{{ suminstL_AMT | currency:"INR"}}</b></td>
+       
+      </tr>
+    </table>
+    
+    <footer><small>
+      This report is generated through CFS-2022
+     </small></footer>
+     
+    
+  </div>
+  <mat-paginator showFirstLastButtons [pageSizeOptions]="[500,1000,pageLength]" aria-label="Select page of users"></mat-paginator>
+  
+  
+   <!-- <pagination style="float:right;"
+  [totalItems]="reportData?.length"  
+  [itemsPerPage]="itemsPerPage"
+  [boundaryLinks]="true"
+  [directionLinks]="true"
+  [maxSize]="5"
+  [(ngModel)]="currentPage"
+  name="currentPage"
+  (pageChanged)="pageChanged($event)"
+  (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+   
+  
+  <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  </div>
+  
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="trial111" 
+   ngxPrint>Print</button>
+  
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

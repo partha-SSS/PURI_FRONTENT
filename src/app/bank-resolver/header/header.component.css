@@ -1,0 +1,139 @@
+a{
+  cursor: pointer!important;
+}
+a:hover{
+  text-decoration: none !important;
+}
+.header_class{background-color: #8ebd00; border:none; padding:5px 0; border-radius: 0; color: #044800; width: 100%; border-bottom: #044800 solid 1px;}
+ul.header_top{margin:0; padding:4px 15px; list-style-type: none;}
+ul.header_top li{display: inline-block;  margin-right: 15px; line-height:16px; color: #044800;}
+ul.header_top li.date{float: right; margin: 0;}
+.logo_sec_main{position: relative;}
+.logo_sec{padding:4px 15px 2px 15px;
+background: #044800;
+/*border-radius: 0 0 50px 50px;*/
+display: inline-block;
+box-shadow: 0 5px 4px -2px #d0cece;
+position: absolute;
+left: 15px;
+top: 0;}
+.logo_sec img{max-width: 60px; height: auto;}
+
+nav{font-family: 'Roboto', sans-serif; color: #fff!important;background-color: #044800 !important;
+font-size: small;
+}
+.navbarSectio{text-align: right; padding-top:3px;}
+.navbar-brand {padding: 7px 7px 7px 0; font-size: 13px; height: inherit;}
+.dropbtn {color:#fff; padding: 7px; font-size: 13px;}
+.dropdown-content{text-align:left;}
+
+.navigation{text-align: left;}
+.navigation ul{list-style-type:none;}
+.navigation ul li{display: inline-block; padding:7px 7px;}
+.navigation ul li:first-child{padding-left: 0;}
+.navigation ul li:last-child{padding-right: 0;}
+.navigation ul li a{color: #044800; font-size: 13px;}
+nav{font-family: 'Roboto', sans-serif;}
+.drpdwn-prnt{
+  font-size: 13px;
+}
+.dropdown-menu-right {
+  font-size: 13px;
+  position: absolute;
+  margin-right: -200px;
+  margin-top: -20%;
+  min-width: 200px!important;
+}
+.dropdown-divider{
+  height:0;
+  margin:0px !important;
+  overflow:hidden;
+  border-top:1px solid #e9ecef
+}
+.example-spacer {
+  flex: 1 1 auto;
+}
+mat-icon{
+  font-size:20px;
+  color: #e2f105!important;
+}
+.mat-menu-item{
+  line-height: 35px !important;
+    height: 35px !important;
+}
+.mat-menu-item>mat-icon{
+  color: #044800!important;
+}
+.mat-menu-item:hover{
+  background: #d9e446!important;
+  color: #044800;
+}
+span{
+  color: #044800;
+}
+.topBody{
+  
+  font-size: 15px !important;
+  border-top:1px solid #060707;
+}
+
+mat-icon.hm{
+  font-size: 13px;
+}
+mat-icon.lo{
+  font-size: 13px;
+}
+.vertical {
+  border-right: 1px solid rgb(255, 255, 255);
+  height: 20px;
+  position: absolute;
+  margin-top: 7px;
+}
+button:disabled,
+button[disabled]{
+  border: 1px solid #ffffff;
+  background-color: #dbdbd8;
+  color: #fffefe;
+}
+.btn{
+  color: white;
+  /* background-color: #aeeea6; */
+}
+span.mat-menu-item:hover:not([disabled]), .mat-menu-item.cdk-program-focused:not([disabled]), .mat-menu-item.cdk-keyboard-focused:not([disabled]), .mat-menu-item-highlighted:not([disabled]) {
+  background: #044800;
+  color: #044800;
+}
+/* span.mat-menu-item .mat-icon {
+  color: #044800;
+}
+span.mat-menu-item{
+  color: #044800;
+} */
+.myDivClass>span>mat-menu-item >mat-icon{
+  color: #044800;
+  height: 51px;
+  margin-left: 70px;
+  margin-top: 10px;
+
+}
+.myDivClass>span>mat-menu-item:hover:not([disabled]), .mat-menu-item.cdk-program-focused:not([disabled]), .mat-menu-item.cdk-keyboard-focused:not([disabled]), .mat-menu-item-highlighted:not([disabled]){
+  background: rgba(251, 255, 32, 0.671);
+  height: 72px;
+}
+.menu_item_style {
+    color: #044800; /* Change 'red' to your desired color */
+  }
+  .mat-button{
+    padding: 0 8px!important; 
+  }
+  .logos{
+      height: 60px;
+      /* top: 33px;
+      left: -11px; */
+  }
+
+  .btn:hover {
+    background:#adb447b6;
+    color: #044800;
+  }
+ 

@@ -1,0 +1,328 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-12">
+            <small for="fundType">Fund Type</small>
+            <select id="fundType" class="form-control form-control-sm" formControlName="fundType">
+              <option disabled>Choose</option>
+              <option value="O">Deposit Scheme Fund</option>
+              <option value="N">Borrowed Fund</option>
+  
+            </select>
+          </div>
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint>Print</button>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+      <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+        <h4>{{ardbName}} {{branchName}}</h4>
+  
+        <h4>Run Date & Time : {{today}} </h4> <br>
+        <h4> <u> Block-wise Demand List from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to
+            {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+        <!-- <p>
+          <b>
+            Loan Type : {{reportcriteria.controls.acc_type_cd.value}} {{loanNm}}</b>
+        </p> -->
+  
+      </div>
+  
+      <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+        [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+        (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination>
+      <table class="p-3" id="trial">
+        <!-- <tr *ngIf="reportData">
+          <th colspan="8"></th>
+          <th colspan="7" style="text-align: center;">Demand</th>
+        </tr> -->
+        <tr *ngIf="reportData">
+          <!-- <th></th> -->
+          <th>Block</th>
+          <th style="text-align:right">Outstanding Prn</th>
+          <th style="text-align:right">Curr Prn</th>
+          <th style="text-align:right">Ovd Prn</th>
+          <th style="text-align:right">Curr Intt</th>
+          <th style="text-align:right">Ovd Intt</th>
+          <!-- <th >UCIC</th> -->
+          <th style="text-align:right">Penal</th>
+          <!-- <th>Purpose</th> -->
+          <th style="text-align:right"> Total Prn</th>
+          <th style="text-align:right"> Total Intt</th>
+          <th style="text-align:right"> Total Demand</th>
+          
+          <!-- <th style="text-align:right">Intt Rt</th> -->
+        </tr>
+        <tbody *ngFor="let i of pagedItems; let itr=index;">
+          <tr>
+            <td>{{i.block_name}}</td>
+            <td style="text-align:right">{{i.outstanding_prn | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_prn | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_prn | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_intt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.ovd_intt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.penal_intt | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.curr_prn+i.ovd_prn| number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt  | number : '1.2-2'}}</td>
+            <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt+i.curr_prn+i.ovd_prn | number : '1.2-2'}} </td> 
+
+             
+  
+          </tr>
+          <tr *ngIf="i.block_name==lastBlock">
+            <td style="text-align:right;font-weight:700;">
+              Total:
+            </td>
+            <td style="text-align:right;font-weight:700;">{{totOut | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{totPrn | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{totIntt | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{totIntt + totPrn | number : '1.2-2'}}</td>
+          </tr>
+          <!-- <tr *ngIf="i.loan_id==lastLoanID">
+            <td colspan="8" style="text-align:right;font-weight:700;">
+              Total:
+            </td>
+            <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+            <td style="text-align:right;font-weight:700;">{{totalSum | number : '1.2-2'}}</td>
+          </tr> -->
+          <!-- <tr *ngIf="i.acc_num==lastAccNum">
+        <td colspan="5" style="text-align:right;font-weight:700;">Total</td>
+        <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+        <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+        <td style="text-align:right;font-weight:700;">{{totPrn | number : '1.2-2'}}</td>
+        <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+        <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+        <td style="text-align:right;font-weight:700;"></td>
+      </tr> -->
+  
+          <!-- <tr *ngIf="itr==reportData.length-1">
+        <td  colspan="2" style="text-align:right;font-weight:800">Total</td>
+        <td  style="text-align:right;font-weight:800">{{clrSum | number : '1.2-2'}}</td>
+        <td  style="text-align:right;font-weight:800">{{currSum | number : '1.2-2'}}</td>
+        <td  style="text-align:right;font-weight:800">{{prnSum | number : '1.2-2'}}</td>
+        <td  style="text-align:right;font-weight:800">{{penalSum | number : '1.2-2'}}</td>
+        <td  colspan="3" style="text-align:right;font-weight:800"></td>
+        <td  style="text-align:right;font-weight:800">{{inttSum | number : '1.2-2'}}</td>
+        <td  style="text-align:right;font-weight:800"></td>
+    
+         <td  style="text-align:right;font-weight:800"></td> 
+       </tr> -->
+  
+  
+  
+        </tbody>
+        <tfoot style="text-align:left">
+          <tr>
+            <td colspan="9"> <small>
+              This report is generated through CFS-2022
+             </small> </td>
+          </tr> </tfoot>
+      </table>
+      <div hidden id="hiddenTab">
+        <div class="justify-content-center" style="text-align:center">
+          <h4>{{ardbName}} {{branchName}}</h4>
+  
+          <h4>Run Date & Time : {{today}} </h4> <br>
+          <!-- <h6> <u> Near Maturity Details from {{reportcriteria.controls.fromDate.value?.toDateString()}} to {{ this.reportcriteria.controls.toDate.value?.toDateString()}}</u></h6> -->
+          <h4> <u> Block-wise Demand List from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to
+              {{reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+          <!-- <p>
+          <b>
+            Loan Type : {{reportcriteria.controls.acc_type_cd.value}} {{loanNm}}</b>
+        </p> -->
+  
+  
+        </div>
+        <table class="p-3" id="trial1" class="mkSmall">
+          <thead>
+            <!-- <tr *ngIf="reportData">
+              <th colspan="8"></th>
+              <th colspan="7" style="text-align: center;"> Demand</th>
+            </tr> -->
+            <tr *ngIf="reportData">
+              <!-- <th></th> -->
+              <th>Block</th>
+             <th style="text-align:right">Outstanding Prn</th>
+              <th style="text-align:right">Curr Prn</th>
+              <th style="text-align:right">Ovd Prn</th>
+              <th style="text-align:right">Curr Intt</th>
+              <th style="text-align:right">Ovd Intt</th>
+              <!-- <th >UCIC</th> -->
+              <th style="text-align:right">Penal</th>
+              <!-- <th>Purpose</th> -->
+              <th style="text-align:right"> Total Prn</th>
+              <th style="text-align:right"> Total Intt</th>
+              <th style="text-align:right"> Total Demand</th>
+              <!-- <th style="text-align:right">Intt Rt</th> -->
+            </tr>
+          </thead>
+  
+  
+          <tbody *ngFor="let i of reportData let itr=index;">
+            <tr>
+              <td>{{i.block_name}}</td>
+              <td style="text-align:right">{{i.outstanding_prn | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_prn | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_prn | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_intt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.ovd_intt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.penal_intt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.curr_prn+i.ovd_prn| number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt | number : '1.2-2'}}</td>
+              <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt+i.curr_prn+i.ovd_prn | number : '1.2-2'}} </td> 
+               
+    
+            </tr>
+            <tr *ngIf="i.block_name==lastBlock">
+              <td style="text-align:right;font-weight:700;">
+                Total:
+              </td>
+              <td style="text-align:right;font-weight:700;">{{totOut | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{totPrn | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{totIntt | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{totIntt + totPrn | number : '1.2-2'}}</td>
+            </tr>
+            <!-- <tr *ngIf="i.loan_id==lastLoanID">
+              <td colspan="8" style="text-align:right;font-weight:700;">
+                Total:
+              </td>
+              <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{penalInttSum | number : '1.2-2'}}</td>
+              <td style="text-align:right;font-weight:700;">{{totalSum | number : '1.2-2'}}</td>
+            </tr> -->
+            <!-- <tr *ngIf="i.acc_num==lastAccNum">
+          <td colspan="5" style="text-align:right;font-weight:700;">Total</td>
+          <td style="text-align:right;font-weight:700;">{{currPrnSum | number : '1.2-2'}}</td>
+          <td style="text-align:right;font-weight:700;">{{ovdPrnSum | number : '1.2-2'}}</td>
+          <td style="text-align:right;font-weight:700;">{{totPrn | number : '1.2-2'}}</td>
+          <td style="text-align:right;font-weight:700;">{{currInttSum | number : '1.2-2'}}</td>
+          <td style="text-align:right;font-weight:700;">{{ovdInttSum | number : '1.2-2'}}</td>
+          <td style="text-align:right;font-weight:700;"></td>
+        </tr> -->
+    
+            <!-- <tr *ngIf="itr==reportData.length-1">
+          <td  colspan="2" style="text-align:right;font-weight:800">Total</td>
+          <td  style="text-align:right;font-weight:800">{{clrSum | number : '1.2-2'}}</td>
+          <td  style="text-align:right;font-weight:800">{{currSum | number : '1.2-2'}}</td>
+          <td  style="text-align:right;font-weight:800">{{prnSum | number : '1.2-2'}}</td>
+          <td  style="text-align:right;font-weight:800">{{penalSum | number : '1.2-2'}}</td>
+          <td  colspan="3" style="text-align:right;font-weight:800"></td>
+          <td  style="text-align:right;font-weight:800">{{inttSum | number : '1.2-2'}}</td>
+          <td  style="text-align:right;font-weight:800"></td>
+      
+           <td  style="text-align:right;font-weight:800"></td> 
+         </tr> -->
+    
+    
+    
+          </tbody>
+          <tfoot>
+            <tr>
+             <td>&nbsp;</td>
+             <td>&nbsp;</td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+             </tr>
+           
+          </tfoot>
+        </table>
+        <footer>
+          <small>
+            This report is generated through CFS-2022
+           </small> 
+         </footer>
+        <!-- <br><br><br><br>
+    <small>This report is generated through CFS-2022</small> -->
+      </div>
+      <button hidden id="chngPage" (click)="setPage(1)"></button>
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint>Print</button>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+      </div>
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

@@ -1,0 +1,157 @@
+<loading *ngIf="isLoading"></loading>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isRetrieve" [hidden]="userType!=='A'" (click)="retrieve()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isNew"  [hidden]="userType!=='A'" (click)="new()">New</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isSave" [hidden]="userType!=='A'" (click)="saveuser()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isModify" (click)="updateuser()">Update</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isClear" (click)="clearuser()">Clear</button> -->
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isDel" (click)="deleteuser()">Delete</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+    <div class="row" [hidden]="!selected_user">
+      <div class="form-group col-3"  [formGroup]="get_user">
+      <small >Select User<span class="text-danger">*</span></small>
+      <select name="select_user"class="form-control form-control-sm" [disabled]="userType!=='A'" formControlName="select_user">
+              <option disabled selected>Select User</option>
+              
+            <option *ngFor="let title of selectalluser" [value]="title.user_id">{{title.user_id}}</option>
+      </select>
+      </div>
+      <div class="form-group col-3" style="margin-top:18px;">
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm"  (click)="getallUser()">Get User</button>
+      </div>
+    </div>
+  
+  </div>
+</div>
+ <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3"> 
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="card" [hidden]="getUserDtl">
+  <form [formGroup]="upd_s_User" style="margin-left:15px; margin-top:10px;" autocomplete="chrome-off" >
+    <h4>User Information for: <u>{{getusername}}</u></h4>
+    <div class="form-row" style="text-align:center;">
+      <div class="form-group col-3">
+        <small for="utype">User Type</small>
+        <select name="utype"class="form-control form-control-sm"  formControlName="utype">
+                <option disabled selected>Select User</option>
+                <option value="S">Super User</option>
+                <option value="G">General User</option>
+                <option value="D">Discard User</option>
+                <option value="A">Admin User</option>
+                <option value="L">Loan User</option>
+                <option value="P">Deposit User</option>
+        </select>
+      </div>
+      <div class="form-group col-6">
+          <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" style="margin-top:20px;" (click)="defPass()">Change Password as a Default</button>
+      </div>
+      <div class="form-group col-3">
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" style="margin-top:20px;" (click)="update_user_dtl()">Update User</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen2()" style="margin-top:20px;">Close</button>
+      </div>
+    </div>
+  </form>
+  </div>
+  <br>
+  <form [formGroup]="addUser" autocomplete="chrome-off" >
+    <div class="form-row" style="text-align:center;">
+       <h4>Personal Information:</h4>
+       <div id="error-message" style="color: red;"></div>
+       <h4 *ngIf="f.cpassword.errors?.confirmedValidator" class="text-danger">Password and Confirm Password must be match.</h4>
+    </div>
+    <div class="form-row">
+      <div class="form-group  col-3">
+        <small for="userid">User Id<span class="text-danger">*</span></small>
+        <input type="text" class="form-control form-control-sm " [disabled]="userType!='A'" formControlName="userid" id="userid">
+      </div>
+      <div class="form-group col-2">
+        <small for="branch">Branch<span class="text-danger">*</span></small>
+        <select id="branch" class="form-control form-control-sm" [disabled]="userType!='A'" formControlName="branch">
+        <option>Select an Option</option>
+        <option *ngFor="let options of brnDtls" [value]="options.brn_cd" >{{ options.brn_name }}</option>
+        </select>
+      </div>
+        <div class="form-group  col-2">
+            <small for="password">Password<span class="text-danger">*</span></small>
+            <div class="input-group">
+              <input [type]="show_button ? 'text' : 'password'" (keyup)="passCheck($event)" class="form-control form-control-sm " formControlName="password" id="password"> 
+              <div class="input-group-append">
+               <button type="button" class=" btn btn-primary btn-sm" (click)="showPassword()">
+                <i [class]="show_eye ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
+               </button> 
+
+              </div>
+            
+            </div>
+            <small [hidden]="pass" (click)="showCpass()"><u class="cpass">Change Your Password?</u></small>
+        </div>
+          <div class="form-group  col-2" *ngIf="showCpassword" >
+            <small for="cPassword">Confirm Password<span class="text-danger">*</span></small>
+            <input type="password" class="form-control form-control-sm " formControlName="cpassword" id="cPassword">
+            <small [hidden]="cpass" (click)="hideCpass()"><u class="cpass">Don't Change Now</u></small>
+          </div>
+                  
+          <div class="form-group col-2">
+            <small for="utype">User Type<span class="text-danger">*</span></small>
+            <select name="utype"class="form-control form-control-sm" [disabled]="userType!=='A'" formControlName="utype">
+                    <option disabled selected>Select User</option>
+                    <option value="S">Super User</option>
+                    <option value="G">General User</option>
+                    <option value="D">Discard User</option>
+                    <option value="A">Admin</option>
+                    <option value="L">Loan User</option>
+                    <option value="P">Deposit User</option>
+                  </select>
+          </div>
+         
+    </div>
+    <div class="form-row">
+      <div class="form-group col-3">
+        <small for="fname">First Name<span class="text-danger">*</span></small>
+        <input type="text" class="form-control form-control-sm " [disabled]="userType!=='A'" formControlName="fname" id="fname">
+      </div>
+
+          <div class="form-group col-3">
+            <small for="mname">Middle Name</small>
+            <input type="text" class="form-control form-control-sm " [disabled]="userType!=='A'" formControlName="mname" id="mname">
+          </div>
+          <div class="form-group col-3">
+            <small for="lname">Last Name<span class="text-danger">*</span></small>
+            <input type="text" class="form-control form-control-sm " [disabled]="userType!=='A'" formControlName="lname" id="lname">
+          </div>
+          <!-- <div class="form-group col-3" style="text-align:center;">
+            <mat-slide-toggle formControlName="loginStatus" [(ngModel)]="loginStatus" style="padding-left:15px;">Login Status: {{loginStatus}}</mat-slide-toggle>
+           
+            <br>
+            <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="updateLoginStatus()" style="position: absolute;right: 10px;">Update Login Status</button>
+          </div> -->
+         </div>
+        
+        </form>
+        
+</div>
+<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isRetrieve" [hidden]="userType!=='A'" (click)="retrieve()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isNew" [hidden]="userType!=='A'" (click)="new()">New</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isSave"  [hidden]="userType!=='A'" (click)="saveuser()">Save</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isModify" (click)="updateuser()">Update</button>
+    <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isClear" (click)="clearuser()">Clear</button> -->
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" [disabled]="!isDel" (click)="deleteuser()">Delete</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary btn-primary-spacing btn-sm" (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+  </div>
+</div>
+  </div>
+  
+ 
