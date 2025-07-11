@@ -30,7 +30,7 @@
               <option [value]="9">9 - Loan Suspense</option> -->
             </select>
           </div>
-          <div class="form-group col-12" *ngIf="reportcriteria.controls.acc_type_cd.value=='7'|| reportcriteria.controls.acc_type_cd.value=='1'|| reportcriteria.controls.acc_type_cd.value=='8'|| reportcriteria.controls.acc_type_cd.value=='10'">
+          <div class="form-group col-12" *ngIf="reportcriteria.controls.acc_type_cd.value=='7'||reportcriteria.controls.acc_type_cd.value=='8'||reportcriteria.controls.acc_type_cd.value=='1'||reportcriteria.controls.acc_type_cd.value=='11'||reportcriteria.controls.acc_type_cd.value=='12'||reportcriteria.controls.acc_type_cd.value=='13'">
             <small for="constitution_cd">Constituion</small>
             <select id="constitution_cd" class="form-control form-control-sm"
             formControlName="constitution_cd" (change)="sendData()">
@@ -94,7 +94,7 @@
   
   
   
-  <div class="mat-elevation-z8" id="trial777" *ngIf="(reportcriteria.controls.acc_type_cd.value=='7'||reportcriteria.controls.acc_type_cd.value=='8'||reportcriteria.controls.acc_type_cd.value=='1'||reportcriteria.controls.acc_type_cd.value=='10') && reportcriteria.controls.constitution_cd.value!='0'">
+  <div class="mat-elevation-z8" id="trial777" *ngIf="(reportcriteria.controls.acc_type_cd.value=='7'||reportcriteria.controls.acc_type_cd.value=='8'||reportcriteria.controls.acc_type_cd.value=='1'||reportcriteria.controls.acc_type_cd.value=='11'||reportcriteria.controls.acc_type_cd.value=='12'||reportcriteria.controls.acc_type_cd.value=='13') && reportcriteria.controls.constitution_cd.value!='0'">
       
     <table mat-table [dataSource]="dataSource2" matSort >
       

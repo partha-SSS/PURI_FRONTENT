@@ -95,7 +95,8 @@ export class DetailListFdmisConstWiseComponent implements OnInit,AfterViewInit {
       acc_type_cd: [null, Validators.required],
       constitution_cd: [{ disabled: true }, Validators.required]
     });
-    this.getOperationMaster()
+    // this.getOperationMaster()
+    this.getAccountTypeList();
     this.onLoadScreen(this.content);
     var date = new Date();
     // get the date as a string
@@ -104,6 +105,20 @@ export class DetailListFdmisConstWiseComponent implements OnInit,AfterViewInit {
        var time = date.toLocaleTimeString();
        this.today= n + " "+ time
        this.getConstitutionList();
+  }
+   getAccountTypeList() {
+    
+    this.AcctTypes = [];
+
+    this.svc.addUpdDel<any>('Mst/GetAccountTypeMaster', null).subscribe(
+      res => {
+
+        this.AcctTypes = res;
+        this.AcctTypes = this.AcctTypes.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
+        this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==2 || e.acc_type_cd==3||e.acc_type_cd==4||e.acc_type_cd==5||e.acc_type_cd==10||e.acc_type_cd==14||e.acc_type_cd==16)
+        
+       
+      });
   }
   private getOperationMaster(): void {
     console.log(DetailListFdmisConstWiseComponent.operations);
@@ -129,7 +144,7 @@ export class DetailListFdmisConstWiseComponent implements OnInit,AfterViewInit {
               return arr.indexOf(arr.find(t => t.acc_type_cd === thing.acc_type_cd)) === i;
             });
           this.AcctTypes = this.AcctTypes.sort((a, b) => (a.acc_type_cd > b.acc_type_cd ? 1 : -1));
-          this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==2 || e.acc_type_cd==3||e.acc_type_cd==4||e.acc_type_cd==5)
+          this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==2 || e.acc_type_cd==3||e.acc_type_cd==4||e.acc_type_cd==5||e.acc_type_cd==10||e.acc_type_cd==14||e.acc_type_cd==16)
         },
         err => { this.isLoading = false; }
       );
@@ -183,6 +198,13 @@ export class DetailListFdmisConstWiseComponent implements OnInit,AfterViewInit {
           this.comSer.SnackBar_Nodata()
           this.isLoading=false
         } 
+        else{
+          for(let i=0;i<this.reportData.length;i++){
+            // this.reportData[i].ardb_cd=i+1;
+           this.reportData[i].opening_dt=this.comSer.getFormatedDate(this.reportData[i].opening_dt);
+           this.reportData[i].mat_dt=this.comSer.getFormatedDate(this.reportData[i].mat_dt);
+           }
+        }
         this.pageLength=this.reportData.length
         this.dataSource.data=this.reportData
         if(this.reportData.length<50){
@@ -227,7 +249,10 @@ export class DetailListFdmisConstWiseComponent implements OnInit,AfterViewInit {
   }
   sendData(){
     console.log(this.accType)
-    this.accType=this.reportcriteria.controls.acc_type_cd.value == '2'?'Fixed Deposit':(this.reportcriteria.controls.acc_type_cd.value == '3'?'DBS':this.reportcriteria.controls.acc_type_cd.value == '4'?'Term Deposit':'MIS')
+    this.accType=''
+    this.accType=this.AcctTypes.filter(e=>e.acc_type_cd==(this.reportcriteria.controls.acc_type_cd.value.toString()))[0]?.acc_type_desc
+   
+    // this.accType=this.reportcriteria.controls.acc_type_cd.value == '2'?'Fixed Deposit':(this.reportcriteria.controls.acc_type_cd.value == '3'?'DBS':this.reportcriteria.controls.acc_type_cd.value == '4'?'Term Deposit':'MIS')
   //  this.ConstType=this.constitutionListToBind.filter(x=>x.constitution_cd=this.reportcriteria.controls.constitution_cd.value)
   //  this.selectConstType=this.ConstType.constitution_desc
   //  this.selectAccType=this.accType;

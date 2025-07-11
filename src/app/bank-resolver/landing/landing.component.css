@@ -614,15 +614,14 @@
   }
   h1 {
     padding-top: 10px;
+    font-family: monospace;
     margin-left: 100px;
-    font-size: xx-large;
-    /* color: #090cc4; */
+    font-size: xxx-large;
     font-weight: 900;
-    background-image: -webkit-linear-gradient(60deg,#ffffff,#ffffff,#ffffff,#ffffff,#ffffff,hsl(0, 0%, 100%));
-    -webkit-background-clip:text;
-    -webkit-text-fill-color: transparent;
+    background-image: -webkit-linear-gradient(60deg, #fa1818, #a70000, #8a0606, #a31f1f, #a70202, hsl(0deg 71.64% 35.17%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #044800;
     -webkit-animation: hue 5s infinite linear;
-    /* transition: rgb(128, 4, 4) 20ms ease-in-out; */
 }
 
 @-webkit-keyframes hue {

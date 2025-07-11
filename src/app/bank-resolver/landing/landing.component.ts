@@ -44,7 +44,7 @@ export class LandingComponent implements OnInit {
   ngOnInit(): void {
     this.ardbName=localStorage.getItem('ardb_name');
     this.brnName=localStorage.getItem('__brnName');
-    this.marqueeText = `${this.ardbName}, Branch: ${this.brnName} `;
+    this.marqueeText = `${this.ardbName} (${this.brnName})`;
     this.comsv.accOpen=false
     this.comsv.accClose=false
     this.comsv.loanDis=false

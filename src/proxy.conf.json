@@ -1,8 +1,8 @@
 {
-    "/sms-api": {
-      "target": "http://sms.digilexa.in/http-api.php",  
-      "secure": false,
-      "changeOrigin": true,
-      "logLevel": "debug"
-    }
+     "/morfinauth": {
+    "target": "http://localhost:8030",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
   }

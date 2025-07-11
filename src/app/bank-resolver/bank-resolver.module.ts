@@ -23,7 +23,7 @@ import { GenLedger2Component } from './finance/report/gen-ledger2/gen-ledger2.co
 import { TransactionapprovalComponent } from './deposit/transactionapproval/transactionapproval.component';
 import { AccOpeningComponent } from './deposit/acc-opening/acc-opening.component';
 import { CustomerInfoComponent } from './Common/customer-info/customer-info.component';
-import { TestComponent } from './test/test.component';
+import { DenominationComponent } from './test/denomination.component';
 import { VoucherComponent } from './finance/voucher/voucher.component';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { AccountDetailsComponent } from './Common/account-details/account-details.component';
@@ -289,6 +289,10 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { YearlyProvisionPostingComponent } from './finance/yearly-provision-posting/yearly-provision-posting.component';
 import { AssetsManagementComponent } from './assets-management/assets-management.component';
 import { CalDepPostComponent } from './assets-management/cal-dep-post/cal-dep-post.component';
+import { AndroidPostingComponent } from './deposit/ddsExportImport/android-posting/android-posting.component';
+import { ConsoDtlListSbcaComponent } from './deposit/report/conso-dtl-list-sbca/conso-dtl-list-sbca.component';
+import { ConsoDtlListRdComponent } from './deposit/report/conso-dtl-list-rd/conso-dtl-list-rd.component';
+import { ConsoDtlListFdMisComponent } from './deposit/report/conso-dtl-list-fd-mis/conso-dtl-list-fd-mis.component';
 
 @NgModule({
   declarations: [  AbsPipe,
@@ -299,8 +303,8 @@ import { CalDepPostComponent } from './assets-management/cal-dep-post/cal-dep-po
     TrialbalanceComponent, CashcumtrialComponent, GenLedgerComponent,Cashaccount2Component,
     VoucherprintComponent, AccountDetailsComponent, TransactionDetailsComponent,
     GenLedger2Component, TransactionapprovalComponent, AccOpeningComponent,
-    CustomerInfoComponent, VoucherComponent, TestComponent,ConsoleCashaccount2Component,
-    ScrollbookComponent, DwRdInstlViewComponent, DwTdInttDtlsViewComponent,
+    CustomerInfoComponent, VoucherComponent, DenominationComponent,ConsoleCashaccount2Component,ConsoDtlListFdMisComponent,
+    ScrollbookComponent, DwRdInstlViewComponent, DwTdInttDtlsViewComponent,ConsoDtlListSbcaComponent,ConsoDtlListRdComponent,
     DwRenewalViewComponent, AccounTransactionsComponent, AccountDetailsForAcctTransComponent,
     VoucherapprovalComponent, DayinitializationComponent, DaycomplitionComponent,
     AdduserComponent, KycComponent, MemberListComponent, OpenLoanAccountComponent,
@@ -321,7 +325,7 @@ import { CalDepPostComponent } from './assets-management/cal-dep-post/cal-dep-po
       ActwiseLstComponent, BlockwiseLstComponent, BlockWiseColLstComponent, ActWiseColLstComponent, 
       AdRecStmtComponent, IntRecStmtComponent, LoanDisburseNormalComponent, RecovNormalComponent, 
       OpenCloseregComponent, DetailDDSComponent, DdsAccStmtComponent, NpaComponent, 
-      YearlyadjustmentvoucherComponent, BlockMasterComponent, VillageMasterComponent, 
+      YearlyadjustmentvoucherComponent, BlockMasterComponent, VillageMasterComponent, AndroidPostingComponent,
       ServiceareamasterComponent, DemandNoticeComponent, OverdueNoticeComponent, OverdueTransferComponent, 
       RecovFundComponent, ConsolidatedCashAccComponent, ConsolidatedDayBookComponent, ConsoProfitAndLossNewComponent,
       ConsolidatedCashCumTrialComponent, ConsolidatedTrialBalanceComponent, ProfitAndLossNewComponent,

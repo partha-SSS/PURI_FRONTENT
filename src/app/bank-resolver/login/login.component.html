@@ -138,24 +138,7 @@
 <loading *ngIf="isLoading"></loading>
 
 <!-- Modal HTML -->
-<div id="myModal" class="modal fade">
-	<div class="modal-dialog modal-confirm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<div class="icon-box">
-					<i class="material-icons">&#xE876;</i>
-				</div>
-				<h4 class="modal-title w-100">Awesome!</h4>
-			</div>
-			<div class="modal-body">
-				<p class="text-center">Your booking has been confirmed. Check your email for detials.</p>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
-			</div>
-		</div>
-	</div>
-</div>
+
 
 
 
@@ -170,18 +153,72 @@
       <div class="inner-content">
         <h1 class="text-center mb-4">Log In</h1>
 
-        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>Error!</strong> {{alertMsg}}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
+       <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
+    </div>
 
         <div class="alert alert-danger" role="alert" *ngIf="isError">
           Invalid email or password, try again or register
         </div>
-
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-group">
+          
+          <!-- Username Input -->
+          <input
+            type="text"
+            id="username"
+            class="form__input"
+            formControlName="username"
+            placeholder="Username"
+            (focusout)="onfocusOut($event)"
+            required
+          />
+
+            <!-- (input)="onUsernameChange() -->
+          <!-- Password or Fingerprint -->
+          <ng-container *ngIf="!showFingerprint">
+            <input
+              type="password"
+              id="password"
+              class="form__input"
+              formControlName="password"
+              placeholder="Password"
+              required
+            />
+          </ng-container>
+
+
+          <!-- Branch Dropdown -->
+          <select
+            id="branch"
+            class="form__input"
+            formControlName="branch"
+            [disabled]="brnDtls.length > 0"
+          >
+            <option value="">Select A Branch</option>
+            <option *ngFor="let option of brnDtls" [value]="option.brn_cd">
+              {{ option.brn_cd }} - {{ option.brn_name }}
+            </option>
+          </select><br>
+        <div class="fingerprint-container" *ngIf="showFingerprint">
+            <div class="finger-circle">
+              <ng-container [ngSwitch]="fingerprintStatus">
+                <span *ngSwitchCase="'idle'" class="material-icons fingerprint-icon idle-icon">fingerprint</span>
+                <div *ngSwitchCase="'scanning'" class="spinner"></div>
+                <span *ngSwitchCase="'success'" class="material-icons success-icon animate-pop">check_circle</span>
+                <span *ngSwitchCase="'error'" class="material-icons error-icon animate-pop">cancel</span>
+              </ng-container>
+            </div>
+
+            <button class="btn-fingerprint" (click)="startFingerprintScan()">Scan Fingerprint</button>
+          </div>
+          <!-- Submit Button -->
+          <button type="submit" class="btn w-100 mt-3" [hidden]="showFingerprint">
+            Login
+          </button>
+        </form>
+
+        <!-- <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-group">
           <input type="text" name="username" id="username" class="form__input" formControlName="username" placeholder="Username" (focusout)="onfocusOut($event)">
           <input type="password" name="password" id="password" class="form__input" formControlName="password" placeholder="Password">
 
@@ -193,7 +230,7 @@
           </select>
 
           <input type="submit" value="Submit" class="btn w-100">
-        </form>
+        </form> -->
       </div>
     </div>
   </div>

@@ -133,7 +133,7 @@ export class DetailListSBCAComponent implements OnInit,AfterViewInit {
               return arr.indexOf(arr.find(t => t.acc_type_cd === thing.acc_type_cd)) === i;
             });
           this.AcctTypes = this.AcctTypes.sort((a, b) => (a.acc_type_cd > b.acc_type_cd ? 1 : -1));
-          this.AcctTypes =this.AcctTypes.filter(e=>e.trans_way==1 || e.acc_type_cd==8||e.acc_type_cd==7||e.acc_type_cd==9||e.acc_type_cd==10)
+          this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==1 || e.acc_type_cd==8||e.acc_type_cd==7||e.acc_type_cd==11||e.acc_type_cd==12||e.acc_type_cd==13)
         },
         err => { this.isLoading = false; }
       );
@@ -222,11 +222,24 @@ export class DetailListSBCAComponent implements OnInit,AfterViewInit {
       this.printedId=(this.reportcriteria.controls.acc_type_cd.value=="7" && this.reportcriteria.controls.constitution_cd.value!='0')||
       (this.reportcriteria.controls.acc_type_cd.value=="1"  && this.reportcriteria.controls.constitution_cd.value!='0')||
       (this.reportcriteria.controls.acc_type_cd.value=="10"  && this.reportcriteria.controls.constitution_cd.value!='0')||
+      (this.reportcriteria.controls.acc_type_cd.value=="11"  && this.reportcriteria.controls.constitution_cd.value!='0')||
+      (this.reportcriteria.controls.acc_type_cd.value=="12"  && this.reportcriteria.controls.constitution_cd.value!='0')||
+      (this.reportcriteria.controls.acc_type_cd.value=="13"  && this.reportcriteria.controls.constitution_cd.value!='0')||
       (this.reportcriteria.controls.acc_type_cd.value=="8"  && this.reportcriteria.controls.constitution_cd.value!='0') ?"trial777":"trial111"
       this.svc.addUpdDel('Deposit/PopulateDLSavingsAll',dt).subscribe(data=>{
         this.sendData()
         console.log(data)
-        this.reportData=data
+        this.reportData=data;
+         for(let i=0;i<this.reportData.length;i++){
+          // this.totprnamt+=this.reportData[i].constype.tot_cons_balance;
+          // this.allconscount+=this.reportData[i].constype.tot_cons_count;
+          // this.totprovIntt+=this.reportData[i].constype.tot_cons_intt_balance;
+          for(let j=0;j<this.reportData[i].ttsbcadtllist.length;j++){
+            this.reportData[i].ttsbcadtllist[j].opening_dt=this.comSer.getFormatedDate(this.reportData[i].ttsbcadtllist[j].opening_dt);
+            // this.reportData[i].ttsbcadtllist[j].mat_dt=this.comSer.getFormatedDate(this.reportData[i].ttsbcadtllist[j].mat_dt);
+            
+          }
+        }
         if(!this.reportData){
           this.comSer.SnackBar_Nodata()
           this.isLoading=false

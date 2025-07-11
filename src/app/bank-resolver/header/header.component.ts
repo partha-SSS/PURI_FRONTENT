@@ -274,6 +274,7 @@ matmenuTrg:any=[];
     this.showScreenTitle = false;
   }
   confirm(): void {
+    this.isLoading=true;
     this.modalRef?.hide();
     this.logout();
   }

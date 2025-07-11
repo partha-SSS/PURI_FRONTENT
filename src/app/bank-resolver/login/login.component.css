@@ -13,8 +13,8 @@
     overflow: hidden;
     width: 100%;
     max-width: 960px;
-    display: flex
-;
+    display: flex;
+    opacity: 80%;
     flex-wrap: wrap;
     z-index: 1;
 
@@ -53,19 +53,19 @@
   width: 100%;
   padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
-  border: 1px solid #8ebd00;
+  border: 1px solid #e2d51b;
   border-radius: 6px;
   transition: border-color 0.3s ease;
 }
 
 .form__input:focus {
-  border-color: #8ebd00;
+  border-color: #e2d51b;
   box-shadow: 0 0 5px rgb(142 189 0);
   outline: none;
 }
 
 .btn {
-  background-color: #8ebd00;
+  background-color: #e2d51b;
   color: #044800;
   border: 1px solid #044800;
   font-weight: bold;
@@ -76,7 +76,7 @@
 
 .btn:hover {
   background-color: #044800;
-  color: #8ebd00;
+  color: #e2d51b;
 }
 
 /* Responsive adjustments */
@@ -102,17 +102,103 @@
   /* animation: rotateLogo 4s linear infinite; */
   /* transition: transform 0.3s ease; */
   object-fit: cover;
+  
 }
 
 /* Animation keyframes */
-@keyframes rotateLogo {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+
+
+
+.fingerprint-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  max-width: 300px;
+  margin: auto;
+  transition: all 0.3s ease;
 }
-.logo-animated:hover {
-  /* animation-play-state: paused; */
+
+.finger-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #dcf54d;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.fingerprint-icon,
+.success-icon,
+.error-icon {
+  font-size: 60px;
+  transition: transform 0.3s ease;
+}
+
+.idle-icon {
+  color: #444;
+  opacity: 0.6;
+}
+
+.success-icon {
+  color: #28a745;
+  animation: pulse-green 0.6s ease-in-out forwards;
+}
+
+.error-icon {
+  color: #dc3545;
+  animation: pulse-red 0.6s ease-in-out forwards;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(0, 128, 0, 0.2);
+  border-top: 4px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.btn-fingerprint {
+  background: linear-gradient(135deg, #0a6c26, #088d3e);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 128, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-fingerprint:hover {
+  background: linear-gradient(135deg, #05531b, #066c2f);
+  box-shadow: 0 6px 15px rgba(0, 128, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes pulse-green {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

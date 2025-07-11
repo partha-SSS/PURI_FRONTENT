@@ -81,6 +81,11 @@ export class mm_customer {
   public accholder_name:string;
   public share_folio:string;
   public street:string;
+  public app_flag:string;
+  public app_date:string;
+  public ledger_no:string;
+  public po_id:number;
+  public po_name:string;
 
   constructor(){
     this.ardb_cd = localStorage.getItem('__ardb_cd');

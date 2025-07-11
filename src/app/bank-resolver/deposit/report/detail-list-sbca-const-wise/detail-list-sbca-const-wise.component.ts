@@ -129,7 +129,7 @@ export class DetailListSbcaConstWiseComponent implements OnInit,AfterViewInit {
               return arr.indexOf(arr.find(t => t.acc_type_cd === thing.acc_type_cd)) === i;
             });
           this.AcctTypes = this.AcctTypes.sort((a, b) => (a.acc_type_cd > b.acc_type_cd ? 1 : -1));
-          this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==1 || e.acc_type_cd==7||e.acc_type_cd==8||e.acc_type_cd==9)
+          this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==1 || e.acc_type_cd==7||e.acc_type_cd==8||e.acc_type_cd==9||e.acc_type_cd==12||e.acc_type_cd==13)
         },
         err => { this.isLoading = false; }
       );
@@ -184,8 +184,10 @@ export class DetailListSbcaConstWiseComponent implements OnInit,AfterViewInit {
         else{
           for(let i=0;i<this.reportData.length;i++){
             this.reportData[i].ardb_cd=i+1;
-
-          }
+           this.reportData[i].opening_dt=this.comSer.getFormatedDate(this.reportData[i].opening_dt);
+          //  this.reportData[i].mat_dt=this.comSer.getFormatedDate(this.reportData[i].mat_dt);
+           }
+         
           
           this.pageLength=this.reportData.length
           this.dataSource.data=this.reportData
@@ -224,8 +226,9 @@ export class DetailListSbcaConstWiseComponent implements OnInit,AfterViewInit {
   }
   sendData(){
     console.log(this.accType)
-  this.accType=this.reportcriteria.controls.acc_type_cd.value == '1'?'Savings Deposit':(this.reportcriteria.controls.acc_type_cd.value == '8'?'Flexi Deposit':(this.reportcriteria.controls.acc_type_cd.value == '9'?'Loan Suspense':'Share'))
-
+    this.accType=''
+    this.accType=this.AcctTypes.filter(e=>e.acc_type_cd==(this.reportcriteria.controls.acc_type_cd.value.toString()))[0]?.acc_type_desc
+   
     // this.accType=this.reportcriteria.controls.acc_type_cd.value == '2'?'Fixed Deposit':(this.reportcriteria.controls.acc_type_cd.value == '3'?'DBS':this.reportcriteria.controls.acc_type_cd.value == '4'?'Term Deposit':'MIS')
   //  this.ConstType=this.constitutionListToBind.filter(x=>x.constitution_cd=this.reportcriteria.controls.constitution_cd.value)
   //  this.selectConstType=this.ConstType.constitution_desc

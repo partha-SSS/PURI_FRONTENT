@@ -135,7 +135,7 @@ export class DetailListFDMISComponent implements OnInit,AfterViewInit {
               return arr.indexOf(arr.find(t => t.acc_type_cd === thing.acc_type_cd)) === i;
             });
           this.AcctTypes = this.AcctTypes.sort((a, b) => (a.acc_type_cd > b.acc_type_cd ? 1 : -1));
-          this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==2 || e.acc_type_cd==3||e.acc_type_cd==4||e.acc_type_cd==5)
+          this.AcctTypes =this.AcctTypes.filter(e=>e.acc_type_cd==2 || e.acc_type_cd==3||e.acc_type_cd==4||e.acc_type_cd==5||e.acc_type_cd==10||e.acc_type_cd==14||e.acc_type_cd==16)
         },
         err => { this.isLoading = false; }
       );
@@ -152,10 +152,9 @@ export class DetailListFDMISComponent implements OnInit,AfterViewInit {
   }
   sendData(){
     console.log(this.accType)
-    this.accType=this.reportcriteria.controls.acc_type_cd.value == '2'?'Fixed Deposit'
-    :(this.reportcriteria.controls.acc_type_cd.value == '3'?'DBS'
-    :this.reportcriteria.controls.acc_type_cd.value == '4'?this.sys.ardbCD=='4'?'Term Deposit':'Cash Certificate'
-    :'MIS')
+    this.accType=''
+    this.accType=this.AcctTypes.filter(e=>e.acc_type_cd==(this.reportcriteria.controls.acc_type_cd.value.toString()))[0]?.acc_type_desc
+   
    }
   getConstitutionList() {
     if (undefined !== this.constitutionList &&

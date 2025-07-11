@@ -9,4 +9,5 @@ export class mm_acc_type {
   public rep_sch_flag: string;
   public cc_flag:string;
   public calc : boolean;
+  public dw_obj : string;
 }

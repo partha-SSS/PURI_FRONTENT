@@ -18,15 +18,11 @@
 
     </div>
     <hr>
-    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
-      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
-       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
-        <strong>{{showMsg.Message}}</strong>
-        <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+    <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
     </div>
+
     <div class="row justify-content-center">
       <form [formGroup]="accTransFrm" class="col-12">
         <div class="form-row">
@@ -35,7 +31,7 @@
             <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
               (change)="onAcctTypeChange()">
               <option *ngIf="AcctTypes" [readonly]="true">Choose</option>
-              <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+              <option *ngFor="let acctType of accountTypeList" [value]="acctType.acc_type_cd">
                 {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
               </option>
             </select>
@@ -354,7 +350,7 @@
             </div>
             <!-- {{this.f.acc_type_cd.value}} {{accNoEnteredForTransaction.ShowClose}}
             *ngIf="showTransfrTyp" -->
-            <div class="form-group col-2" >
+            <div class="form-group col-3" >
               <small for="trf_type">Transaction Type <span class="text-danger">*</span></small>
               <select id="trf_type" class="form-control form-control-sm" formControlName="trf_type"
                 (change)="onTransTypeChange()">
@@ -367,7 +363,7 @@
           <!-- <div *ngIf="f.acc_type_cd.value!=11"> -->
             <div class="form-group col-2" *ngIf="!showOnRenewal && !showOnClose">
               <small for="amount">Amount <span class="text-danger">*</span> </small>
-              <input *ngIf="!showAmtDrpDn" type="text" class="form-control form-control-sm" formControlName="amount"
+              <input *ngIf="!showAmtDrpDn" type="number" class="form-control form-control-sm" formControlName="amount"
                 id="amount" (keyup)="onAmtChng()">
                
 
@@ -783,15 +779,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
-      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
-       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
-        <strong>{{showMsg.Message}}</strong>
-        <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    </div>
+   
     <hr>
     <div *ngIf="undefined !== accNoEnteredForTransaction"
       class="mb-1 col-xs-12 col-sm-12 col-md-11 col-lg-11 d-flex justify-content-center align-items-center">
@@ -1277,5 +1265,21 @@
     </div>
     
     </div>
+  </div>
+</ng-template>
+
+
+
+
+
+<ng-template #denomination > 
+  <div class="modal-header">
+    <h4 class="modal-title pull-left customHeader">Denomination details for Transaction Code: {{trans_code}}, Total Transaction Amount:{{transactionAmount}}     </h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-denomination [trans_code]="trans_code"></app-denomination>
   </div>
 </ng-template>

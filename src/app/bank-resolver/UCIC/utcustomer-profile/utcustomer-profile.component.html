@@ -294,6 +294,16 @@
             </small>
           </div>
         </div>
+        <div class="form-group col-1">
+          <small for="app_flag">App Flag</small>
+          <!-- <input type="text" class="form-control form-control-sm text-capitalize" formControlName="nom_relation"
+            id="nom_relation" placeholder="Nominee Relation"> -->
+            <select id="app_flag" (change)="setAppFlag($event.target.value)" class="form-control form-control-sm" formControlName="app_flag">
+              <option  selected [readonly]="true">Choose</option>
+              <option value="Y">ON</option>
+              <option value="N">OFF</option>
+             </select>
+        </div>
       </div><!-- form group row end -->
       <!-- <hr> -->
       <h4 class="customHeader">Correspondence Details:</h4>
@@ -319,10 +329,44 @@
             <option *ngFor="let state of blocks" [value]="state.block_cd">{{state.block_name}}</option>
           </select>
         </div>
+        <!-- <div class="form-group col-2">
+          <small for="po">Post Office</small>
+          <select id="po" class="form-control form-control-sm"  formControlName="po">
+            <option *ngIf="blocks" [readonly]="true">Choose</option>
+            <option *ngFor="let state of blocks" [value]="state.block_cd">{{state.block_name}}</option>
+          </select>
+        </div> -->
+        <div class="form-group col-2">
+        <!-- <mat-form-field class="example-full-width"> -->
+          <small>Search Post-Office</small>
+          <input type="text"  class="form-control form-control-sm" style="border: 1px solid"
+                 aria-label="Number"
+                 matInput
+                 formControlName="po_id"
+                 [matAutocomplete]="auto"
+                 (keypress)="filterVill()">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+            <mat-option>Post Office / Pin</mat-option>
+            <mat-option *ngFor="let option of filteredOptions | async; let i=index" [value]="option.po_id" (click)="onVillageChnage(option.po_id , i)">
+            {{option.po_name}} / {{option.pin}}
+            </mat-option>
+          </mat-autocomplete>
+        <!-- </mat-form-field> -->
+      </div>
+      <div class="form-group col-2">
+        <small for="po_name">Post Office Name</small>
+        <input type="text" class="form-control form-control-sm" [readonly]="true"
+        formControlName="po_name" id="po_name" [readonly]="true" placeholder="Post Office">
+      </div>
         <div class="form-group col-1">
           <small for="pin">Pin Code</small>
           <input type="text" class="form-control form-control-sm"
-          formControlName="pin" id="pin" maxlength="6" (input)="onPininput($event)" placeholder="Pin code">
+          formControlName="pin" id="pin" maxlength="6" [readonly]="true" placeholder="Pin code">
+        </div>
+        <div class="form-group col-1">
+          <small for="ward_no">Ward No</small>
+          <input type="text" class="form-control form-control-sm"
+          formControlName="ward_no" id="ward_no"  placeholder="Ward No">
         </div>
         <!-- <div class="form-group col-1" hidden>
           <small for="vill_cd">vill cd</small>
@@ -330,7 +374,7 @@
           formControlName="vill_cd" id="vill_cd" placeholder="vill cd">
         </div>
         <div class="form-group col-2">
-          <small for="vill_name">Village <span class="text-danger">*</span> </small>
+          <small for="po_name">Village <span class="text-danger">*</span> </small>
           <input type="text" class="form-control form-control-sm"
           formControlName="vill_name"   (keyup)="onshow($event)" placeholder="Village"> -->
           <!-- <select id="vill_cd" class="form-control form-control-sm" formControlName="vill_cd"
@@ -421,26 +465,26 @@
           <input type="text" class="form-control form-control-sm text-uppercase" id="pan" formControlName="pan"
             placeholder="PAN Number" maxlength="10">
         </div> -->
-        <div class="form-group col-1">
+        <!-- <div class="form-group col-1">
           <small for="farmer_type">Farmer Type</small>
           <select id="farmer_type" class="form-control form-control-sm" formControlName="farmer_type">
             <option value="S">Small</option>
             <option value="M">Medium</option>
             <option value="B">Big</option>
           </select>
-        </div>
+        </div> -->
         
-        <div class="form-group col-1 mt-4">
+        <!-- <div class="form-group col-1 mt-4">
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="is_weaker" [attr.checked]="this.f.is_weaker.value=='Y'" formControlName="is_weaker">
             <small class="form-check-small" for="is_weaker">
               Is weaker
             </small>
           </div>
-        </div>
+        </div> -->
         <div class="form-group col-1">
-          <small for="email">Ledger No</small>
-          <input type="text" class="form-control form-control-sm" id="ldgr" placeholder="Ledger Number" formControlName="email">
+          <small for="ledger_no">Ledger No</small>
+          <input type="text" class="form-control form-control-sm" id="ledger_no" placeholder="Ledger Number" formControlName="ledger_no">
         </div>
         <div class="form-group col-2">
           <small for="monthly_income">Monthly Income</small>
@@ -534,13 +578,13 @@
       <!-- <hr>  -->
       <h4 class="customHeader">Customer ID Proof Details</h4>
       <div class="form-row" >
-        <div class="form-group col-2" *ngIf="!organizationMode">
+        <!-- <div class="form-group col-2" *ngIf="!organizationMode">
           <small for="pan_status">PAN STATUS<span class="text-danger">*</span></small><br><br>
           <mat-radio-group aria-label="Select an option" formControlName="pan_status">
             <mat-radio-button value="P" style="margin-left: 16px;">PAN</mat-radio-button>
             <mat-radio-button value="F" style="margin-left: 16px;">From 60</mat-radio-button>
           </mat-radio-group>
-        </div>
+        </div> -->
         <div class="form-group col-2" *ngIf="!organizationMode">
           <small for="pan">PAN<span class="text-danger">*</span></small>
           <input type="text" #pan class="form-control form-control-sm " id="pan" formControlName="pan"  (change)="CheckExistance('PAN')"

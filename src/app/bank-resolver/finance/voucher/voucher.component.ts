@@ -839,7 +839,7 @@ debugger
           this.isClear = false;
           this.isLoading = false;
           this.HandleMessage(true,MessageType.Sucess,"Voucher saved successfully!")
-          this.modalRef = this.modalService.show(this.print, { class: 'modal-xl' });
+          // this.modalRef = this.modalService.show(this.print, { class: 'modal-xl' });
         },
         err => { this.isLoading = false; 
           this.HandleMessage(true, MessageType.Error, 'Field can not be blank !')
@@ -1192,12 +1192,7 @@ debugger
     return new Date(+dateParts[2], +dateParts[1] - 1, +dateParts[0]);
   }
 
-  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-    this.showMsg = new ShowMessage();
-    this.showMsg.Show = show;
-    this.showMsg.Type = type;
-    this.showMsg.Message = message;
-  }
+  
   checkFlag(_flag:any,_voucher_type:any){
     this.drInput = _flag == 'dr_amt' && _voucher_type == 'C' ? true : false;
     this.crInput =_flag == 'cr_amt' && _voucher_type == 'C' ? true : false;
@@ -1218,6 +1213,47 @@ debugger
       this.VoucherF.controls[0].get(_debit_flag).setValue(total > 0 ? total : '');
     }
    }
+        getAlertClass(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return 'alert-success';
+      case MessageType.Warning:
+        return 'alert-warning';
+      case MessageType.Info:
+        return 'alert-info';
+      case MessageType.Error:
+        return 'alert-danger';
+      default:
+        return 'alert-info';
+    }
+  }
+  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+    this.showMsg = new ShowMessage();
+    this.showMsg.Show = show;
+    this.showMsg.Type = type;
+    this.showMsg.Message = message;
+  
+    if (show) {
+      setTimeout(() => {
+        this.showMsg.Show = false;
+      }, 5000); // auto-close after 4 sec
+    }
+  }
+  
+  getAlertIcon(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return '✅';
+      case MessageType.Warning:
+        return '⚠️';
+      case MessageType.Info:
+        return 'ℹ️';
+      case MessageType.Error:
+        return '❌';
+      default:
+        return '🔔';
+    }
+  }
   //  public getBranchIp(e: any) {
   //   // this.loginForm.disable();
   //   return new Promise((resolve, reject) => {

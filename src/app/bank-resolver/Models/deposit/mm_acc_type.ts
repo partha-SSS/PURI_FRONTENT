@@ -9,5 +9,6 @@ export class mm_acc_type
   public cc_flag: string;
   public rep_sch_flag: string;
   public intt_calc_type: string;
+  public dw_obj: string;
 
 }

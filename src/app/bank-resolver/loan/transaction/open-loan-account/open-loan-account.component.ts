@@ -31,7 +31,7 @@ import { sm_parameter } from 'src/app/bank-resolver/Models/sm_parameter';
 
 
 
-
+  
 @Component({
   selector: 'app-open-loan-account',
   templateUrl: './open-loan-account.component.html',
@@ -45,6 +45,7 @@ export class OpenLoanAccountComponent implements OnInit {
               private msg: InAppMessageService,
 
   ) { }
+  @ViewChild('contentLoanStmt', { static: true }) contentLoanStmt: TemplateRef<any>;
   @ViewChild('MakerChecker', { static: true }) MakerChecker: TemplateRef<any>;
   @ViewChild('kycContent', { static: true }) kycContent: TemplateRef<any>;
   actDesc:any;
@@ -175,6 +176,11 @@ export class OpenLoanAccountComponent implements OnInit {
         this.repaymentFormulaList=emi
         console.log(this.repaymentFormulaList);
        })
+  }
+  openModalC1(template: TemplateRef<any>) {
+    ////////debugger;
+    this.modalRef = this.modalService.show(template, { class: 'modal-xl' });
+    // this.PopulateLoanRepSch(template);
   }
   getsystemParam(){
     this.svc.addUpdDel<any>('Mst/GetSystemParameter', null).subscribe(

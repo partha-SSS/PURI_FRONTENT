@@ -11,12 +11,12 @@ import { p_gen_param } from 'src/app/bank-resolver/Models/p_gen_param';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
-  selector: 'app-dds-individual-posting',
-  templateUrl: './dds-individual-posting.component.html',
-  styleUrls: ['./dds-individual-posting.component.css'],
+  selector: 'app-android-posting',
+  templateUrl: './android-posting.component.html',
+  styleUrls: ['./android-posting.component.css'],
   providers: [DatePipe]
 })
-export class DdsIndividualPostingComponent implements OnInit {
+export class AndroidPostingComponent implements OnInit {
   brnDtls: m_branch[] = [];
   modalRef: BsModalRef;
   showHideAgent:boolean=false
@@ -56,7 +56,7 @@ export class DdsIndividualPostingComponent implements OnInit {
     this.getAgentList()
     this.agentFrm = this.formBuilder.group({
       trans_cd: [''],
-      trans_dt: [''],
+      // trans_dt: [''],
       agent_cd: [''],
       agent_name: [''],
       trans_amt: [''],
@@ -64,7 +64,7 @@ export class DdsIndividualPostingComponent implements OnInit {
     });
     this.isDel = false;
     this.agentFrm.controls.agent_cd.disable()
-    this.agentFrm.controls.trans_dt.disable()
+    // this.agentFrm.controls.trans_dt.disable()
     this.agentFrm.disable()
     this.isRetrieve = true;
     this.isNew = true;
@@ -72,7 +72,7 @@ export class DdsIndividualPostingComponent implements OnInit {
     this.isSave = false;
     this.isClear = true;
     this.editDeleteMode = false
-    this.agentFrm.controls.trans_dt.setValue(this.sys.CurrentDate)
+    // this.agentFrm.controls.trans_dt.setValue(this.sys.CurrentDate)
     this.agentFrm.controls.agent_cd.enable();
 
   }
@@ -125,31 +125,21 @@ export class DdsIndividualPostingComponent implements OnInit {
   saveuser() {
     console.log(this.agentFrm);
     console.log(this.transData)
-    var dt={
-      "ardb_cd": this.sys.ardbCD,
-      "brn_cd":this.sys.BranchCode,
-      "agent_cd":this.f.agent_cd.value,
-      "trans_dt":this.f.trans_dt.value,
-      "trans_cd":this.f.trans_cd.value,
-      "trans_amt":this.f.trans_amt.value
-    }
-   this.svc.addUpdDel('Deposit/UpdateUnapprovedAgentTrans',dt).subscribe(data=>{
-      this.svc.addUpdDel('Deposit/UpdateUnapprovedDdsTrans',this.transData).subscribe(d1=>{
-       if(!data && !d1){
+    
+      this.svc.addUpdDel('Deposit/UpdateUnapprovedDdsTransAndroid',this.transData).subscribe(d1=>{
+       if(!d1){
           this.HandleMessage(true,MessageType.Sucess,'Updated successfully!!')
         }
         else{
           this.HandleMessage(true,MessageType.Error,'An Error occurred while updating!!')
         }
-         
+
       },error=>{
         this.HandleMessage(true,MessageType.Error,'An Error occurred while saving!!')
       }
 
       )
-    },error=>{
-      this.HandleMessage(true,MessageType.Error,'An Error occurred while saving!!')
-    })
+
   }
  deleteuser() {
     this.isLoading = true;
@@ -197,10 +187,11 @@ export class DdsIndividualPostingComponent implements OnInit {
     this.agentFrm.disable();
     this.disTransBtn=true;
     this.transData=null
-    this.agentFrm.controls.trans_dt.setValue(this.sys.CurrentDate)
+    // this.agentFrm.controls.trans_dt.setValue(this.sys.CurrentDate)
   }
-  selectAgent(agent_cd:any){
-    this.agentFrm.controls.agent_cd.setValue(agent_cd);
+  selectAgent(agent:any){
+    this.agentFrm.controls.agent_cd.setValue(agent.agent_cd);
+    this.agentFrm.controls.agent_name.setValue(agent.agent_name);
     this.showHideAgent=false
     debugger;
     this.retrieveData();
@@ -209,69 +200,58 @@ export class DdsIndividualPostingComponent implements OnInit {
     this.custName=[];
     this.isLoading=true;
     this.k=0
-    console.log(this.f.trans_dt.value+" "+this.f.agent_cd.value);
+    // console.log(this.f.trans_dt.value+" "+this.f.agent_cd.value);
     this.totSum=0;
     this.totAmt=0
     var dt = {
       "ardb_cd":this.sys.ardbCD,
       "brn_cd":this.sys.BranchCode,
       "agent_cd":this.f.agent_cd.value,
-      "trans_dt":this.f.trans_dt.value
+      // "trans_dt":this.f.trans_dt.value
     }
     if(this.f.agent_cd.value){
-    this.svc.addUpdDel('Deposit/GetUnapprovedAgentTrans',dt).subscribe(data => {console.log(data)
-    this.retrieveAgentData=data
-   
-      if(this.retrieveAgentData.approval_status=='U'){
-        this.isApprove=true;
-        this.agentFrm.patchValue({
-          trans_cd:this.retrieveAgentData.trans_cd,
-          trans_type:this.retrieveAgentData.trans_type=='D'?'Deposit':'Transfer',
-          trans_amt:this.retrieveAgentData.trans_amt,
-          agent_name:this.retrieveAgentData.agent_cd
-        })
-        var req={
-          "ardb_cd":this.sys.ardbCD,
-          "brn_cd":this.sys.BranchCode,
-          "agent_cd":this.f.agent_cd.value,
-          "trans_dt":this.f.trans_dt.value,
-          "trans_cd":this.f.trans_cd.value
-        }
-        this.svc.addUpdDel('Deposit/GetUnapprovedDdsTrans',req).subscribe(dat=>{
-            this.transData=dat
-           
-            this.transData.forEach(resp => {
+    // this.svc.addUpdDel('Deposit/GetUnapprovedSBFLEXITrans',dt).subscribe(data => {console.log(data)
+    // this.retrieveAgentData=data
+
+    //   if(this.retrieveAgentData.approval_status=='U'){
+    //     this.isApprove=true;
+      
+        // var req={
+        //   "ardb_cd":this.sys.ardbCD,
+        //   "brn_cd":this.sys.BranchCode,
+        //   "agent_cd":this.f.agent_cd.value,
+        //   "trans_dt":this.f.trans_dt.value,
+        //   "trans_cd":this.f.trans_cd.value
+        // }
+        this.svc.addUpdDel('Deposit/GetUnapprovedDdsTransAndroid',dt).subscribe(dat=>{
+          console.log(dat);
+          this.isLoading=false;
+          this.isApprove=true;
+            this.transData=dat;
+              this.transData.forEach(resp => {
               this.totSum+=resp.paid_amt
               this.totAmt+=resp.paid_amt
-              const prm = new p_gen_param();
-              // prm.ad_acc_type_cd = +this.f.acc_type_cd.value;
-              prm.as_cust_name =resp.acc_num
-              // prm.ad_acc_type_cd =resp.acc_type_cd;
-              prm.ad_acc_type_cd = 11;
-              console.log(prm);
-              this.svc.addUpdDel<any>('Deposit/GetAccDtls', prm).subscribe(
-                res => {
-                  console.log(res)
-                  this.isLoading=false;
-                  this.custName.push(res[0])
-                  console.log(this.custName);
-                  this.isLoading=false;
-                },
-                err => { this.isLoading = false; }
-              );
-             });
-            // this.agentFrm.controls.trans_amt.setValue(this.totSum)
-            this.totAmt=this.totSum
-            console.log(dat)
+              this.totAmt=this.totSum
+              console.log(dat)
           })
-      }
-      else{
-        this.isApprove=false
-        this.isLoading=false;
-        this.HandleMessage(true, MessageType.Error, 'The data for this agent has either been approved or hasn\'t been imported yet!');
-      }
+        if(this.totAmt>0){
+          this.agentFrm.patchValue({
+          trans_amt:this.totAmt,
+        })
+        }
+      // else{
+      //   this.isApprove=false
+      //   this.isLoading=false;
+      //   this.HandleMessage(true, MessageType.Error, 'The data for this agent has either been approved or hasn\'t been imported yet!');
+      // }
+    },
+    err => {
+      this.isApprove=false;
+      this.isLoading = false;
+      this.HandleMessage(true, MessageType.Error, 'No data found');
+
     })
-     
+
     }
     else{
       this.isLoading=false;
@@ -286,12 +266,10 @@ export class DdsIndividualPostingComponent implements OnInit {
   calcSum(){
     this.totSum=0;
     this.transData.forEach(res => {
-      this.totSum+=(+res.paid_amt)
-
-      console.log(this.totSum,+res.paid_amt)
+      this.totSum+=(+res.paid_amt);
      });
     this.agentFrm.controls.trans_amt.setValue(this.totSum)
-    this.totAmt=this.totSum
+    this.totAmt=this.totSum;
   }
   clearSuggestedCust() {
     this.suggestedCustomer = null;
@@ -338,46 +316,46 @@ export class DdsIndividualPostingComponent implements OnInit {
     }
   }
    getAlertClass(type: MessageType): string {
-  switch (type) {
-    case MessageType.Sucess:
-      return 'alert-success';
-    case MessageType.Warning:
-      return 'alert-warning';
-    case MessageType.Info:
-      return 'alert-info';
-    case MessageType.Error:
-      return 'alert-danger';
-    default:
-      return 'alert-info';
-  }
-}
-private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-  this.showMsg = new ShowMessage();
-  this.showMsg.Show = show;
-  this.showMsg.Type = type;
-  this.showMsg.Message = message;
+      switch (type) {
+        case MessageType.Sucess:
+          return 'alert-success';
+        case MessageType.Warning:
+          return 'alert-warning';
+        case MessageType.Info:
+          return 'alert-info';
+        case MessageType.Error:
+          return 'alert-danger';
+        default:
+          return 'alert-info';
+      }
+    }
+    private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+      this.showMsg = new ShowMessage();
+      this.showMsg.Show = show;
+      this.showMsg.Type = type;
+      this.showMsg.Message = message;
 
-  if (show) {
-    setTimeout(() => {
-      this.showMsg.Show = false;
-    }, 5000); // auto-close after 4 sec
-  }
-}
+      if (show) {
+        setTimeout(() => {
+          this.showMsg.Show = false;
+        }, 5000); // auto-close after 4 sec
+      }
+    }
 
-getAlertIcon(type: MessageType): string {
-  switch (type) {
-    case MessageType.Sucess:
-      return '✅';
-    case MessageType.Warning:
-      return '⚠️';
-    case MessageType.Info:
-      return 'ℹ️';
-    case MessageType.Error:
-      return '❌';
-    default:
-      return '🔔';
-  }
-}
+    getAlertIcon(type: MessageType): string {
+      switch (type) {
+        case MessageType.Sucess:
+          return '✅';
+        case MessageType.Warning:
+          return '⚠️';
+        case MessageType.Info:
+          return 'ℹ️';
+        case MessageType.Error:
+          return '❌';
+        default:
+          return '🔔';
+      }
+    }
   openModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
@@ -387,14 +365,10 @@ getAlertIcon(type: MessageType): string {
     var dt={
       "ardb_cd":this.sys.ardbCD,
       "brn_cd":this.sys.BranchCode,
-      "trans_dt":this.f.trans_dt.value,
-      "trans_cd":this.f.trans_cd.value,
-      "user_id":this.sys.UserId,
       "agent_cd":this.f.agent_cd.value,
-      "ad_acc_type_cd":10
     }
-    this.svc.addUpdDel('Deposit/ApproveDdsImportData',dt).subscribe(data=>{console.log(data)
-      
+    this.svc.addUpdDel('Deposit/ApproveDdsImportDataAndroid',dt).subscribe(data=>{console.log(data)
+
     if(!data){
       this.HandleMessage(true, MessageType.Sucess, 'Approved successfully');
       this.isApprove=false

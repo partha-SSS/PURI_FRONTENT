@@ -31,9 +31,11 @@ import { td_accholder } from '../../Models/deposit/td_accholder';
 })
 export class AccounTransactionsComponent implements OnInit {
   td_def_trans_trf: any;
+  trans_code:any
+  cashMode:boolean=false;
   constructor(private INRCurrency: INRCurrencyPipe,private svc: RestService, private msg: InAppMessageService,
-    private frmBldr: FormBuilder, public datepipe: DatePipe, private router: Router,private  dcml:DecimalPipe,
-    private modalService: BsModalService) { }
+  private frmBldr: FormBuilder, public datepipe: DatePipe, private router: Router,private  dcml:DecimalPipe,
+  private modalService: BsModalService) { }
   get f() { return this.accTransFrm.controls; }
   get td() { return this.tdDefTransFrm.controls; }
   static existingCustomers: mm_customer[] = [];
@@ -54,6 +56,7 @@ export class AccounTransactionsComponent implements OnInit {
   @ViewChild('netWorth', { static: true }) netWorth: TemplateRef<any>;
 
   @ViewChild('effint', { static: true }) effint: ElementRef;
+  @ViewChild('denomination', { static: true }) denomination: TemplateRef<any>;
   operations: mm_operation[];
   unApprovedTransactionLst: td_def_trans_trf[] = [];
   unApprovedTransactionLstOfAcc: td_def_trans_trf[] = [];
@@ -120,7 +123,8 @@ export class AccounTransactionsComponent implements OnInit {
   afMat: any;
   afMat1: any;
   lastInst: any;
-  prevTransForDsp: any
+  prevTransForDsp: any;
+  transactionAmount:0;
   showtransmodeforC = false
   // showTranferType = true;
   showMsg: ShowMessage;
@@ -873,25 +877,63 @@ debugger
         this.accNoEnteredForTransaction.intt_trf_type,
         this.accNoEnteredForTransaction.intt_rt
       );
-      if (this.accNoEnteredForTransaction.acc_type_cd === 2
-        || this.accNoEnteredForTransaction.acc_type_cd === 3
-        || this.accNoEnteredForTransaction.acc_type_cd === 4) {
-        this.showInterestDtls = true;
-        this.accNoEnteredForTransaction.ShowClose = true;
+      const accNature = this.accountTypeList.find(
+        (e) => e.acc_type_cd === this.accNoEnteredForTransaction.acc_type_cd
+      )?.dw_obj;
+
+      switch (accNature) {
+        case 'FD':
+          this.showInterestDtls = true;
+          this.accNoEnteredForTransaction.ShowClose = true;
+          break;
+        case 'TD':
+          this.showInterestDtls = true;
+          this.accNoEnteredForTransaction.ShowClose = true;
+          break;
+
+        case 'RD':
+          this.showRdInstalment = true;
+          this.accNoEnteredForTransaction.ShowClose = true;
+          break;
+
+        case 'MIS':
+          this.showMisInstalment = true;
+          this.showInterestDtls = true;
+          this.accNoEnteredForTransaction.ShowClose = true;
+          break;
+
+        case 'DD':
+          this.showInterestDtls = true;
+          this.accNoEnteredForTransaction.ShowClose = true;
+          break;
+
+        default:
+          // Optional: reset flags if not matching
+          this.showInterestDtls = false;
+          this.showRdInstalment = false;
+          this.showMisInstalment = false;
+          this.accNoEnteredForTransaction.ShowClose = false;
+          break;
       }
-      if (this.accNoEnteredForTransaction.acc_type_cd === 6) {
-        this.showRdInstalment = true;
-        this.accNoEnteredForTransaction.ShowClose = true;
-      }
-      if (this.accNoEnteredForTransaction.acc_type_cd === 5) {
-        this.showMisInstalment = true;
-        this.showInterestDtls = true;
-        this.accNoEnteredForTransaction.ShowClose = true;
-      }
-      if (this.accNoEnteredForTransaction.acc_type_cd === 11) {
-        this.showInterestDtls = true;
-        this.accNoEnteredForTransaction.ShowClose = true;
-      }
+      // if (this.accNoEnteredForTransaction.acc_type_cd === 2
+      //   || this.accNoEnteredForTransaction.acc_type_cd === 3
+      //   || this.accNoEnteredForTransaction.acc_type_cd === 4) {
+      //   this.showInterestDtls = true;
+      //   this.accNoEnteredForTransaction.ShowClose = true;
+      // }
+      // if (this.accNoEnteredForTransaction.acc_type_cd === 6) {
+      //   this.showRdInstalment = true;
+      //   this.accNoEnteredForTransaction.ShowClose = true;
+      // }
+      // if (this.accNoEnteredForTransaction.acc_type_cd === 5) {
+      //   this.showMisInstalment = true;
+      //   this.showInterestDtls = true;
+      //   this.accNoEnteredForTransaction.ShowClose = true;
+      // }
+      // if (this.accNoEnteredForTransaction.acc_type_cd === 11) {
+      //   this.showInterestDtls = true;
+      //   this.accNoEnteredForTransaction.ShowClose = true;
+      // }
       const constitution = AccounTransactionsComponent.constitutionList.filter(e => e.constitution_cd
         === this.accNoEnteredForTransaction.constitution_cd)[0];
       const OprnInstrDesc = AccounTransactionsComponent.operationalInstrList.filter(e => e.oprn_cd
@@ -935,7 +977,7 @@ debugger
         prn_amt: this.accNoEnteredForTransaction.prn_amt,
         intt_amt: this.accNoEnteredForTransaction.intt_amt,
         // mat_amt:this.accNoEnteredForTransaction.prn_amt + this.accNoEnteredForTransaction.intt_amt,
-        mat_amt: this.accNoEnteredForTransaction.intt_trf_type === 'H'  ||this.accNoEnteredForTransaction.intt_trf_type === 'Y'  ||this.accNoEnteredForTransaction.intt_trf_type === 'Q'? this.accNoEnteredForTransaction.prn_amt + this.interestPeriod*this.accNoEnteredForTransaction.intt_amt : this.accNoEnteredForTransaction.prn_amt + (this.interestAmount?this.interestAmount:0),
+        mat_amt: this.accNoEnteredForTransaction.intt_trf_type === 'H'  ||this.accNoEnteredForTransaction.intt_trf_type === 'Y'  ||this.accNoEnteredForTransaction.intt_trf_type === 'Q'? this.accNoEnteredForTransaction.prn_amt + this.interestPeriod*this.accNoEnteredForTransaction.intt_amt : this.accNoEnteredForTransaction.prn_amt + (this.interestAmount?this.interestAmount:0)+this.accNoEnteredForTransaction.intt_amt,
         
         
         dep_period_y: null === this.accNoEnteredForTransaction.dep_period ? ''
@@ -1106,56 +1148,96 @@ console.log(this.accDtlsFrm.controls.mat_amt.value);
   }
 
   /** method fires on account type change */
-  public onAcctTypeChange(): void {
-    this.accountTypeList3=[]
-    if(this.accTransFrm.controls.acc_type_cd.value==1){
-      this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
-      this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
-      this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
-    }
-    else if(this.accTransFrm.controls.acc_type_cd.value==7){
-      this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
-      this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
-      this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
-    }
-    else if(this.accTransFrm.controls.acc_type_cd.value==8){
-      this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
-      this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
-      this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
-    }
-    else if(this.accTransFrm.controls.acc_type_cd.value==9){
-      this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
-      this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
-      this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
-    }
-    else{
-      this.accountTypeList3 =this.accountTypeList
-    }
-    this.suggestedCustomer=[]
-    console.log(this.f.acc_type_cd.value)
-    this.tm_denominationList = [];
-    this.accNoEnteredForTransaction = undefined;
-    this.resetTransfer();
-    this.f.acct_num.reset(); this.f.oprn_cd.reset();
-    this.tdDefTransFrm.reset(); this.showTransactionDtl = false;
-    this.HandleMessage(false);
-    const acctTypCdTofilter = +this.f.acc_type_cd.value;
-    const acctTypeDesription = AccounTransactionsComponent.operations
-      .filter(e => e.acc_type_cd === acctTypCdTofilter)[0].acc_type_desc;
-    this.tdDefTransFrm.patchValue({
-      acc_type_desc: acctTypeDesription,
-      acc_type_cd: acctTypCdTofilter
-    });
-    this.operations = AccounTransactionsComponent.operations
-      .filter(e => e.acc_type_cd === acctTypCdTofilter);
-    // this.f.oprn_cd.enable();
-    this.f.acct_num.enable();
-    this.f.oprn_cd.disable();
-    // this.refresh = false;
-    // this.msg.sendCommonTmDepositAll(null);
-    // this.refresh = true;
+  // public onAcctTypeChange(): void {
+  //   this.accountTypeList3=[]
+  //   if(this.accTransFrm.controls.acc_type_cd.value==1){
+  //     this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
+  //     this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
+  //     this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
+  //   }
+  //   else if(this.accTransFrm.controls.acc_type_cd.value==7){
+  //     this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
+  //     this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
+  //     this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
+  //   }
+  //   else if(this.accTransFrm.controls.acc_type_cd.value==8){
+  //     this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
+  //     this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
+  //     this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
+  //   }
+  //   else if(this.accTransFrm.controls.acc_type_cd.value==9){
+  //     this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
+  //     this.accountTypeList3 =this.accountTypeList3.filter(e=>e.acc_type_cd!=2 && e.acc_type_cd!=3 && e.acc_type_cd!=4 && e.acc_type_cd!=5 && e.acc_type_cd!=6 && e.acc_type_cd!=11)
+  //     this.accountTypeList3 = this.accountTypeList3.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
+  //   }
+  //   else{
+  //   }
+  //      this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
+
+  //   this.suggestedCustomer=[]
+  //   console.log(this.f.acc_type_cd.value)
+  //   this.tm_denominationList = [];
+  //   this.accNoEnteredForTransaction = undefined;
+  //   this.resetTransfer();
+  //   this.f.acct_num.reset(); this.f.oprn_cd.reset();
+  //   this.tdDefTransFrm.reset(); this.showTransactionDtl = false;
+  //   this.HandleMessage(false);
+  //   const acctTypCdTofilter = +this.f.acc_type_cd.value;
+  //   const acctTypeDesription = AccounTransactionsComponent.operations
+  //     .filter(e => e.acc_type_cd === acctTypCdTofilter)[0].acc_type_desc;
+  //   this.tdDefTransFrm.patchValue({
+  //     acc_type_desc: acctTypeDesription,
+  //     acc_type_cd: acctTypCdTofilter
+  //   });
+  //   this.operations = AccounTransactionsComponent.operations
+  //     .filter(e => e.acc_type_cd === acctTypCdTofilter);
+  //   this.f.acct_num.enable();
+  //   this.f.oprn_cd.disable();
+  // }
+public onAcctTypeChange(): void {
+  const selectedTypeCd = +this.accTransFrm.controls.acc_type_cd.value;
+
+  // Exclusion list for common account filtering
+  const excludedTypeCds = new Set([2, 3, 4, 5, 6, 11]);
+
+  // Account types with same filtering logic (1, 7, 8, 9)
+  const similarLogicTypes = new Set([1, 7, 8, 9]);
+
+  if (similarLogicTypes.has(selectedTypeCd)) {
+    this.accountTypeList3 = this.accountTypeList
+      .filter(c => c.dep_loan_flag === 'D' && !excludedTypeCds.has(c.acc_type_cd))
+      .sort((a, b) => a.acc_type_cd - b.acc_type_cd);
+  } else {
+    // Provide logic if other acc_type_cd need handling
+    this.accountTypeList3 = this.accountTypeList.filter(c => c.dep_loan_flag === 'D');
   }
 
+  this.suggestedCustomer = [];
+  this.tm_denominationList = [];
+  this.accNoEnteredForTransaction = undefined;
+
+  this.resetTransfer();
+  this.f.acct_num.reset();
+  this.f.oprn_cd.reset();
+  this.tdDefTransFrm.reset();
+  this.showTransactionDtl = false;
+  this.HandleMessage(false);
+
+  const acctTypCdTofilter = selectedTypeCd;
+  const acctTypeDesription = AccounTransactionsComponent.operations
+    .find(e => e.acc_type_cd === acctTypCdTofilter)?.acc_type_desc ?? '';
+
+  this.tdDefTransFrm.patchValue({
+    acc_type_desc: acctTypeDesription,
+    acc_type_cd: acctTypCdTofilter
+  });
+
+  this.operations = AccounTransactionsComponent.operations
+    .filter(e => e.acc_type_cd === acctTypCdTofilter);
+
+  this.f.acct_num.enable();
+  this.f.oprn_cd.disable();
+}
   public SelectCustomer(cust: any): void {
     // this.optionClicked=true;
     if(cust){this.showNW=false;}
@@ -1232,9 +1314,7 @@ getjoinholder(){
           this.isLoading = false;
           return false;
         }
-        if(res[0]?.cust_cd){
-          this.getCustInfo(res[0]?.cust_cd);
-        }
+        
         this.categories=res[0]?.catg_cd
         this.custName=res[0]?.cust_name
         this.getCategoryMaster();
@@ -1358,44 +1438,7 @@ getjoinholder(){
     );
 
   }
-    private getCustInfo(CustCd: number): void {
-    this.isLoading = true;
-    // this.showCust = false; // this is done to forcibly rebind the screen
-    const cust = new mm_customer(); cust.cust_cd = CustCd;
-    this.svc.addUpdDel<any>('UCIC/GetCustomerDtls', cust).subscribe(
-      res => {
-        this.customerFullData = res[0];
-        this.isLoading = false;
-        const aadhar = this.customerFullData.aadhar?.toString() || '';
-        const pan = this.customerFullData.pan?.toString() || '';
-        const custName = this.accDtlsFrm.controls.cust_name.value;
-
-        // Check both Aadhar and PAN are missing or invalid
-        if (aadhar.length < 5 && pan.length < 5) {
-          this.HandleMessage(true, MessageType.Warning,
-            `Account for ${custName} does not have full KYC completed.`);
-        }
-        // Check both are valid
-        else if (aadhar.length > 5 && pan.length > 5) {
-          this.HandleMessage(true, MessageType.Sucess,
-            `Account for ${custName} has successfully completed full KYC.`);
-        }
-        // Aadhar valid, PAN invalid
-        else if (aadhar.length > 5 && pan.length < 5) {
-          this.HandleMessage(true, MessageType.Warning,
-            `Account for ${custName} has Aadhar uploaded but PAN not verified.`);
-        }
-        // PAN valid, Aadhar invalid
-        else if (aadhar.length < 5 && pan.length > 5) {
-          this.HandleMessage(true, MessageType.Warning,
-            `Account for ${custName} has PAN uploaded but Aadhar not verified.`);
-        }
-
-        debugger
-      },
-      err => { this.isLoading = false; }
-    );
-  }
+  
   holderKYC(i:any){
     if(i=="OWN"){
     this.msg.sendcustomerCodeForKyc(this.acc_OWNER);
@@ -5263,6 +5306,8 @@ debugger
       if (this.td.trf_type.value === 'C') {
         // saveTransaction.tmdenominationtrans = this.tm_denominationList;  
         //for denomination somnath comment
+        this.transactionAmount=this.td.amount.value;
+        this.cashMode=true;
       } else if (this.td.trf_type.value === 'T') {
         let i = 0;
 
@@ -5379,6 +5424,7 @@ debugger
       debugger;
       this.svc.addUpdDel<AccOpenDM>('Deposit/InsertAccountOpeningData', saveTransaction).subscribe(
         res => {
+          this.trans_code=(+res)
           this.HandleMessage(true, MessageType.Sucess, 'Saved sucessfully, your transaction code is :' + res);
           this.tdDefTransFrm.reset(); this.f.oprn_cd.reset();
           this.getShadowBalance();
@@ -5386,10 +5432,14 @@ debugger
           this.td_deftranstrfList=null;
           this.TrfTotAmt=0;
           this.isLoading = false;
-        
-          if(this.accTransFrm.controls.acc_type_cd.value==2 || this.accTransFrm.controls.acc_type_cd.value==3 || this.accTransFrm.controls.acc_type_cd.value==4|| this.accTransFrm.controls.acc_type_cd.value==5 || this.accTransFrm.controls.acc_type_cd.value==6){
-            this.onResetClick();
+          if (this.cashMode) {
+            setTimeout(() => {
+              this.openModal(this.denomination);
+            }, 2000); // auto-close after 4 sec
           }
+          // if(this.accTransFrm.controls.acc_type_cd.value==2 || this.accTransFrm.controls.acc_type_cd.value==3 || this.accTransFrm.controls.acc_type_cd.value==4|| this.accTransFrm.controls.acc_type_cd.value==5 || this.accTransFrm.controls.acc_type_cd.value==6){
+          //   this.onResetClick();
+          // }
         },
         err => { this.isLoading = false; console.error('Error on onSaveClick' + JSON.stringify(err)); }
       );
@@ -6326,7 +6376,8 @@ debugger
   
   }
   onResetClick(): void {
-    // this.showMsg = null;
+    this.transactionAmount=0;
+    this.cashMode=false;
     this.showNW=true;
     this.showInterestDtls=false
     this.showRdInstalment=false
@@ -6954,15 +7005,47 @@ debugger
     this.td_deftranstrfList.push(temp_deftranstrf);
   }
 
-  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-    this.showMsg = new ShowMessage();
-    this.showMsg.Show = show;
-    this.showMsg.Type = type;
-    this.showMsg.Message = message;
-    // setTimeout(() => {
-    //   this.showMsg = new ShowMessage();
-    // }, 3000);
+    getAlertClass(type: MessageType): string {
+  switch (type) {
+    case MessageType.Sucess:
+      return 'alert-success';
+    case MessageType.Warning:
+      return 'alert-warning';
+    case MessageType.Info:
+      return 'alert-info';
+    case MessageType.Error:
+      return 'alert-danger';
+    default:
+      return 'alert-info';
   }
+}
+private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+  this.showMsg = new ShowMessage();
+  this.showMsg.Show = show;
+  this.showMsg.Type = type;
+  this.showMsg.Message = message;
+
+  if (show) {
+    setTimeout(() => {
+      this.showMsg.Show = false;
+    }, 5000); // auto-close after 4 sec
+  }
+}
+
+getAlertIcon(type: MessageType): string {
+  switch (type) {
+    case MessageType.Sucess:
+      return '✅';
+    case MessageType.Warning:
+      return '⚠️';
+    case MessageType.Info:
+      return 'ℹ️';
+    case MessageType.Error:
+      return '❌';
+    default:
+      return '🔔';
+  }
+}
   // ngAfterViewInit() {
   //   if(this.f.acct_num.value.length>0)
   //   {

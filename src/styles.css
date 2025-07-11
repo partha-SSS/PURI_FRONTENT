@@ -11,7 +11,12 @@
 
 /* You can add global styles to this file, and also import other style files */
 /* .daseboard_home{flex: 1 0 auto; padding: 25px 25px; background: url("assets/images/bgCus.png") no-repeat center top; background-size: cover;align-items: center;} */
-.daseboard_home{flex: 1 0 auto; padding: 5px 5px; background: url("assets/images/landing.jpeg") no-repeat center top; background-size: cover;align-items: center;}
+.daseboard_home{flex: 1 0 auto; padding: 5px 5px; 
+  background: url("assets/images/temple.jpg") no-repeat center top; 
+  background-size: cover;
+  align-items: center;
+  min-height: 500px;
+}
 /* cyrillic-ext */
 @font-face {
   font-family: 'Roboto';
@@ -935,3 +940,63 @@ select{
   z-index:9000 !important; 
 }
 /*  */
+
+ .custom-alert-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 340px;
+  max-width: 80%;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 1050;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* Popup animation */
+.animate-popup {
+  animation: fadeScale 0.4s ease-in-out;
+}
+
+@keyframes fadeScale {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Icons */
+.alert-icon {
+  font-size: 1.5rem;
+}
+
+/* Alert type colors */
+.alert-success {
+  background: linear-gradient(135deg, #00ad06, #0dad15);
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #0084c2, #1f8eca);
+}
+
+.alert-warning {
+  background: linear-gradient(135deg, #b19000, #da8e15);
+  color: #212121;
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #cc0805, #bd2424);
+}

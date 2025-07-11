@@ -131,6 +131,11 @@ export class DetailListRDComponent implements OnInit,AfterViewInit {
         if(!this.reportData){
           this.comSer.SnackBar_Nodata()
           this.isLoading=false
+        }else{
+           for(let i=0;i<this.reportData.length;i++){
+           this.reportData[i].opening_dt=this.comSer.getFormatedDate(this.reportData[i].opening_dt);
+           this.reportData[i].mat_dt=this.comSer.getFormatedDate(this.reportData[i].mat_dt);
+           }
         } 
         this.pageLength=this.reportData.length
         this.dataSource.data=this.reportData
@@ -146,6 +151,7 @@ export class DetailListRDComponent implements OnInit,AfterViewInit {
         this.setPage(1)
         // this.lastcustcd=this.reportData[this.reportData.length-1].cust_cd
         this.reportData.forEach(e=>{
+          
           this.suminstL_AMT+=e.instL_AMT
           this.sumprN_AMT+=e.prN_AMT
           this.sumproV_INTT_AMT+=e.proV_INTT_AMT

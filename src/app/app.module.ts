@@ -38,7 +38,7 @@ import { DatePipe } from '@angular/common';
   imports: [
     MatSnackBarModule,
     BrowserModule, HttpClientModule, BrowserAnimationsModule, 
-    AppRoutingModule, // NgbModule,
+    AppRoutingModule,
     NgxJsonViewerModule, FormsModule, ReactiveFormsModule,
     ModalModule.forRoot(), BsDatepickerModule.forRoot(), AccordionModule.forRoot()
   ],

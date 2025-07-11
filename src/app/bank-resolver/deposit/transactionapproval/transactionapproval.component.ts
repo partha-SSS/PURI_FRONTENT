@@ -591,7 +591,7 @@ export class TransactionapprovalComponent implements OnInit {
   public onClickRefreshList() {
     this.disabledApproved=true;
     this.unLockTransaction(this.tempData?this.tempData:null);
-    this.HandleMessage(false);
+    // this.HandleMessage(false);
     this.refresh = false;
     // this.msg.sendCommonTransactionInfo(null);
     this.resetTransactionDtlsFrm();
@@ -882,13 +882,47 @@ export class TransactionapprovalComponent implements OnInit {
   }
 
   /** Below method handles message show/hide */
-  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-    this.showMsg = new ShowMessage();
-
-    this.showMsg.Show = show;
-    this.showMsg.Type = type;
-    this.showMsg.Message = message;
+    getAlertClass(type: MessageType): string {
+  switch (type) {
+    case MessageType.Sucess:
+      return 'alert-success';
+    case MessageType.Warning:
+      return 'alert-warning';
+    case MessageType.Info:
+      return 'alert-info';
+    case MessageType.Error:
+      return 'alert-danger';
+    default:
+      return 'alert-info';
   }
+}
+private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+  this.showMsg = new ShowMessage();
+  this.showMsg.Show = show;
+  this.showMsg.Type = type;
+  this.showMsg.Message = message;
+
+  if (show) {
+    setTimeout(() => {
+      this.showMsg.Show = false;
+    }, 5000); // auto-close after 4 sec
+  }
+}
+
+getAlertIcon(type: MessageType): string {
+  switch (type) {
+    case MessageType.Sucess:
+      return '✅';
+    case MessageType.Warning:
+      return '⚠️';
+    case MessageType.Info:
+      return 'ℹ️';
+    case MessageType.Error:
+      return '❌';
+    default:
+      return '🔔';
+  }
+}
 
   private GetUnapprovedDepTrans(): void {
     this.isLoading = true;
@@ -991,7 +1025,7 @@ export class TransactionapprovalComponent implements OnInit {
             this.onClickRefreshList();
             this.isLoading = false;
             
-          }, 3000);
+          }, 1000);
         } else {
           this.onClickRefreshList();
           this.isLoading = false;

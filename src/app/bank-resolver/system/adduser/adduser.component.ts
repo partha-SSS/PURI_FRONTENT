@@ -5,6 +5,21 @@ import { RestService } from 'src/app/_service';
 import { LOGIN_MASTER, MessageType, ShowMessage, SystemValues } from '../../Models';
 import { m_branch } from '../../Models/m_branch';
 
+
+
+declare const GetMorFinAuthInfo: (connectedDvc: string, clientKey: string) => any;
+declare const IsDeviceConnected: (connectedDvc: string) => any;
+declare const InitDevice: (connectedDvc: string, clientKey: string) => any;
+declare const UninitDevice: () => any;
+declare const GetSupportedDeviceList: () => any;
+declare const GetConnectedDeviceList: () => any;
+declare const GetMorFinAuthKeyInfo: (key: string) => any;
+declare const CaptureFinger: (quality: number, timeout: number) => any;
+declare const VerifyFinger: (ProbFMR: string, GalleryFMR: string, tmpFormat: string) => any;
+declare const MatchFinger: (quality: number, timeout: number, GalleryFMR: string, tmpFormat: string) => any;
+declare const GetImage: (imgformat: string) => any;
+declare const GetTemplate: (tmpFormat: string) => any;
+
 @Component({
   selector: 'app-adduser',
   templateUrl: './adduser.component.html',
@@ -12,6 +27,8 @@ import { m_branch } from '../../Models/m_branch';
 })
 export class AdduserComponent implements OnInit {
   brnDtls:any=[];
+  showFingerprint=true;
+  fingerprintStatus: 'scanning' | 'success' | 'error' | 'idle'='idle';
   selectalluser:any=[];
   sys = new SystemValues();
   isLoading=false;
@@ -38,6 +55,7 @@ export class AdduserComponent implements OnInit {
   pass:Boolean=false;
   cpass:Boolean=false;
   selected_user:boolean=false;
+  selected_userID:any;
   loginStatus:boolean=true;
   filterUser:any;
   statusVal:any
@@ -53,26 +71,28 @@ export class AdduserComponent implements OnInit {
   
   
   ngOnInit(): void {
+     const res = IsDeviceConnected("MFS500");
+    // const deviceReady: any;
+    const data=res.data
+    console.log(res.data);
+    if(data.ErrorCode=='0'){
+     const deviceInit=InitDevice("MFS500","");
+     console.log(deviceInit);
+     
+    }
     this.errorMSG=document.getElementById('error-message') as HTMLDivElement;
     debugger
       this.errorMSG.textContent='';
-    
+    //  document.getElementById('imgFinger').src = "";
     this.currentUID= localStorage.getItem('__userId');
     this.upd_s_User = this.formBuilder.group({
-      userid: ['', Validators.required],
-      password:['', Validators.required],
-      cpassword: ['', Validators.required],
-      fname: ['', Validators.required],
-      mname: ['', null],
-      lname: ['', Validators.required],
-      utype: ['', Validators.required],
-      branch: ['', Validators.required],
-      logsts:['']
+      user_id: ['', Validators.required],
+      utype:['', Validators.required]
     })
 
-    this.get_user = this.formBuilder.group({
-      select_user: ['', Validators.required],
-     });
+    // this.get_user = this.formBuilder.group({
+    //   select_user: ['', Validators.required],
+    //  });
      
     this.addUser = this.formBuilder.group({
       userid: ['', Validators.required],
@@ -155,12 +175,12 @@ export class AdduserComponent implements OnInit {
   }
 
   
-  showCpass(){
+  showCpass1(){
     this.addUser.controls.password.enable()
     this.isModify=false;
     this.showCpassword=true;
   }
-  hideCpass(){
+  hideCpass1(){
     this.addUser.controls.password.setValue(this.UserPassword);
     this.addUser.controls.password.disable()
     this.addUser.controls.cpassword.reset()
@@ -300,10 +320,12 @@ export class AdduserComponent implements OnInit {
       err => {this.isLoading=false; ;}
     )
   }
-  getallUser(){
+  getallUser(i:any){
+    console.log(i.target.value);
+    debugger
     // this.get_user.controls.select_user.value
     let login = new LOGIN_MASTER();
-    login.user_id = this.get_user.controls.select_user.value;
+    login.user_id = i.target.value;
     login.brn_cd = this.sys.BranchCode;
     login.ardb_cd=this.sys.ardbCD,
     
@@ -346,25 +368,24 @@ export class AdduserComponent implements OnInit {
   this.HandleMessage(true, MessageType.Warning,'Password set to be a Default !12345, after Click Update User');
   console.log(this.defaultPass);
   }
-  passCheck(i:any){
-    const password = i.target.value;
-    const hasMinimumLength: boolean = password.length >= 8;
-    const hasUppercase: boolean = /[A-Z]/.test(password);
-    const hasNumber: boolean = /\d/.test(password);
-    if(password.length<1){
-      this.errorMSG.textContent='';
-    }
-    else{
-      if (hasMinimumLength && hasUppercase && hasNumber) {
-        this.errorMSG.textContent = ''; // Clear error message if conditions are met
-    } else {
-        this.errorMSG.textContent = 'Password must have at least 8 characters, one uppercase letter, and one number.';
-        debugger
-        this.isSave = false;this.isModify = false;
-      }
-    }
+  // passCheck(i:any){
+  //   const password = i.target.value;
+  //   const hasMinimumLength: boolean = password.length >= 8;
+  //   const hasUppercase: boolean = /[A-Z]/.test(password);
+  //   const hasNumber: boolean = /\d/.test(password);
+  //   if(password.length<1){
+  //     this.errorMSG.textContent='';
+  //   }
+  //   else{
+  //     if (hasMinimumLength && hasUppercase && hasNumber) {
+  //   } else {
+  //       this.errorMSG.textContent = 'Password must have at least 8 characters, one uppercase letter, and one number.';
+  //       debugger
+  //       this.isSave = false;this.isModify = false;
+  //     }
+  //   }
     
-  }
+  // }
   retrieve ()
   {
     this.selected_user=true;
@@ -515,7 +536,8 @@ export class AdduserComponent implements OnInit {
         this.isSave = false;
         this.isClear = true;
       },
-      err => {this.isLoading=false; ; this.HandleMessage(true, MessageType.Error,'Updation Failed!!' );
+      err => {this.isLoading=false; 
+         this.HandleMessage(true, MessageType.Error,'Updation Failed!!' );
       this.isDel = false;
       this.isRetrieve = true;
       this.isNew = true;
@@ -528,7 +550,8 @@ export class AdduserComponent implements OnInit {
   }
   closeScreen2(){
     this.getUserDtl=true
-    this.get_user.controls.select_user.setValue(null)
+    // this.get_user.controls.select_user.setValue(null)
+    this.selected_userID=null;
   }
   deleteuser()
   {
@@ -586,13 +609,16 @@ export class AdduserComponent implements OnInit {
     this.f.userid.setValue(null);
     this.f.password.setValue(null);
   }
-  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-    this.showMsg = new ShowMessage();
-    this.showMsg.Show = show;
-    this.showMsg.Type = type;
-    this.showMsg.Message = message;
-  }
-  showPassword() {
+  // private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+  //   this.showMsg = new ShowMessage();
+  //   this.showMsg.Show = show;
+  //   this.showMsg.Type = type;
+  //   this.showMsg.Message = message;
+  // }
+
+
+
+  showPassword1() {
     this.show_button = !this.show_button;
     this.show_eye = !this.show_eye;
   }
@@ -633,6 +659,256 @@ export class AdduserComponent implements OnInit {
     }
 }
 
+captureAndMatchFinger() {
+   this.fingerprintStatus = 'scanning';
+  setTimeout(() => {
+        
+      const quality = 60;
+  const timeout = 10;
+  // const galleryTemplate = this.bioData; // Replace this with actual stored FMR
+  const tmpFormat = 'ISO'; // Or ANSI, based on your system
+
+  // Step 1: Capture the finger
+  const captureResult = CaptureFinger(quality, timeout);
+    console.log(captureResult);
+    
+  if (captureResult?.httpStaus==true && captureResult?.data?.ErrorCode=="0") {
+    const probTemplate = captureResult?.data
+    if(probTemplate.Quality>40){
+      const captureData=probTemplate.BitmapData
+       const templateRes = GetTemplate('0');
+        var tempdata=''
+        console.log(templateRes);
+        
+    if (templateRes?.data?.ErrorCode=='0') {
+      //  this.fingerprintStatus = 'success';
+      tempdata= templateRes?.data.ImgData
+      console.log("Captured Template:", templateRes.ImgData);
+      this.updateBiometric(tempdata)
+    } else {
+       this.fingerprintStatus = 'idle';
+          this.HandleMessage(true, MessageType.Error, `Please Capture Again`);
+
+              console.warn('❌ Failed to get template');
+            }
+      // console.error("Failed to get template:", templateRes.err);
+    }
+    }
+    else{
+          this.fingerprintStatus = 'error'
+          this.HandleMessage(true, MessageType.Error, `Error in Capture...! Capture Again`);
+          setTimeout(() => {
+           this.fingerprintStatus = 'idle'
+        }, 1000);
+      }
+    
+debugger
+      }, 4200);
+debugger
+
+   
+
+  } 
+     
+  updateBiometric(i:any){
+       this.isLoading=true;
+    var dt={
+      "user_id":localStorage.getItem('__userId'),
+      "biometric":i
+    }
+    this.svc.addUpdDel<any>('Sys/UpdateUserMasterBiometricTemplate', dt).subscribe(
+      res => {
+        console.log(res);
+         if(res>=0){
+           this.fingerprintStatus = 'success';
+          this.HandleMessage(true, MessageType.Sucess,'Your Biometric Successfully Updated!!')
+         } 
+         this.fingerprintStatus = 'success';         
+        this.isLoading=false;
+
+      },
+      err => {
+        this.fingerprintStatus = 'error';this.isLoading=false; ;}
+    )
+  }
+  getAlertClass(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return 'alert-success';
+      case MessageType.Warning:
+        return 'alert-warning';
+      case MessageType.Info:
+        return 'alert-info';
+      case MessageType.Error:
+        return 'alert-danger';
+      default:
+        return 'alert-info';
+    }
+  }
+  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+    this.showMsg = new ShowMessage();
+    this.showMsg.Show = show;
+    this.showMsg.Type = type;
+    this.showMsg.Message = message;
+  
+    if (show) {
+      setTimeout(() => {
+        this.showMsg.Show = false;
+      }, 5000); // auto-close after 4 sec
+    }
+  }
+  
+  getAlertIcon(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return '✅';
+      case MessageType.Warning:
+        return '⚠️';
+      case MessageType.Info:
+        return 'ℹ️';
+      case MessageType.Error:
+        return '❌';
+      default:
+        return '🔔';
+    }
+  }
+
+
+  passwordMatchValidator(): void {
+    const password = this.addUser.get('password')?.value;
+    const confirmPassword = this.addUser.get('cpassword')?.value;
+    
+    if (password && confirmPassword && password !== confirmPassword) {
+      this.addUser.get('cpassword')?.setErrors({ 'mismatch': true });
+    } else {
+      this.addUser.get('cpassword')?.setErrors(null);
+    }
+  }
+  private setupPasswordTransitions(): void {
+    const confirmGroups = document.querySelectorAll('.form-group:has(#cPassword)');
+    confirmGroups.forEach(group => {
+      (group as HTMLElement).style.transition = 'all 0.3s ease';
+      (group as HTMLElement).style.opacity = '0';
+      (group as HTMLElement).style.transform = 'translateY(-10px)';
+    });
+  }
+  getUserTypeBadgeClass(): string {
+  const userType = this.addUser.controls.utype?.value;
+  switch(userType) {
+    case 'A': return 'badge-admin';
+    case 'S': return 'badge-super';
+    case 'G': return 'badge-general';
+    case 'D': return 'badge-discard';
+    case 'L': return 'badge-loan';
+    case 'P': return 'badge-deposit';
+    default: return 'badge-general';
+  }
+}
+
+// Method to get user type label
+getUserTypeLabel(): string {
+  const userType = this.addUser.get('utype')?.value;
+  switch(userType) {
+    case 'A': return 'Administrator';
+    case 'S': return 'Super User';
+    case 'G': return 'General User';
+    case 'D': return 'Discard User';
+    case 'L': return 'Loan User';
+    case 'P': return 'Deposit User';
+    default: return 'Select User Type';
+  }
+}
+
+// Enhanced password visibility toggle
+showPassword(): void {
+  this.show_button = !this.show_button;
+  this.show_eye = !this.show_eye;
+}
+
+// Enhanced show change password
+showCpass(): void {
+  this.showCpassword = true;
+  this.pass = true;
+  
+  // Add smooth animation
+  setTimeout(() => {
+    const confirmGroup = document.querySelector('.form-group:has(#cPassword)') as HTMLElement;
+    if (confirmGroup) {
+      confirmGroup.style.opacity = '1';
+      confirmGroup.style.transform = 'translateY(0)';
+    }
+  }, 10);
+}
+
+// Enhanced hide change password
+hideCpass(): void {
+  const confirmGroup = document.querySelector('.form-group:has(#cPassword)') as HTMLElement;
+  if (confirmGroup) {
+    confirmGroup.style.opacity = '0';
+    confirmGroup.style.transform = 'translateY(-10px)';
+  }
+  
+  setTimeout(() => {
+    this.showCpassword = false;
+    this.pass = false;
+    this.cpass = false;
+  }, 300);
+}
+
+// Enhanced password validation
+passCheck(event: any): void {
+  const password = event.target.value;
+  
+  // Add your existing password validation logic here
+  // Example validation:
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const isLongEnough = password.length >= 8;
+  
+  const isValid = hasUppercase && hasLowercase && hasNumbers && hasSpecialChar && isLongEnough;
+  debugger
+  // Update form validation state
+  if (isValid) {
+    this.addUser.get('password')?.setErrors(null);
+  } else {
+    this.addUser.get('password')?.setErrors({ 'invalid': true });
+  }
+}
+
+
+// Methods for retrieve section
+getRetrieveUserTypeBadgeClass(): string {
+  const userType = this.upd_s_User.get('utype')?.value;
+  switch(userType) {
+    case 'A': return 'badge-admin';
+    case 'S': return 'badge-super';
+    case 'G': return 'badge-general';
+    case 'D': return 'badge-discard';
+    case 'L': return 'badge-loan';
+    case 'P': return 'badge-deposit';
+    default: return 'badge-general';
+  }
+}
+
+getRetrieveUserTypeLabel(): string {
+  const userType = this.upd_s_User.get('utype')?.value;
+  switch(userType) {
+    case 'A': return 'Administrator';
+    case 'S': return 'Super User';
+    case 'G': return 'General User';
+    case 'D': return 'Discard User';
+    case 'L': return 'Loan User';
+    case 'P': return 'Deposit User';
+    default: return 'Select User Type';
+  }
+}
+
+  ngAfterViewInit(): void {
+    // Add smooth transitions for change password functionality
+    this.setupPasswordTransitions();
+  }
 }
 // if(this.saveFlag=='N'){
 //   this.isModify=true;

@@ -19,7 +19,7 @@ import { VoucherprintComponent } from './finance/voucherprint/voucherprint.compo
 import { GenLedger2Component } from './finance/report/gen-ledger2/gen-ledger2.component';
 import { TransactionapprovalComponent } from './deposit/transactionapproval/transactionapproval.component';
 import { AccOpeningComponent } from './deposit/acc-opening/acc-opening.component';
-import { TestComponent } from '../bank-resolver/test/test.component';
+import { DenominationComponent } from './test/denomination.component';
 import { ScrollbookComponent } from './finance/report/scrollbook/scrollbook.component';
 import { VoucherapprovalComponent } from './finance/voucherapproval/voucherapproval.component';
 import { DayinitializationComponent } from './system/dayinitialization/dayinitialization.component';
@@ -255,6 +255,10 @@ import { AnextureEntryComponent } from './assets-management/master/anexture-entr
 import { SubAnextureEntryComponent } from './assets-management/master/sub-anexture-entry/sub-anexture-entry.component';
 import { TransAssetsComponent } from './assets-management/transaction/trans-assets.component';
 import { CalDepPostComponent } from './assets-management/cal-dep-post/cal-dep-post.component';
+import { AndroidPostingComponent } from './deposit/ddsExportImport/android-posting/android-posting.component';
+import { ConsoDtlListFdMisComponent } from './deposit/report/conso-dtl-list-fd-mis/conso-dtl-list-fd-mis.component';
+import { ConsoDtlListSbcaComponent } from './deposit/report/conso-dtl-list-sbca/conso-dtl-list-sbca.component';
+import { ConsoDtlListRdComponent } from './deposit/report/conso-dtl-list-rd/conso-dtl-list-rd.component';
 
 const routes: Routes = [
   { path: 'Admin', component: AdminPanelComponent },
@@ -283,7 +287,7 @@ const routes: Routes = [
       // { path: 'la', component: LandingComponent, canActivate: [AuthGuard] },
       { path: 'la', component: LandingComponent, canActivate: [AuthGuard] },
       { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-      { path: 'test', component: TestComponent },
+      { path: 'denomination', component: DenominationComponent },
       { path: 'FT_Y_PROV_POST', component: YearlyProvisionPostingComponent },
       
       // { path: 'UT_Contai_CustomerProfile', component: ContaiUCICprofileComponent, canActivate: [AuthGuard] },
@@ -311,6 +315,10 @@ const routes: Routes = [
       { path: 'FR_CdDayBook', component: ConsolidatedDayBookComponent, canActivate: [AuthGuard] },
       { path: 'FR_DayBookNew', component: DailybookNewComponent, canActivate: [AuthGuard] },
       { path: 'FR_consoDayBookNew', component: ConsolidatedDailybookNewComponent, canActivate: [AuthGuard] },
+       
+      { path: 'DR_DLFDMIS_CONSO', component: ConsoDtlListFdMisComponent, canActivate: [AuthGuard] },
+      { path: 'DR_DLSBCA_CONSO', component: ConsoDtlListSbcaComponent, canActivate: [AuthGuard] },
+      { path: 'DR_DLRD_CONSO', component: ConsoDtlListRdComponent, canActivate: [AuthGuard] },
       
       { path: 'FR_CdCashAccount', component: ConsolidatedCashAccComponent, canActivate: [AuthGuard] },
       { path: 'FR_CdTrialBalance', component: ConsolidatedTrialBalanceComponent, canActivate: [AuthGuard] },
@@ -396,7 +404,7 @@ const routes: Routes = [
       { path: 'LR_AdvRec', component: AdRecStmtComponent, canActivate: [AuthGuard] },
       { path: 'LR_intRec', component: IntRecStmtComponent, canActivate: [AuthGuard] },
       { path: 'DM_Cert_Print_U', component: BlockMasterComponent, canActivate: [AuthGuard] },
-      { path: 'Service_Area', component: ServiceareamasterComponent, canActivate: [AuthGuard] },
+      { path: 'LM_PoEntry', component: ServiceareamasterComponent, canActivate: [AuthGuard] },
       { path: 'LM_Villentry', component: VillageMasterComponent, canActivate: [AuthGuard] },
       { path: 'LM_Villentry_contai', component: VillMasterContaiComponent, canActivate: [AuthGuard] },
       { path: 'LR_NPA', component: NpaComponent, canActivate: [AuthGuard] },
@@ -439,6 +447,7 @@ const routes: Routes = [
       { path: 'DT_DDIMPORT', component: DdsImportComponent, canActivate: [AuthGuard] },
       { path: 'DR_DDS_COL_REP', component: DdsAgentTransReportComponent, canActivate: [AuthGuard] },
       { path: 'DT_DDINDPOST', component: DdsIndividualPostingComponent, canActivate: [AuthGuard] },
+      { path: 'DT_AndroidPOST', component: AndroidPostingComponent, canActivate: [AuthGuard] },
       { path: 'DT_SavingInttPost', component: SavingIntPostComponent, canActivate: [AuthGuard] },
       { path: 'DT_SMSchargeDed', component: SmsChargeDeductionComponent, canActivate: [AuthGuard] },
       { path: 'DT_AgentComPost', component: AgentCommissionComponent, canActivate: [AuthGuard] },

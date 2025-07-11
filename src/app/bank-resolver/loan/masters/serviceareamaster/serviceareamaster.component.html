@@ -56,7 +56,7 @@ style="background-color: #78c2ad21; min-height: 20vh;">
 
 
       <div class="form-group col-3">
-        <small for="Service_Area">Service Area CD</small>
+        <small for="Service_Area">Post Office CD</small>
         <div class="input-group">
     
         <input style="height:25px" type="text"
@@ -69,10 +69,10 @@ style="background-color: #78c2ad21; min-height: 20vh;">
         </div>
         </div>
         <div class="suggestions border p-2" *ngIf="allServiceArea">
-          <strong> Area Code / Area Name </strong>
+          <strong> Post Office Code / Post Office Name </strong>
           <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let sarea of allServiceArea"
             (click)="setAreaDtls(sarea)">
-            {{ sarea.service_area_cd  +'/'+ sarea.service_area_name}}
+            {{ sarea.po_cd  +'/'+ sarea.po_name}}
           </p>
         </div>
         <div class="suggestions border p-2" style="width: 200%; font-size: small;"

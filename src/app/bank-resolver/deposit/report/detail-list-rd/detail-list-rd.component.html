@@ -84,12 +84,12 @@ style="background-color: #78c2ad21; min-height: 20vh;">
     <!-- Progress Column -->
     <ng-container matColumnDef="opening_dt" >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Opening DT</th>
-      <td mat-cell *matCellDef="let row" > {{row.opening_dt.substr(0,10)}} </td>
+      <td mat-cell *matCellDef="let row" > {{row.opening_dt}} </td>
     </ng-container>
     <!-- ID Column -->
     <ng-container matColumnDef="mat_dt" >
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Maturity Dt</th>
-      <td mat-cell *matCellDef="let row">{{row.mat_dt.substr(0,10) }}</td>
+      <td mat-cell *matCellDef="let row">{{row.mat_dt }}</td>
     </ng-container>
 
     <!-- ID Column -->

@@ -25,7 +25,7 @@
   <!-- <ng-container *ngTemplateOutlet="messageDiv"></ng-container> -->
   <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3 ml-2">
     <!-- <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3"> -->
-  <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+   <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
       <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
       <span class="alert-text">{{ showMsg.Message }}</span>
     </div>
@@ -49,7 +49,7 @@
                 <th>Agent Name</th>
               </tr>
               <tbody *ngFor="let agent of agentRes" >
-                <tr  (click)="selectAgent(agent.agent_cd)">
+                <tr  (click)="selectAgent(agent)">
                   <td>
                     {{agent.agent_cd}}
                   </td>
@@ -71,35 +71,11 @@
           </select>
         </div> -->
         <div class="form-group col-4" style="margin-bottom: 0%;">
-          <small for="trans_dt">Trans Date</small>
-          <div class="input-group">
-            <input type="text" placeholder="dd/mm/yyyy" class="form-control"
-              formControlName="trans_dt" bsDatepicker
-              [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
-            <div class="input-group-append">
-              <button mat-raised-button class="btn btn-outline-secondary" [disabled]="disTransBtn" type="button"
-                (click)="isOpenFromDp = !isOpenFromDp">
-                <i class="fa fa-calendar" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
+          <small for="agent_name">Agent Name</small>
+          <input type="text" readonly style="height:30px;" class="form-control" formControlName="agent_name">
+       
         </div>
-        <div class="form-group col-4" style="margin-bottom: 0%;">
-          <small for="trans_cd">Trans CD</small>
-          <div class="input-group">
-            <input type="text" style="height:30px;" class="form-control" formControlName="trans_cd">
-          </div>
-        </div>
-        <div class="form-group col-4" style="margin-bottom: 0%;">
-          <small for="agent_name">Agent Code</small>
-          <input type="text" class="form-control form-control-sm text-capitalize" formControlName="agent_name"
-            id="agent_name">
-        </div>
-        <div class="form-group  col-4">
-          <small for="trans_type">Trans Type</small>
-          <input type="text" (input)="clearSuggestedCust()" class="form-control form-control-sm text-capitalize"
-            formControlName="trans_type" id="trans_type">
-        </div>
+        
         <div class="form-group col-4">
           <small for="trans_amt">Trans Amt</small>
           <input type="text" style="height:30px;" class="form-control" formControlName="trans_amt">

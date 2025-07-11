@@ -1,8 +1,8 @@
 import { RestService } from './../../_service/rest.service';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LOGIN_MASTER, SystemValues } from '../Models';
+import { LOGIN_MASTER, MessageType, ShowMessage, SystemValues } from '../Models';
 import { InAppMessageService } from 'src/app/_service';
 import { sm_parameter } from '../Models/sm_parameter';
 import { HttpClient } from '@angular/common/http';
@@ -10,15 +10,26 @@ import { DatePipe } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { CommonServiceService } from '../common-service.service';
 import { Observable } from 'rxjs';
-// import {WINDOW} from '../../bank-resolver/window.providers'
-// import { SampleService } from './services';
+
+declare const GetMorFinAuthInfo: (connectedDvc: string, clientKey: string) => any;
+declare const IsDeviceConnected: (connectedDvc: string) => any;
+declare const InitDevice: (connectedDvc: string, clientKey: string) => any;
+declare const UninitDevice: () => any;
+declare const GetSupportedDeviceList: () => any;
+declare const GetConnectedDeviceList: () => any;
+declare const GetMorFinAuthKeyInfo: (key: string) => any;
+declare const CaptureFinger: (quality: number, timeout: number) => any;
+declare const VerifyFinger: (ProbFMR: string, GalleryFMR: string, tmpFormat: string) => any;
+declare const MatchFinger: (quality: number, timeout: number, GalleryFMR: string, tmpFormat: string) => any;
+declare const GetImage: (imgformat: string) => any;
+declare const GetTemplate: (tmpFormat: string) => any;
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   providers:[DatePipe]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit ,AfterViewInit{
 
   // private apiUrl = 'https://api.ipify.org/?format=json';
   private apiUrl = 'https://api.ipify.org?format=json';
@@ -29,7 +40,15 @@ export class LoginComponent implements OnInit {
   returnUrl: string;
   isError = false;
   brnDtls: any = [];
+  bioData:string=''
+
+  showPassword = true;
+  showFingerprint = false;
+  fingerprintStatus: 'scanning' | 'success' | 'error' | 'idle'='idle';
+
+  tmpFormat = 1;
   // ardbBrnMst: mm_ardb[] = [];
+  // showFingerprint:boolean = false;
   ardbBrnMst: any = [];
   // ardbBrnMst: any[] = [];
   systemParam: sm_parameter[] = [];
@@ -40,7 +59,8 @@ export class LoginComponent implements OnInit {
   ipAddress: any;
   showUnlockUsr = false;
   usrToUnlock: any;
-  nm: any
+  nm: any;
+  showMsg: ShowMessage;
   userData: any;
   dtData:any
   getIp:any
@@ -53,6 +73,7 @@ export class LoginComponent implements OnInit {
   footer:any;
   ARBD:any='';
   SBaccCD:any;
+  
   constructor(private router: Router,
     private formBuilder: FormBuilder,
     private rstSvc: RestService,
@@ -65,7 +86,11 @@ export class LoginComponent implements OnInit {
      }
 
   ngOnInit(): void {
-   
+    const res = UninitDevice();
+    // const deviceReady: any;
+    const data=res.data
+    console.log(res.data);
+    
     this.ARBD="1"
   //  this.getMyIp();
     this.wrongAttamt=localStorage.getItem('W_attempt')
@@ -77,12 +102,6 @@ export class LoginComponent implements OnInit {
       // this.getLogdUser();
       //  this.updateLoginStatus();
     }
-
-    // alert("hii")
-    // const getmac = require('getmac')
-    // //console.log(getmac)
-    // //console.log(window.location.hostname)
-  //  this.getPrivateIP()
     this.loginForm = this.formBuilder.group({
       ardbbrMst: ['', Validators.required],
       username: ['', Validators.required],
@@ -112,6 +131,20 @@ export class LoginComponent implements OnInit {
       this.isLoading = false
     }, 300);
 
+  }
+  ngAfterViewInit(): void {
+    const res = IsDeviceConnected("MFS500");
+    // const deviceReady: any;
+    const data=res.data
+    console.log(res.data);
+    if(data.ErrorCode=='0'){
+     const deviceInit=InitDevice("MFS500","");
+     console.log(deviceInit);
+     
+    }else{
+           this.HandleMessage(true, MessageType.Error, `${data.ErrorDescription}`);
+
+    }
   }
 
 getparamval(){
@@ -200,8 +233,10 @@ getparamval(){
         this.userData = data;
         this.isLoading=false;
         if(this.userData[0]?.user_type=="D"){
-          this.showAlert=true;
-          this.alertMsg='User id was Locked, Contact to Administrator!'
+           this.HandleMessage(true, MessageType.Error, 'User id was Locked, Contact to Administrator!');
+
+          // this.showAlert=true;
+          // this.alertMsg='User id was Locked, Contact to Administrator!'
           this.isLoading=false;
           this.loginForm.invalid;
           return true;
@@ -209,8 +244,10 @@ getparamval(){
 
        }
        else{
-        this.showAlert=true;
-        this.alertMsg='Somthing was wrong, try again..'
+        this.HandleMessage(true, MessageType.Error, 'Somthing was wrong, try again..!');
+
+        // this.showAlert=true;
+        // this.alertMsg='Somthing was wrong, try again..'
         this.isLoading=false;
         return
        }
@@ -247,8 +284,10 @@ getparamval(){
     }
     if(this.userData[0]?.user_type != 'A' &&  this.userData[0]?.brn_cd!=this.f.branch.value){
         this.f.branch.disable() ;
-        this.showAlert=true;
-        this.alertMsg='User only signed into that branch where they were assigned.'
+         this.HandleMessage(true, MessageType.Warning, 'User only signed into that branch where they were assigned.');
+
+        // this.showAlert=true;
+        // this.alertMsg='User only signed into that branch where they were assigned.'
         return
     }
     else{
@@ -287,14 +326,18 @@ getparamval(){
 
 
             if(this.wrongAttamt==1){
-              this.showAlert = true;
+              // this.showAlert = true;
               this.isLoading=false;
-              this.alertMsg = `Invalid UserName Or Password,(Wrong Attamt - ${this.wrongAttamt})`;
+              this.HandleMessage(true, MessageType.Error, `Invalid UserName Or Password,(Wrong Attamt - ${this.wrongAttamt})`);
+
+              // this.alertMsg = `Invalid UserName Or Password,(Wrong Attamt - ${this.wrongAttamt})`;
             }
             else if(this.wrongAttamt==2){
-              this.showAlert = true;
+              // this.showAlert = true;
               this.isLoading=false;
-              this.alertMsg = `Wrong Attamt - ${this.wrongAttamt}, After one more wrong attamt ID will be locked `;
+              this.HandleMessage(true, MessageType.Error, `Wrong Attamt - ${this.wrongAttamt}, After one more wrong attamt ID will be locked `);
+
+              // this.alertMsg = `Wrong Attamt - ${this.wrongAttamt}, After one more wrong attamt ID will be locked `;
             }
            else if(this.wrongAttamt>2){
               var dc={
@@ -304,16 +347,20 @@ getparamval(){
               this.rstSvc.addUpdDel<any>('Sys/DeleteUserMaster', dc).subscribe(
                 res => {
                   if(res==0){
-                    this.showAlert = true;
+                    // this.showAlert = true;
                     this.isLoading=false;
-                    this.alertMsg = 'User id was locked, Contact to Administrator!';
+                    this.HandleMessage(true, MessageType.Error, `User id was locked, Contact to Administrator!`);
+
+                    // this.alertMsg = 'User id was locked, Contact to Administrator!';
                   }
                 })
             }
             else{
-              this.showAlert = true;
+              // this.showAlert = true;
               this.isLoading=false;
-              this.alertMsg = `Invalid UserName Or Password,(Wrong Attamt - ${this.wrongAttamt})`;
+              this.HandleMessage(true, MessageType.Error, `Invalid UserName Or Password,(Wrong Attamt - ${this.wrongAttamt})`);
+
+              // this.alertMsg = `Invalid UserName Or Password,(Wrong Attamt - ${this.wrongAttamt})`;
             }
 
             debugger
@@ -323,9 +370,12 @@ getparamval(){
             //console.log(res[0])
 
             if (res[0].login_status === "Y") {
-              this.showAlert = true;
+              // this.showAlert = true;
               this.isLoading=false;
-              this.alertMsg = 'User id already logged in another machine;';
+              this.HandleMessage(true, MessageType.Error, `User id already logged in another machine;`);
+
+              
+              // this.alertMsg = 'User id already logged in another machine;';
               // this.showUnlockUsr = true;
               // alert(this.showUnlockUsr)
               this.usrToUnlock = res[0];
@@ -354,8 +404,9 @@ getparamval(){
         },
         err => {
           this.isLoading = false;
-          this.showAlert = true;
-          this.alertMsg = 'Invalid Credential !!!!!';
+          // this.showAlert = true;
+          // this.alertMsg = 'Invalid Credential !!!!!';
+          this.HandleMessage(true, MessageType.Error, `Invalid Credential !!!!!`);
         }
       ),
       err => {
@@ -460,8 +511,10 @@ getparamval(){
 
         catch (exception) {
           this.isLoading = false;
-          this.showAlert = true;
-          this.alertMsg = 'Initialization Failed. Contact Administrator !';
+          // this.showAlert = true;
+          this.HandleMessage(true, MessageType.Error, `Initialization Failed. Contact Administrator !`);
+          
+          // this.alertMsg = 'Initialization Failed. Contact Administrator !';
         }
       },
       sysErr => { }
@@ -536,7 +589,7 @@ getparamval(){
     })
   }
   onfocusOut(e: any) {
-
+      this.onUsernameChange();
     var dt = {
       "ardb_cd": "1",
       "user_id": e.target.value
@@ -546,8 +599,10 @@ getparamval(){
        this.userData = data;
        if(this.userData){
         if(this.userData[0]?.user_type=="D"){
-          this.showAlert=true;
-          this.alertMsg='User id was Locked, Contact to Administrator!'
+           this.HandleMessage(true, MessageType.Error, `User id was Locked, Contact to Administrator!`);
+          
+          // this.showAlert=true;
+          // this.alertMsg='User id was Locked, Contact to Administrator!'
           this.isLoading=false;
           this.loginForm.disable();
           return true;
@@ -556,9 +611,11 @@ getparamval(){
         localStorage.setItem('userType',this.userData[0]?.user_type)
        this.loginForm.patchValue({branch:this.userData[0]?.user_type != 'A' ?  this.userData[0]?.brn_cd : ''})
        this.userData[0]?.user_type != 'A' ? this.f.branch.disable() : this.f.branch.enable();
-       this.showAlert = this.userData[0]?.login_status == 'Y' ? true : false;
-       this.alertMsg = this.userData[0]?.login_status == 'Y' ? 'User id already logged in another machine' : '';
-       }
+      //  this.showAlert = this.userData[0]?.login_status == 'Y' ? true : false;
+      //  this.alertMsg = this.userData[0]?.login_status == 'Y' ? 'User id already logged in another machine' : '';
+           this.HandleMessage(this.userData[0]?.login_status == 'Y', MessageType.Error, `User id already logged in another machine`);
+       
+      }
        // if (this.userData[0].user_type != 'A') {
       //   this.loginForm.patchValue({
       //     branch: this.userData[0].brn_cd
@@ -581,7 +638,62 @@ getparamval(){
       this.isLoading=false;
     })
   }
+      getAlertClass(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return 'alert-success';
+      case MessageType.Warning:
+        return 'alert-warning';
+      case MessageType.Info:
+        return 'alert-info';
+      case MessageType.Error:
+        return 'alert-danger';
+      default:
+        return 'alert-info';
+    }
+  }
+  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+    this.showMsg = new ShowMessage();
+    this.showMsg.Show = show;
+    this.showMsg.Type = type;
+    this.showMsg.Message = message;
   
+    if (show) {
+      setTimeout(() => {
+        this.showMsg.Show = false;
+      }, 5000); // auto-close after 4 sec
+    }
+  }
+  
+  getAlertIcon(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return '✅';
+      case MessageType.Warning:
+        return '⚠️';
+      case MessageType.Info:
+        return 'ℹ️';
+      case MessageType.Error:
+        return '❌';
+      default:
+        return '🔔';
+    }
+  }
+  public getUserBiometric(i:any){
+              var dc={
+                "user_id":i
+              }
+              //  this.isLoading=true;
+              this.rstSvc.addUpdDel<any>('Sys/GetUserBiometricImage', dc).subscribe(
+                res => {
+                 console.log(res);
+                  const dataUrl = res.biometric;
+                  const base64String = dataUrl.split(',')[1];
+                  console.log(base64String);
+                    this.bioData=base64String;
+                   },err=>{console.log(err);
+                   })
+            }
   public getBranchIp(e: any) {
     this.loginForm.disable();
     return new Promise((resolve, reject) =>
@@ -608,8 +720,10 @@ getparamval(){
             }
 
           if (!ipMatched) {
-            this.showAlert = true;
-            this.alertMsg = 'IP not allowed to access, contact support.';
+           this.HandleMessage(true, MessageType.Error, `IP not allowed to access, contact support`);
+
+            // this.showAlert = true;
+            // this.alertMsg = 'IP not allowed to access, contact support.';
             this.loginForm.disable();
             resolve(false);
           } else {
@@ -621,6 +735,135 @@ getparamval(){
      }
     )
 
+  }
+  onUsernameChange(): void {
+  const username = this.loginForm.controls['username'].value;
+  this.showFingerprint = (username?.trim().toUpperCase() === 'ADMIN');
+  // Optional: clear password when fingerprint is shown
+  if (this.showFingerprint) {
+    this.getUserBiometric(username);
+    this.loginForm.controls['password'].reset();
+  }
+}
+
+ 
+  captureFingerprint(): void {
+  const result = CaptureFinger(60, 10);
+  if (result.httpStaus) {
+    console.log("Fingerprint data:", result.data);
+  } else {
+    console.error("Error:", result.err);
+  }
+}
+captureAndMatchFinger() {
+  
+debugger
+
+  const quality = 60;
+  const timeout = 10;
+  const galleryTemplate = this.bioData; // Replace this with actual stored FMR
+  const tmpFormat = 'ISO'; // Or ANSI, based on your system
+
+  // Step 1: Capture the finger
+  const captureResult = CaptureFinger(quality, timeout);
+    console.log(captureResult);
+    
+  if (captureResult?.httpStaus==true && captureResult?.data?.ErrorDescription=="Success") {
+    const probTemplate = captureResult?.data
+    if(probTemplate.Quality>40){
+      const captureData=probTemplate.BitmapData
+       const templateRes = GetTemplate('0');
+        var tempdata=''
+    if (templateRes?.ErrorCode=='0') {
+      tempdata= templateRes?.ImgData
+      console.log("Captured Template:", templateRes.ImgData);
+    } else {
+      console.error("Failed to get template:", templateRes.err);
+    }
+    }
+    else{
+          this.HandleMessage(true, MessageType.Error, `Low Quality Capture...! Capture Again`);
+      }
+    
+debugger
+   
+
+  } else {
+    console.error('Capture failed:', captureResult.err);
+  }
+}
+
+ startFingerprintScan(): void {
+    this.fingerprintStatus = 'scanning';
+
+    // Simulate scan delay or call CaptureFinger directly
+    setTimeout(() => {
+      const tmpFormat = '2';
+      // const result = CaptureFinger(60, 10); // quality: 60%, timeout: 10s
+      const result = MatchFinger(60, 10,this.bioData,tmpFormat); // quality: 60%, timeout: 10s
+
+      if (result?.httpStaus) {
+        // If capture success and data exists
+        if (result.data?.ErrorCode=='0') {
+          console.log("Captured Finger Data:", result.data.FingerData);
+            if (result.data?.Status) {
+              console.log('✅ Fingerprint matched!');
+                this.fingerprintStatus = 'success';
+                   var dt = this.brnDtls.find(x => x.brn_cd == this.f.branch.value)
+              this.getBranchIp(dt).then(response => {
+
+                if (response == true) {
+                  // res[0].login_status = 'Y';
+                  // res[0].ip = localStorage.getItem('ipAddress');
+                  // this.updateUsrStatus(res[0]);
+                  this.getSystemParam();
+                }
+
+                else {
+
+                }
+              })
+            } else {
+              this.fingerprintStatus = 'error';
+               this.HandleMessage(true, MessageType.Error, `Fingerprint not matched! try Again..`);
+              console.warn('❌ Fingerprint did NOT match.');
+            }
+          // const templateRes = GetTemplate('1');
+          // var tempdata=''
+          // if (templateRes?.data.ErrorCode=='0') {
+          //   tempdata= templateRes?.data.ImgData
+          //   console.log("Captured Template:", templateRes?.data.ImgData);
+          // } else {
+          //   console.error("Failed to get template:", templateRes.err);
+          // }
+          // const tmpFormat = 'ISO';
+          // // const verifyRes = VerifyFinger(probTemplate, galleryTemplate, tmpFormat);
+          // const verifyRes = VerifyFinger(this.bioData,tempdata,  tmpFormat);
+
+          
+          // if (verifyRes.httpStaus) {
+          //   if (verifyRes.data?.IsMatched) {
+          //     console.log('✅ Fingerprint matched!');
+          //   } else {
+          //     console.warn('❌ Fingerprint did NOT match.');
+          //   }
+          // } else {
+          //   console.error('Verification failed:', verifyRes.err);
+          // }
+        } else {
+           this.HandleMessage(true, MessageType.Error, `${result.data?.ErrorDescription}`);
+          this.fingerprintStatus = 'error';
+        }
+      } else {
+        console.error("Capture Error:", result?.err);
+        this.fingerprintStatus = 'error';
+      }
+
+      // Reset status after few seconds (optional)
+      setTimeout(() => {
+        this.fingerprintStatus = 'idle';
+      }, 3000);
+    }, 1000); // Simulated delay for visual spinner
   }
 
 

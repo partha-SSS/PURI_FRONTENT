@@ -17,7 +17,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.sticky-footer{background-color: #8ebd00; text-align: center; color: #044800;}
+.sticky-footer{background-color: #e2d51b; text-align: center; color: #044800;}
 .sticky-footer a{color: #044800; text-decoration: underline;}
 .sticky-footer a:hover{text-decoration: none;}
 

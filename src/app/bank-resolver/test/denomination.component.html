@@ -1,0 +1,172 @@
+                    
+          
+       <ng-template #retriveDeno let-modal bd-example-modal-lg>
+        <div class="modal-header text-center" >
+            <h3>Get Denomination</h3>
+        </div>
+          <div class="modal-body text-center" >
+            <div class="form-row">
+                    <div class="col-8">
+                    <small for="fromDate">Trans Date</small>
+                    <div class="input-group">
+                        <input type="text" placeholder="dd/mm/yyyy" class="form-control" [(ngModel)]="trans_dt"  bsDatepicker
+                         [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenTransDt">
+                        <div class="input-group-append">
+                        <!-- <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenTransDt = !isOpenTransDt">
+                          <i class="fa fa-calendar" aria-hidden="true"></i>
+                        </button> -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-4">
+                    <small for="deno_total">Trans Code</small>
+                    <input [(ngModel)]="trans_cd" type="number"
+                      class="form-control form-control-sm" id="trans_cd" placeholder="Trans Code">
+                  </div>
+            </div>                              
+          </div>
+          <div class="modal-footer text-center" >
+            <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+            <button mat-raised-button type="button" class=" btn btn-primary" (click)="getDenomination(trans_dt,trans_cd)" >Submit</button>
+          </div>
+        </ng-template>
+        <ng-template #insertDeno let-modal bd-example-modal-lg>
+        <div class="modal-header text-center" >
+            <h3>Insert Denomination</h3>
+        </div>
+          <div class="modal-body text-center" >
+            <div class="form-row">
+                  <div class="col-8">
+                    <small for="fromDate">Trans Date</small>
+                    <div class="input-group">
+                        <input type="text" placeholder="dd/mm/yyyy" class="form-control" [(ngModel)]="trans_dt" bsDatepicker
+                         [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenTransDt">
+                        <div class="input-group-append">
+                        <!-- <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenTransDt = !isOpenTransDt">
+                          <i class="fa fa-calendar" aria-hidden="true"></i>
+                        </button> -->
+                      </div>
+                    </div>
+                  </div>
+                 
+                  <div class="col-4">
+                    <small for="deno_total">Trans Code</small>
+                    <input [(ngModel)]="trans_cd" type="number"
+                      class="form-control form-control-sm" id="trans_cd" placeholder="Trans Code">
+                  </div>
+            </div>                              
+          </div>
+          <div class="modal-footer text-center" >
+            <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
+            <button mat-raised-button type="button" class=" btn btn-primary" (click)="insertDenomination(trans_dt,trans_cd)" >Insert Data</button>
+          </div>
+        </ng-template>
+          
+          <ng-template #buttonDiv > 
+          <div class="row d-flex justify-content-center align-items-center"
+            style="background-color: #78c2ad21; text-align: center;" *ngIf="!transFromAnotherSceen">
+            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 mb-4 bg-white p-2">
+              <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onNewClick()">New</button>
+              <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="openModal(retriveDeno)">Retrieve</button>
+              <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="!enableModifyAndDel"
+                (click)="onModifyClick()">Modify</button> -->
+              <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onClearClick()">Clear</button>
+              
+              <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+              <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" [disabled]="!updateMode"
+                (click)="onDelClick()">Delete</button>
+                <button mat-raised-button type="button" #saveBtn class="btn btn-primary btn-sm ml-1 mr-1" (click)="onSaveClick()" [disabled]="updateMode">Save</button>
+                <button mat-raised-button type="button" #updateBtn class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()" [disabled]="!updateMode">Update</button>
+            </div>
+          </div>
+          </ng-template>
+          <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+          <loading *ngIf="isLoading"></loading>
+         <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3" style=" margin-left: 16%;"> 
+          <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+              <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+              <span class="alert-text">{{ showMsg.Message }}</span>
+            </div>  
+           <div>
+              <h4 class="customHeader">Denomination Information </h4>
+            <div *ngIf="transFromAnotherSceen">
+               <div class="form-row">
+                    <div class="form-group col-4">
+                        <small for="deno_count">Trans Code</small>
+                        <input [(ngModel)]="trans_code" type="number"
+                          class="form-control form-control-sm " 
+                          id="trans_cd" placeholder="Trans Code">
+                  </div>
+                  <div class="form-group col-6">
+                        <small for="fromDate">Trans Date</small>
+                    <div class="input-group">
+                        <input type="text" placeholder="dd/mm/yyyy" class="form-control" [(ngModel)]="trans_dt" bsDatepicker
+                         [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenTransDt">
+                       
+                    </div>
+                  </div>
+                  <div class="form-group col-2">
+                      <button mat-raised-button type="button" style="margin-top: 20px;" #saveBtn class="btn btn-primary btn-sm ml-1 mr-1" (click)="onSaveClick()" >Save</button>
+                  </div>
+               </div>
+               
+            </div>
+              <section *ngFor="let t1 of tm_denominationList; let i=index">
+                <div class="form-row">
+                  <div class="form-group col-5">
+                    <small>Rupees</small> <br>
+                    <select
+                      class="form-control form-control-sm" (change)="setDenomination($event.target.value, i)">
+                      <option value="t1.value" [readonly]="true" selected>{{t1.rupees_desc}}</option>
+                      <option [value]="l.value" *ngFor="let l of denominationList">{{l.rupees}}</option>
+                    </select>
+                  </div>
+
+
+                  <div class="form-group col-3">
+                    <small for="deno_count">Count</small>
+                    <input [(ngModel)]="t1.count" type="text"
+                      class="form-control form-control-sm text-capitalize" (change)="calculateTotalDenomination(i)"
+                      id="deno_count" placeholder="Count">
+                  </div>
+
+                  <div class="form-group col-4">
+                    <small for="deno_total">Total</small>
+                    <input [(ngModel)]="t1.total" type="text"
+                      class="form-control form-control-sm text-capitalize" id="deno_total" placeholder="Total">
+                  </div>
+                </div>
+              </section>
+
+
+              <div class="form-row">
+                <div class="form-group col-8" style="text-align: right;">
+                  <label class="form-check-label"> <small> Total</small> </label>
+                </div>
+
+                <div class="form-group col-4">
+                  <input [(ngModel)]='denominationGrandTotal' [readonly]="true" type="text"
+                    class="form-control form-control-sm text-capitalize" id="total" placeholder="Total">
+                </div>
+              </div>
+
+              <div class="text-right mb-3">
+                <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm  mr-1"
+                  (click)="addDenomination()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </button>
+
+                <button mat-raised-button type="button" style="height:22px; padding-top: 0px;" class="btn btn-primary btn-sm"
+                  (click)="removeDenomination()">
+                  <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                </button>
+              </div>
+
+      </div>
+      </div>
+      <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+
+
+
+
+     
