@@ -1274,12 +1274,11 @@
 
 <ng-template #denomination > 
   <div class="modal-header">
-    <h4 class="modal-title pull-left customHeader">Denomination details for Transaction Code: {{trans_code}}, Total Transaction Amount:{{transactionAmount}}     </h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+     <h4 class="modal-title pull-left customHeader"> Denomination for Trans Code: <b style="color: rgb(207 255 65);font-size: x-large;">{{trans_code}}</b> and Trans Amount: <b style="color: rgb(207 255 65);font-size: x-large;">₹{{transactionAmount}} </b>  &nbsp;&nbsp;&nbsp;  </h4><button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
-    <app-denomination [trans_code]="trans_code"></app-denomination>
+    <app-denomination [trans_code]="trans_code" [transaction_date]="transaction_date"></app-denomination>
   </div>
 </ng-template>

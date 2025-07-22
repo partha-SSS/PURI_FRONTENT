@@ -105,12 +105,16 @@
                        
                     </div>
                   </div>
-                  <div class="form-group col-2">
+                  <div class="form-group col-2" *ngIf="!updateMode">
                       <button mat-raised-button type="button" style="margin-top: 20px;" #saveBtn class="btn btn-primary btn-sm ml-1 mr-1" (click)="onSaveClick()" >Save</button>
+                  </div>
+                  <div class="form-group col-2" *ngIf="updateMode">
+                      <button mat-raised-button type="button" style="margin-top: 20px;" #saveBtn class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()" >Update</button>
                   </div>
                </div>
                
             </div>
+           
               <section *ngFor="let t1 of tm_denominationList; let i=index">
                 <div class="form-row">
                   <div class="form-group col-5">

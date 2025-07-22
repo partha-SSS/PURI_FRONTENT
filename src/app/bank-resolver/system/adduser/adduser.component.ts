@@ -4,8 +4,7 @@ import { Router } from '@angular/router';
 import { RestService } from 'src/app/_service';
 import { LOGIN_MASTER, MessageType, ShowMessage, SystemValues } from '../../Models';
 import { m_branch } from '../../Models/m_branch';
-
-
+// import { m_brancsh } from '../../../app.worker'
 
 declare const GetMorFinAuthInfo: (connectedDvc: string, clientKey: string) => any;
 declare const IsDeviceConnected: (connectedDvc: string) => any;
@@ -172,8 +171,26 @@ export class AdduserComponent implements OnInit {
         console.log(res);
       })
     this.checkUser();
+    // this.fireWebWorker();
   }
 
+  fireWebWorker = () =>{
+        if (typeof Worker !== 'undefined') {
+        console.log('page got message');
+
+      // Create a new
+      const worker = new Worker(new URL('./app.worker.ts', import.meta.url));
+      worker.onmessage = ({ data }) => {
+        console.log(`page got message: ${data}`);
+      };
+      worker.postMessage('hello');
+    } else {
+      // Web workers are not supported in this environment.
+      // You should add a fallback so that your program still executes correctly.
+    }
+  }
+
+ 
   
   showCpass1(){
     this.addUser.controls.password.enable()
@@ -660,54 +677,80 @@ export class AdduserComponent implements OnInit {
 }
 
 captureAndMatchFinger() {
-   this.fingerprintStatus = 'scanning';
-  setTimeout(() => {
+    this.fingerprintStatus = 'scanning';
+
+    setTimeout(() => {
+
+    const quality = 60;
+    const timeout = 10;
+    const captureResult = CaptureFinger(quality, timeout);
+    // console.log(captureResult)
+    if (captureResult?.httpStaus==true && captureResult?.data?.ErrorCode=="0") {
+        const probTemplate = captureResult?.data?.Quality;
+        // console.log(probTemplate)
+          if(probTemplate>40){
+            const templateRes = GetTemplate('0');
+            var tempdata=''
+            console.log(templateRes)
+            if (templateRes?.data?.ErrorCode=='0') {
+              tempdata= templateRes?.data.ImgData
+              console.log("Captured Template:", templateRes?.data.ImgData);
+              this.updateBiometric(tempdata)
+            } else {
+              this.fingerprintStatus = 'idle';
+                  this.HandleMessage(true, MessageType.Error, `Please Capture Again`);
+                      console.warn('❌ Failed to get template');
+                    }
+          }
+        }
+        else{
+              this.fingerprintStatus = 'error'
+              this.HandleMessage(true, MessageType.Error, `Error in Capture...! Capture Again`);
+              setTimeout(() => {
+              this.fingerprintStatus = 'idle'
+            }, 1000);
+        }
+    }, 4200);
+    // setTimeout(() => {
+    //   const quality = 60;
+    //   const timeout = 10;
+    //   // const galleryTemplate = this.bioData; // Replace this with actual stored FMR
+    //   const tmpFormat = 'ISO'; // Or ANSI, based on your system
+
+    //   // Step 1: Capture the finger
+    //   const captureResult = CaptureFinger(quality, timeout);
+    //     console.log(captureResult);
         
-      const quality = 60;
-  const timeout = 10;
-  // const galleryTemplate = this.bioData; // Replace this with actual stored FMR
-  const tmpFormat = 'ISO'; // Or ANSI, based on your system
+    //     if (captureResult?.httpStaus==true && captureResult?.data?.ErrorCode=="0") {
+    //     const probTemplate = captureResult?.data
+    //     if(probTemplate.Quality>40){
+    //       const captureData=probTemplate.BitmapData
+    //       const templateRes = GetTemplate('0');
+    //         var tempdata=''
+    //         console.log(templateRes);
+            
+    //     if (templateRes?.data?.ErrorCode=='0') {
+    //       //  this.fingerprintStatus = 'success';
+    //       tempdata= templateRes?.data.ImgData
+    //       console.log("Captured Template:", templateRes.ImgData);
+    //       this.updateBiometric(tempdata)
+    //     } else {
+    //       this.fingerprintStatus = 'idle';
+    //           this.HandleMessage(true, MessageType.Error, `Please Capture Again`);
 
-  // Step 1: Capture the finger
-  const captureResult = CaptureFinger(quality, timeout);
-    console.log(captureResult);
-    
-  if (captureResult?.httpStaus==true && captureResult?.data?.ErrorCode=="0") {
-    const probTemplate = captureResult?.data
-    if(probTemplate.Quality>40){
-      const captureData=probTemplate.BitmapData
-       const templateRes = GetTemplate('0');
-        var tempdata=''
-        console.log(templateRes);
-        
-    if (templateRes?.data?.ErrorCode=='0') {
-      //  this.fingerprintStatus = 'success';
-      tempdata= templateRes?.data.ImgData
-      console.log("Captured Template:", templateRes.ImgData);
-      this.updateBiometric(tempdata)
-    } else {
-       this.fingerprintStatus = 'idle';
-          this.HandleMessage(true, MessageType.Error, `Please Capture Again`);
-
-              console.warn('❌ Failed to get template');
-            }
-      // console.error("Failed to get template:", templateRes.err);
-    }
-    }
-    else{
-          this.fingerprintStatus = 'error'
-          this.HandleMessage(true, MessageType.Error, `Error in Capture...! Capture Again`);
-          setTimeout(() => {
-           this.fingerprintStatus = 'idle'
-        }, 1000);
-      }
-    
-debugger
-      }, 4200);
-debugger
-
-   
-
+    //               console.warn('❌ Failed to get template');
+    //             }
+    //       // console.error("Failed to get template:", templateRes.err);
+    //     }
+    //     }
+    //     else{
+    //           this.fingerprintStatus = 'error'
+    //           this.HandleMessage(true, MessageType.Error, `Error in Capture...! Capture Again`);
+    //           setTimeout(() => {
+    //           this.fingerprintStatus = 'idle'
+    //         }, 1000);
+    //     }
+    // }, 4200);
   } 
      
   updateBiometric(i:any){

@@ -14,6 +14,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 })
 export class VoucherComponent implements OnInit {
   @ViewChild('print', { static: true }) print: TemplateRef<any>;
+    @ViewChild('denomination', { static: true }) denomination: TemplateRef<any>;
   tvd = new T_VOUCHER_DTLS();
   tvdRet: T_VOUCHER_DTLS[] = [];
   tvn = new T_VOUCHER_DTLS();
@@ -32,7 +33,11 @@ export class VoucherComponent implements OnInit {
   filteredTransactions: { acc_cd: number; acc_name: string; debit: number | null; credit: number | null; narrationdtl: string | null }[] = [];
   totalDebit: number = 0;
   totalCredit: number = 0;//alertMsg = '';
-  // showAlert = false;
+  transactionAmount:any
+  trans_code:any;
+  trans_date:any;
+  cashMode:boolean=false
+
   showMsg: ShowMessage;
   onVoucherCreation: FormGroup;
   VoucherF: FormArray;
@@ -223,6 +228,7 @@ export class VoucherComponent implements OnInit {
     if (this._voucherId > 0)
       if (this._approvalSts == "Unapproved")
         this.DeleteVoucher();
+      
       else
       this.modalRef.hide()
         this.HandleMessage(true, MessageType.Error, 'Voucher already Approved can not be Deleted !');
@@ -246,6 +252,10 @@ export class VoucherComponent implements OnInit {
   }
 
   Clear() {
+    this.cashMode=false;
+    this.trans_code=0;
+    this.trans_date=this.sys.CurrentDate;
+    this.transactionAmount=0;
     this.Initialize();
     this.isDel = true;
     this.isAddNew = true;
@@ -289,6 +299,7 @@ export class VoucherComponent implements OnInit {
       }
     }
     else {
+      this.cashMode=true;
       for (let x = 0; x < this.VoucherF.length; x++) {
         if (this.voucherData.value[x].acc_cd == null || this.voucherData.value[x].acc_cd == '') {
           isAccCDBlank = true;
@@ -304,15 +315,19 @@ export class VoucherComponent implements OnInit {
      }
     else {
         // debugger;
-        if (this._voucherId > 0)
+        if (this._voucherId > 0){
           if (this._approvalSts == "Unapproved") {
             this.DeleteInsertVoucher();
           }
-          else
+          else{
             this.HandleMessage(true, MessageType.Error, 'Voucher already Approved can not Modify !');
-        else
+          }
+        }
+        else{
           this.InsertVoucher();
-      }
+        }
+      
+    }
     }
   
   OpenVoucher(item) {
@@ -822,7 +837,15 @@ debugger
         debugger
       this.svc.addUpdDel<any>('Voucher/InsertTVoucherDtls', tvdSaveAll).subscribe(
         res => {
-          ;
+           if (this.cashMode) {
+            this.transactionAmount=this.totalDebit
+            this.trans_code=(+100000)+(+res);
+            // this.trans_date=this._voucherDt;
+            setTimeout(() => {
+            this.modalRef = this.modalService.show(this.denomination,{ class: 'modal-xl' , keyboard: false, backdrop: true, ignoreBackdropClick: true });
+            }, 1300); // auto-close after 4 sec
+            }
+          
        
           this._voucherId = res;
           this._approvalSts = "Unapproved";
@@ -876,8 +899,10 @@ debugger
         tvdSave.acc_cd = this.voucherData.value[x].acc_cd;
         // tvdSave.amount = Number(tvdSave.cr_amount == 0 ? tvdSave.dr_amount : tvdSave.cr_amount);
         if (tvdSave.transaction_type == 'C') {
-          if (this.voucherData.value[x].acc_cd == 21101)
+          if (this.voucherData.value[x].acc_cd == 21101){
             tvdSave.amount = this.getTotalCr() == 0 ? this.getTotalDr() : this.getTotalCr();
+            
+          }
           else {
             tvdSave.amount = tvdSave.cr_amount;
           }
@@ -909,11 +934,22 @@ debugger
           }
         }
       }
+      
       debugger;
       console.log(tvdSaveAll)
       this.svc.addUpdDel<any>('Voucher/DeleteInsertVoucherDtls', tvdSaveAll).subscribe(
         res => {
-          ;
+          if(this._voucherTyp == "CR" ||this._voucherTyp == "CP"){
+            //  this.onDelDenomination(this._voucherDt,this._voucherId);
+            this.transactionAmount=this.totalDebit//tobechange
+            // this.trans_code=this._voucherId;
+            this.trans_code=(+100000)+(+this._voucherId);
+            this.trans_date=this._voucherDt;
+            setTimeout(() => {
+            this.modalRef = this.modalService.show(this.denomination,{ class: 'modal-xl' , keyboard: false, backdrop: true, ignoreBackdropClick: true });
+            }, 1300); // auto-close after 4 sec
+            
+          }
           console.log(this._voucherTyp)
           this._voucherId = this._voucherId;
           this._approvalSts = "Unapproved";
@@ -932,14 +968,27 @@ debugger
           this.isClear = false;
           this.isLoading = false;
           this.HandleMessage(true, MessageType.Sucess, 'Voucher Updated Successfully !');
-          this.modalRef = this.modalService.show(this.print, { class: 'modal-xl' });
+          // this.modalRef = this.modalService.show(this.print, { class: 'modal-xl' });
         },
         err => { this.isLoading = false; this.HandleMessage(true, MessageType.Error, 'Update Failed !'); }
       );
     }
     catch (exception) { let x = 0; }
   }
-
+onDelDenomination(trans_dt,trans_cd){
+            var dt= {
+                      "brn_cd": this.sys.BranchCode,
+                      "trans_dt":trans_dt,
+                      "trans_cd":trans_cd
+                    }
+              this.svc.addUpdDel<any>('Common/DeleteDenominationDtls', dt).subscribe(
+              res => {console.log(res);
+                },
+                err => { 
+                    this.HandleMessage(true, MessageType.Error, err);
+                }
+              );
+          }
   private DeleteVoucher(): void {
     try {
       this.isLoading = true;
@@ -980,6 +1029,7 @@ debugger
       // debugger;
       this.svc.addUpdDel<any>('Voucher/DeleteVoucherDtls', tvdSaveAll).subscribe(
         res => {
+          this.onDelDenomination(this._voucherDt,this._voucherId);
           // debugger;
           console.log(res.length)
           this.insertMode = false;

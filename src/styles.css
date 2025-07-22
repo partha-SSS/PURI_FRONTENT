@@ -806,43 +806,43 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #044800;
+  background-color: #575b71;
   border-radius: 20px;
   border: 6px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #044800;
+  background-color: #575b71;
 }
 
 .mat-mdc-raised-button:enabled{
-  background-color: #044800 !important;
+  background-color: #575b71 !important;
   color:white!important;
   border-color: #418b48 !important;
 }
 .btn-primary{
-  background-color: #044800 !important;
+  background-color: #575b71 !important;
   color:white!important;
   border-color: #418b48 !important;
 }
 .btn-light{
   background-color: #ffff !important;
-  color:#044800!important;
+  color:#575b71!important;
   border-color: #ffffff !important;
 }
 .btn-light:hover{
-  background-color: #044800 !important;
+  background-color: #575b71 !important;
   color:#ffff!important;
-  border-color: #044800 !important;
+  border-color: #575b71 !important;
 }
 .btn-primary:hover{
   background-color:white !important;
-  color:#044800!important;
-  border-color: #044800 !important;
+  color:#575b71!important;
+  border-color: #575b71 !important;
 }
 .customHeader{
-  background-color:#044800; 
+  background-color:#575b71; 
   border-radius: 10px;
   padding-left: 11px;
   color:white
@@ -850,7 +850,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .btn-link{
-  color:#044800 !important
+  color:#575b71 !important
 }
 input{
   /* border-radius: 15px !important; */
@@ -858,7 +858,7 @@ input{
 
 }
 input:checked{
-  background-color: #044800 !important;
+  background-color: #575b71 !important;
 }
 select{
   /* border-radius: 15px !important; */
@@ -892,17 +892,17 @@ select{
 
 #close {
   top: 280px;
-  background-color: #044800;
+  background-color: #575b71;
 }
 
 #print {
   top: 360px;
-  background-color: #044800;
+  background-color: #575b71;
 }
 
 #retrieve {
   top: 440px;
-  background-color: #044800;
+  background-color: #575b71;
 }
 .sidenav>button>mat-icon{
   margin-left:30px

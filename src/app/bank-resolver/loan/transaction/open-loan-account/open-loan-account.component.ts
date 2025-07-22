@@ -28,7 +28,14 @@ import Utils from 'src/app/_utility/utils';
 import { MessageType, mm_customer, ShowMessage } from 'src/app/bank-resolver/Models';
 import { CommonServiceService } from 'src/app/bank-resolver/common-service.service';
 import { sm_parameter } from 'src/app/bank-resolver/Models/sm_parameter';
-
+import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+// import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+// import { error } from 'console';
+interface SecurityType {
+  sec_type: string;
+  sec_desc: string;
+}
 
 
   
@@ -43,15 +50,35 @@ export class OpenLoanAccountComponent implements OnInit {
               private modalService: BsModalService,
               private router: Router,
               private msg: InAppMessageService,
+              private fb: FormBuilder
 
   ) { }
+
   @ViewChild('contentLoanStmt', { static: true }) contentLoanStmt: TemplateRef<any>;
   @ViewChild('MakerChecker', { static: true }) MakerChecker: TemplateRef<any>;
   @ViewChild('kycContent', { static: true }) kycContent: TemplateRef<any>;
-  actDesc:any;
-  SecaccNum:any;
+
+   securityForm!: FormGroup;
+  securityTypes: SecurityType[] = [
+    { sec_type: 'G', sec_desc: 'Gold' },
+    { sec_type: 'N', sec_desc: 'Govt.Certificates(NSC/KVP/LIC)' },
+    { sec_type: 'D', sec_desc: 'Deposit' },
+    { sec_type: 'H', sec_desc: 'House/Land' },
+    { sec_type: 'M', sec_desc: 'Guaranter' },
+    { sec_type: 'L', sec_desc: 'LIC' },
+    { sec_type: 'S', sec_desc: 'Stock' }
+  ];
+  selectedIndexForSuggestion: number | null = null;
+   depositDTLS : any
+  newtm_deposit:any;
+   SecaccNum:any;
   SecaccCD:any;
-  duedateSetting:boolean=false;
+  shownoresult:Boolean
+  // selectedType = 'G'; 
+ acc_data:any[]=[];
+  actDesc:any;
+  
+  // duedateSetting:boolean=false;
   branchCode = '0';
   createUser = '';
   updateUser = '';
@@ -62,7 +89,6 @@ export class OpenLoanAccountComponent implements OnInit {
   custNameForAcc:any;
   createDate: Date;
   updateDate: Date;
-  newtm_deposit:any;
   p_gen_param = new p_gen_param();
   diff:any;
   isLoading = false;
@@ -72,7 +98,10 @@ export class OpenLoanAccountComponent implements OnInit {
   disabledOnNull=true;
   disableLoanId:boolean=true;
   disabledJointOnNull=true;
+ 
   accountTypeList: mm_acc_type[] = [];
+  accountTypeListAll: mm_acc_type[] = [];
+  depositAccountTypeList: mm_acc_type[] = [];
   instalmentTypeList: mm_instalment_type[] = [];
   fundTypeList = [
     {
@@ -103,6 +132,7 @@ export class OpenLoanAccountComponent implements OnInit {
   accName:boolean
   CustomerName:any;
   suggestedCustomer: mm_customer[];
+  suggestedCustomer2: mm_customer[];
   suggestedJointCustomer: mm_customer[];
   suggestedCustomerJointHolderIdx: number;
   kycEnable = false;
@@ -146,6 +176,11 @@ export class OpenLoanAccountComponent implements OnInit {
   createUser1:any;
   logUser:any;
   ngOnInit(): void {
+    this.securityForm = this.fb.group({
+      securities: this.fb.array([
+        this.initSecurityFormGroup(1)
+      ])
+    });
     this.getRepFormula();
     this.getsystemParam();
     this.logUser=localStorage.getItem('itemUX');
@@ -168,8 +203,329 @@ export class OpenLoanAccountComponent implements OnInit {
 
     this.initializeModels();
     this.newAccount();
+    
 
   }
+  get securities(): FormArray {
+    return this.securityForm.get('securities') as FormArray;
+  }
+
+  initSecurityFormGroup(slNo: number): FormGroup {
+    return this.fb.group({
+      // ALL Fields
+      loan_id: [''],
+      acc_cd: [''],
+      sec_type: [''],
+      sl_no: [slNo],
+      created_by: [''],
+      created_dt: [''],
+      modified_by: [''],
+      modified_dt: [''],
+
+      // GOLD (G)
+      gold_gross_wt: [''],
+      gold_net_wt: [''],
+      karat: [''],
+      gold_desc: [''],
+      gold_qty: [''],
+      unit_rate: [''],
+      gold_val: [''],
+      gold_appraiser_name: [''],
+      gold_appraiser_id: [''],
+
+      // CERTIFICATE (N)
+      cert_name1: [''],
+      cert_name2: [''],
+      cert_no: [''],
+      regn_no: [''],
+      post_off: [''],
+      post_pin: [''],
+      post_ph: [''],
+      cert_opn_dt: [''],
+      cert_mat_dt: [''],
+      cert_pdlg_dt: [''],
+      cert_plg_no: [''],
+      sum_assured: [''],
+
+      // LIC (L)
+      pol_name1: [''],
+      pol_name2: [''],
+      pol_type: [''],
+      pol_no: [''],
+      pol_opn_dt: [''],
+      pol_mat_dt: [''],
+      pol_sur_val: [''],
+      pol_brn_name: [''],
+      pol_br_ph: [''],
+      pol_assgn_no: [''],
+      pol_assgn_dt: [''],
+      pol_money_bk: [''],
+      pol_sum_assured: [''],
+      // Deposit (D)
+      acc_type_cd: [''],
+      acc_num: [''],
+      opn_dt: [''],
+      prn_amt:[''],
+      mat_dt: [''],
+      mat_val: [''],
+
+      // House/Land (H)
+      dh_name1: [''],
+      dh_name2: [''],
+      dh_name3: [''],
+      dh_name4: [''],
+      dh_name5: [''],
+      prop_type: [''],
+      prop_addr: [''],
+      to_lnd_area: [''],
+      tot_cv_area: [''],
+      deed_no: [''],
+      distct: [''],
+      ps: [''],
+      mouza: [''],
+      jl_no: [''],
+      rs_kha: [''],
+      lr_kha: [''],
+      rs_dag: [''],
+      lr_dag: [''],
+      deed_muni: [''],
+      ward_no: [''],
+      holding_no: [''],
+      boundry: [''],
+      cnst_yr: [''],
+      floor_area: [''],
+      mkt_val: [''],
+      tax_upto: [''],
+      bl_ro_tax: [''],
+      mort_deed_reg_no: [''],
+      mort_deed_dt: [''],
+
+      // Stock (S)
+      stock_type: [''],
+      stock_value: ['']
+    });
+  }
+
+  addSecurity(): void {
+    if( this.operationType == 'U'){
+      this.securities.push(this.initSecurityFormGroup(0)); // sl_no dummy
+      this.resetSlNo(); 
+         this.securities.controls.forEach((group, index) => {
+              group.get('loan_id')?.setValue(this.tm_loan_all.loan_id.toString());
+              group.get('acc_cd')?.setValue(this.tm_loan_all.acc_cd);
+              });
+    }else{
+      this.securities.push(this.initSecurityFormGroup(0)); // sl_no dummy
+      this.resetSlNo(); 
+    }
+    
+    // const slNo = this.securities.length + 1;
+    // this.securities.push(this.initSecurityFormGroup(slNo));
+  }
+
+  removeSecurity(index: number): void {
+
+        this.securities.controls.forEach((group: AbstractControl, i: number) => {
+           if(index==i){
+            if (group instanceof FormGroup) {
+                group.reset(); // Resets all fields in this FormGroup to their initial/default values
+              }
+          this.securities.removeAt(index);
+          this.resetSlNo();
+          this.CustomerName=[];
+        }
+      
+    });
+
+  }
+  resetArrayIndex(i:number){
+    this.securities.controls.forEach((group: AbstractControl, index: number) => {
+           if(index==i){
+            if (group instanceof FormGroup) {
+                group.reset(); // Resets all fields in this FormGroup to their initial/default values
+              }
+          this.resetSlNo();
+          this.CustomerName=[];
+        }
+      
+    });
+  }
+  resetSlNo(): void {
+  this.securities.controls.forEach((group, index) => {
+    group.get('sl_no')?.setValue(index + 1);
+    });
+  }
+  public suggestCustomer2(index: number): void {
+  this.selectedIndexForSuggestion = index;
+
+  this.securities.controls.forEach((group, index) => {
+    const secType = group.get('sec_type')?.value;
+    const accTypeCd = group.get('acc_type_cd')?.value;
+    const accNum = group.get('acc_num')?.value?.toLowerCase();
+debugger
+    if (secType === 'D' && accTypeCd && accNum?.length > 0) {
+      this.SecaccCD=accTypeCd;
+      // this.SecaccNum=accNum;
+      const dt={
+        ardb_cd:this.sys.ardbCD,
+        ad_acc_type_cd:+accTypeCd,
+        as_cust_name:accNum
+      }
+      this.svc.addUpdDel<any>('Deposit/GetAccDtls', dt).subscribe(
+      res => {
+        console.log(res);
+        
+        this.suggestedCustomer2=res
+        if (res?.length === 0) {
+          this.isLoading = false;
+            this.HandleMessage(true, MessageType.Warning, 'No Data Found');
+            // this.securities.clear();
+            return this.suggestedCustomer2=[];
+          }
+          else{
+                this.isLoading = false;
+                this.shownoresult = this.suggestedCustomer2.length === 0;
+                return this.suggestedCustomer2;
+          }
+       },
+      err=>{console.log(err);
+        this.isLoading = false;
+        this.HandleMessage(true, MessageType.Warning, 'Error fetching account details');
+        return this.suggestedCustomer2=[]
+      })
+      
+
+    }else{
+      debugger
+    }
+  });
+  }
+  public async getFulldata(cust_cd: number): Promise<any | null> {
+   this.isLoading = true;
+          var dt={
+            "ardb_cd":this.sys.ardbCD,
+            "brn_cd":this.sys.BranchCode,
+            "cust_cd":cust_cd
+          }
+
+          const res = await firstValueFrom(this.svc.addUpdDel<any>('UCIC/GetDepositDtls', dt));
+          this.isLoading = false;
+
+       if(res){
+                this.acc_data=res.filter(c => c.acc_type_cd ==this.SecaccCD)[0];
+                console.log(this.acc_data);
+                
+              return this.acc_data
+            } else{
+              return null
+            } 
+             
+            
+}
+
+  
+async SelectCustomer(cust: any, i: number) {
+  this.selectedIndexForSuggestion = null;
+  this.suggestedCustomer2 = [];
+  this.shownoresult = false;
+  console.log(cust);
+
+  for (let index = 0; index < this.securities.controls.length; index++) {
+    const group = this.securities.controls[index];
+    if (index === i) {
+    let bal:any=null;
+    
+    debugger
+      this.depositDTLS = new tm_deposit();
+      this.depositDTLS = await this.getAccountData(this.SecaccCD, cust.acc_num);
+      console.log(this.depositDTLS);
+      
+      debugger;
+
+      if (this.depositDTLS) {
+        bal= await this.getFulldata(this.depositDTLS.cust_cd);
+              console.log(bal[0]);
+        group.get('dh_name1')?.setValue(cust.cust_name);
+        group.get('acc_num')?.setValue(cust.acc_num);
+        group.get('prn_amt')?.setValue(bal?.prn_amt);
+        group.get('mat_dt')?.setValue(this.convertToInputDateFormat(bal?.mat_dt));
+        group.get('mat_val')?.setValue(bal?.clr_bal);
+        group.get('opn_dt')?.setValue(this.convertToInputDateFormat(this.depositDTLS.opening_dt));
+      }
+      // else{
+      //   group.get('acc_num')?.setValue(cust.acc_num);
+      //   group.get('prn_amt')?.setValue(this.depositDTLS.prn_amt);
+      //   group.get('mat_dt')?.setValue(this.convertToInputDateFormat(this.depositDTLS.mat_dt));
+      //   group.get('mat_val')?.setValue((+this.depositDTLS?.prn_amt));
+      //   group.get('opn_dt')?.setValue(this.convertToInputDateFormat(this.depositDTLS.opening_dt));
+      // }
+    }
+  }
+}
+convertToInputDateFormat(dateStr: string): string | null {
+  if (!dateStr) return null;
+
+  const parts = dateStr.split(' ')[0].split('/'); // ["14", "03", "2018"]
+  if (parts.length !== 3) return null;
+
+  const [day, month, year] = parts;
+  return `${year}-${month}-${day}`; // "2018-03-14"
+}
+  insertSecurity(): void {
+    console.log(this.securityForm.value?.securities);
+    this.svc.addUpdDel<any>('Loan/InsertLoanSecurityList', this.securityForm.value?.securities).subscribe(
+      res => {
+        console.log(res);
+       },
+      err=>{console.log(err);
+      })
+  }
+   updateSecurity(): void {
+    console.log(this.securityForm.value?.securities);
+    this.svc.addUpdDel<any>('Loan/UpdateLoanSecurityList', this.securityForm.value?.securities).subscribe(
+      res => {
+        console.log(res);
+       },
+      err=>{console.log(err);
+      })
+  }
+  getSecurity(loan:any){
+     this.svc.addUpdDel<any>(`Loan/GetLoanSecurityList?loan_id=${loan}`, null).subscribe(
+      res => {
+        if(res){
+          this.setSecuritiesFormArray(res);
+        }
+      })
+  }
+  setSecuritiesFormArray(apiData: any[]) {
+  this.securities.clear();  // optional: reset previous data
+
+  apiData.forEach((item, i) => {
+    const group = this.initSecurityFormGroup(i + 1); // reuse your initializer
+    console.log(item);
+    
+    // Convert necessary date fields to yyyy-MM-dd
+    const formattedItem = {
+      ...item,
+      sec_type:item.sec_type,
+      opn_dt: this.convertToInputDateFormat(item.opn_dt),
+      mat_dt: this.convertToInputDateFormat(item.mat_dt),
+      pol_opn_dt: this.convertToInputDateFormat(item.pol_opn_dt),
+      pol_mat_dt: this.convertToInputDateFormat(item.pol_mat_dt),
+      pol_assgn_dt: this.convertToInputDateFormat(item.pol_assgn_dt),
+      cert_opn_dt: this.convertToInputDateFormat(item.cert_opn_dt),
+      cert_mat_dt: this.convertToInputDateFormat(item.cert_mat_dt),
+      cert_pdlg_dt: this.convertToInputDateFormat(item.cert_pdlg_dt),
+      mort_deed_dt: this.convertToInputDateFormat(item.mort_deed_dt),
+      created_dt: this.convertToInputDateFormat(item.created_dt),
+      modified_dt: this.convertToInputDateFormat(item.modified_dt),
+    };
+
+    group.patchValue(formattedItem);
+    this.securities.push(group);
+  });
+}
+
   getRepFormula(){
     this.svc.addUpdDel<any>('Loan/GetEmiFormula', null).subscribe(
       emi => {
@@ -246,6 +602,15 @@ export class OpenLoanAccountComponent implements OnInit {
 
     this.selectedActivityList = [];
     this.selectedCorpList = [];
+    this.tm_loan_all.instl_start_dt=null;
+    this.tm_loan_all.piriodicity=null;
+    this.tm_loan_all.instalmentTypeDesc = null;
+    this.tm_loan_all.instl_no=null;
+    this.tm_loan_sanction_dtls[0].due_dt=null;
+    this.tm_loan_sanction_dtls[0].sector_cd=null;
+    this.tm_loan_sanction_dtls[0].activity_cd=null;
+    this.tm_loan_sanction_dtls[0].crop_cd=null;
+    this.tm_loan_sanction_dtls[0].sanc_amt=0;
 
   }
 
@@ -379,7 +744,7 @@ setActivity(){//PARTHA
 
   getAccountTypeList() {
 
-    if (this.accountTypeList.length > 0) {
+    if (this.accountTypeListAll.length > 0) {
       return;
     }
     this.accountTypeList = [];
@@ -389,8 +754,9 @@ setActivity(){//PARTHA
       res => {
 
         this.isLoading = false;
-        this.accountTypeList = res;
-        this.accountTypeList = this.accountTypeList.filter(c => c.dep_loan_flag === 'L');
+        this.accountTypeListAll = res;
+        this.depositAccountTypeList = this.accountTypeListAll.filter(c => c.dep_loan_flag === 'D');
+        this.accountTypeList = this.accountTypeListAll.filter(c => c.dep_loan_flag === 'L');
         this.accountTypeList = this.accountTypeList.sort((a, b) => (a.acc_type_cd > b.acc_type_cd) ? 1 : -1);
       },
       err => {
@@ -752,6 +1118,9 @@ removeSecurityDtlList()
     }
 
     this.setSmLoanSanctionList(accType);
+    this.securities.controls.forEach((group, index) => {
+    group.get('acc_cd')?.setValue(accType);
+    });
 
   }
 
@@ -799,19 +1168,7 @@ getHousingOrNot(i:any): boolean {
   return allowedNumbers.includes(value);
 }
   public setActivityType(act: string, idx: number): void {
-    if(this.tm_loan_all.fund_type){
-      
-      if(this.tm_loan_all.fund_type=='N' && this.sys.ardbCD=="26" && !this.getHousingOrNot(act)){
-        this.dueDateChange(act);
-      }
-      else{
-        this.duedateSetting=false;
-      }
-    }
-    else{
-      this.HandleMessage(true, MessageType.Error, 'Please Select The FundType !!!');
-
-    }
+  
     
     this.tm_loan_sanction_dtls[idx].activity_cd = act;
     this.tm_loan_sanction_dtls[idx].activity_desc =
@@ -894,70 +1251,11 @@ getHousingOrNot(i:any): boolean {
     }
 
   }
-  dueDateChange(act){
-    var data = {
-      "ardb_cd": this.sys.ardbCD,
-      "activity_cd": act
-    }
-      var ret = 0;
-    this.isLoading=true;
-      this.svc.addUpdDel<any>('Loan/GetActivitywiseDetails', data).subscribe(
-        res => {
-          if(res){
-            if(res.periodicity!=null){
-              const dueData=res;
-              this.duedateSetting=true;
-              this.tm_loan_all.instl_start_dt=dueData.due_dt;
-              this.tm_loan_all.piriodicity=dueData.periodicity;
-              this.tm_loan_all.instalmentTypeDesc = this.instalmentTypeList.filter(x => x.desc_type.toString() === dueData.periodicity)[0].ins_desc;
-              this.tm_loan_all.instl_no=dueData.instl_no;
-              this.tm_loan_sanction_dtls[0].due_dt=dueData.validity_dt;
-              this.isLoading=false;
   
-            }
-            else{
-              this.duedateSetting=true;
-              this.tm_loan_all.instl_start_dt=null;
-              this.tm_loan_all.piriodicity=null;
-              this.tm_loan_all.instalmentTypeDesc = null;
-              this.tm_loan_all.instl_no=null;
-              this.tm_loan_sanction_dtls[0].due_dt=null;
-              this.tm_loan_sanction_dtls[0].sector_cd=null;
-              this.tm_loan_sanction_dtls[0].activity_cd=null;
-              this.HandleMessage(true, MessageType.Sucess, 'No Master Data Found For This Activity, Please Contact to Support.... ');
-              this.isLoading=false;
-  
-            }
-            console.log(res);
-          }
-          else{
-            return;
-          }
-          
-          // this.HandleMessage(true, MessageType.Sucess, 'Due date settings fatch Successfully');
-
-        },
-        err => {
-          this.duedateSetting=false;
-
-          // this.tm_loan_all.instl_start_dt=null;
-            // this.tm_loan_all.piriodicity=null;
-            // this.tm_loan_all.instalmentTypeDesc = null;
-            // this.tm_loan_all.instl_no=null;
-            // this.tm_loan_sanction_dtls[0].due_dt=null;
-            // this.tm_loan_sanction_dtls[0].sector_cd=null;
-            // this.tm_loan_sanction_dtls[0].activity_cd=null;
-          this.isLoading = false;
-          // this.HandleMessage(true, MessageType.Sucess, 'No Master Data Found For This Activity, Please Contact to Support.... ');
-
-        }
-      );
-  }
   setFundType(event:any){
     console.log(event);
     
     if(event=='N' && this.sys.ardbCD=='26'){
-      this.duedateSetting=true;
       this.tm_loan_all.instl_start_dt=null;
       this.tm_loan_all.piriodicity=null;
       this.tm_loan_all.instalmentTypeDesc = null;
@@ -969,7 +1267,6 @@ getHousingOrNot(i:any): boolean {
       this.tm_loan_sanction_dtls[0].sanc_amt=0;
     }
     else{
-      this.duedateSetting=false;
     this.tm_loan_all.instl_start_dt=null;
     this.tm_loan_all.piriodicity=null;
     this.tm_loan_all.instalmentTypeDesc = null;
@@ -1008,6 +1305,12 @@ getHousingOrNot(i:any): boolean {
   }
 
   clearData() {
+    this.securities.clear();
+    this.securityForm = this.fb.group({
+      securities: this.fb.array([
+        this.initSecurityFormGroup(1)
+      ])
+    });
     this.operationType = '';
     this.disableLoanId=true
     this.closeAlertMsg();
@@ -1021,9 +1324,13 @@ getHousingOrNot(i:any): boolean {
     this.disabledOnNull=true;
     this.disabledJointOnNull=true;
     this.accName=true;
-    this.SecaccCD=false;
+    // this.SecaccCD=false;
     this.newtm_deposit=null;
-
+    this.depositDTLS=null
+    this.selectedIndexForSuggestion = null;
+    this.SecaccNum=null;
+    this.SecaccCD=null;
+    this.shownoresult=false
     
   }
 
@@ -1171,8 +1478,11 @@ getHousingOrNot(i:any): boolean {
           return;
         }
         this.tm_loan_all.loan_id = val.toString();
-
-
+        
+          this.securities.controls.forEach((group, index) => {
+              group.get('loan_id')?.setValue(val.toString());
+              group.get('acc_cd')?.setValue(this.tm_loan_all.acc_cd);
+              });
         // this.masterModel.tmguaranter = null;
         // this.masterModel.tdaccholder = null;
         // this.masterModel.tmlaonsanction = null;
@@ -1191,6 +1501,8 @@ getHousingOrNot(i:any): boolean {
   }
 
   InsertLoanAccountOpeningData() {
+    console.log( this.securities.value);
+    this.insertSecurity();
     debugger;
     this.masterModel.tmloanall.approval_status = 'U';
     this.ValidateLoanUpdateData(); // Validation for Loan Account Child
@@ -1220,6 +1532,7 @@ getHousingOrNot(i:any): boolean {
 
   UpdateLoanAccountOpeningData(saveType: string) {
     this.ValidateLoanUpdateData();
+    this.updateSecurity();
      debugger;
     this.isLoading = true;
     this.svc.addUpdDel<any>('Loan/InsertLoanAccountOpeningData', this.masterModel).subscribe(
@@ -1306,7 +1619,9 @@ getHousingOrNot(i:any): boolean {
   getCustforLoan(cust:any){
     this.tm_loan_all.brn_cd = this.branchCode;
     this.tm_loan_all.ardb_cd=this.sys.ardbCD;
-    this.tm_loan_all.loan_id=cust.loan_id
+    this.tm_loan_all.loan_id=cust.loan_id;
+    this.tm_loan_all.instl_no=0;
+    this.getSecurity(cust.loan_id);
     // cust.ardb_cd=this.sys.ardbCD;
     // cust.branchCode=this.sys.BranchCode
     // this.svc.addUpdDel<any>('Loan/GetLoanData', this.tm_loan_all).subscribe(
@@ -1339,7 +1654,7 @@ getHousingOrNot(i:any): boolean {
             this.operationType = 'Q';
             this.disableAll = 'Y';
             if(res.tdloansancsetlist){
-              this.getAccountData();//for geting security acc details
+              // this.getAccountData();//for geting security acc details
             }
           }
           else {
@@ -1587,15 +1902,47 @@ getHousingOrNot(i:any): boolean {
   //   // this.disablePersonal = 'Y';
   // }
 
-  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-    this.showMsg = new ShowMessage();
-    this.showMsg.Show = show;
-    this.showMsg.Type = type;
-    this.showMsg.Message = message;
+      getAlertClass(type: MessageType): string {
+        switch (type) {
+          case MessageType.Sucess:
+            return 'alert-success';
+          case MessageType.Warning:
+            return 'alert-warning';
+          case MessageType.Info:
+            return 'alert-info';
+          case MessageType.Error:
+            return 'alert-danger';
+          default:
+            return 'alert-info';
+        }
+      }
+      private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+        this.showMsg = new ShowMessage();
+        this.showMsg.Show = show;
+        this.showMsg.Type = type;
+        this.showMsg.Message = message;
 
-    this.disableAll = 'Y';
-  }
+        if (show) {
+          setTimeout(() => {
+            this.showMsg.Show = false;
+          }, 5000); // auto-close after 4 sec
+        }
+      }
 
+      getAlertIcon(type: MessageType): string {
+        switch (type) {
+          case MessageType.Sucess:
+            return '✅';
+          case MessageType.Warning:
+            return '⚠️';
+          case MessageType.Info:
+            return 'ℹ️';
+          case MessageType.Error:
+            return '❌';
+          default:
+            return '🔔';
+        }
+      }
 
   public closeAlertMsg() {
 
@@ -1608,92 +1955,62 @@ getHousingOrNot(i:any): boolean {
     this.router.navigate([this.sys.BankName + '/la']);
   }
 
-  getAccountData() {
-    debugger
-    for (const i in this.masterModel.tdloansancsetlist) {
-      for (const j in this.masterModel.tdloansancsetlist[i].tdloansancset) {
-        if(this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_cd == '115'){
-          this.SecaccCD=this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_value
+  public async getAccountData(acc_type_cd: number, acc_num: string): Promise<tm_deposit | null> {
+  if (!acc_num) return null;
+
+  const usr = new tm_deposit();
+  usr.ardb_cd = this.sys.ardbCD;
+  usr.brn_cd = this.sys.BranchCode;
+  usr.acc_type_cd = acc_type_cd;
+  usr.acc_num = acc_num;
+
+  this.isLoading = true;
+
+  try {
+    const res = await firstValueFrom(this.svc.addUpdDel<any>('Deposit/GetAccountOpeningData', usr));
+    this.isLoading = false;
+
+    if (!res || !res.tmdeposit) {
+      this.HandleMessage(true, MessageType.Warning, 'No Account Details found!!');
+      return null;
+    }
+
+    this.newtm_deposit = res.tmdeposit;
+
+    if (res.tmdeposit.acc_num !== null) {
+      if (res.tmdeposit.lock_mode === 'L' && this.operationType === 'N') {
+        for (const list of this.masterModel.tdloansancsetlist) {
+          for (const param of list.tdloansancset) {
+            if (param.param_cd === '115' || param.param_cd === '116') {
+              param.param_value = null;
+            }
+          }
         }
-        if(this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_cd == '116'){
-          this.SecaccNum=this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_value
-        }
+        this.HandleMessage(true, MessageType.Warning, 'This Account is already added into another loan security');
+        return null;
+      } else if (res.tmdeposit.acc_status !== 'O') {
+        this.HandleMessage(true, MessageType.Warning, 'This Account is already Closed');
+        return null;
+      } else {
+        this.getCustomer(res.tmdeposit.cust_cd);
+        return res.tmdeposit;
       }
+    } else {
+      this.HandleMessage(true, MessageType.Warning, 'No record found for getting Account Details!!');
+      return null;
     }
-    debugger
-    if(this.SecaccNum){
-      const usr = new tm_deposit();
-      usr.ardb_cd=this.sys.ardbCD
-      usr.brn_cd = this.sys.BranchCode;
-      usr.acc_type_cd= this.SecaccCD
-      usr.acc_num = this.SecaccNum
-  
-  
-      this.isLoading = true;
-      this.svc.addUpdDel<any>('Deposit/GetAccountOpeningData', usr).subscribe(
-        res => {
-        console.log(res);
-        this.newtm_deposit = new tm_deposit();
-        //  this.custNameForAcc=this.comServ.customerList.forEach(element =>element.cust_cd===Number(res.tm_deposit.cust_cd))
-        // console.log(this.comServ.customerList);
-        
-          debugger;
-          this.isLoading = false;
-  
-          if (res === undefined || res === null) {
-            // this.showAlertMsg('WARNING', 'No record found!!');
-            this.HandleMessage(true, MessageType.Warning, 'No Account Details found!!');
-          }
-          else {
-            if (res.tmdeposit.acc_num !== null) {
-              if(res.tmdeposit.lock_mode=='L' && this.operationType == 'N'){
-                for (const i in this.masterModel.tdloansancsetlist) {
-                  for (const j in this.masterModel.tdloansancsetlist[i].tdloansancset) {
-                    if(this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_cd == '115'){
-                      this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_value=null
-                    }
-                    if(this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_cd == '116'){
-                     this.masterModel.tdloansancsetlist[i].tdloansancset[j].param_value=null
-                    }
-                  }
-                }
-                this.HandleMessage(true, MessageType.Warning, 'this Account is already added into another loan security');
-              }
-              else{
-                this.newtm_deposit=res.tmdeposit;
-                console.log(this.newtm_deposit);
-                this.getCustomer();
-              }
-            }
-            else {
-              // this.showAlertMsg('WARNING', 'No record found!!!');
-              this.HandleMessage(true, MessageType.Warning, 'No record found for getting Account Details!!');
-            }
-  
-          }
-  
-  
-        },
-        err => {
-          this.isLoading = false;
-          // this.showAlertMsg('ERROR', 'Unable to find record!!');
-          this.HandleMessage(true, MessageType.Warning, 'Unable to find record!!');
-        }
-  
-      );
-    }
-    else{
-      return
-    }
-    
-    
+  } catch (err) {
+    this.isLoading = false;
+    this.HandleMessage(true, MessageType.Warning, 'Unable to find record!!');
+    return null;
   }
-  public getCustomer() {
+}
+  public getCustomer(cust_cd) {
     debugger
     this.isLoading=true;
     const prm = new p_gen_param();
       // prm.ad_acc_type_cd = +this.f.acc_type_cd.value;
-      prm.as_cust_name = this.newtm_deposit.cust_cd.toString();
+      prm.as_cust_name = cust_cd?.toString();
       this.svc.addUpdDel<any>('Deposit/GetCustDtls', prm).subscribe(
         res => {
           debugger
@@ -1712,5 +2029,10 @@ getHousingOrNot(i:any): boolean {
    
 
   }
+
+//for new security
+
+
+
 
 }

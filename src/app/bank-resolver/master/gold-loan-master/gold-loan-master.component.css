@@ -34,7 +34,7 @@ small {
     padding-top: 2px;
     padding-bottom: 2px;
     text-align: left;
-    background-color: #044800;
+    background-color: #575b71;
     color: white;
     font-size:small
   }
@@ -70,7 +70,7 @@ small {
     padding-top: 2px;
     padding-bottom: 2px;
     text-align: left;
-    background-color: #044800;
+    background-color: #575b71;
     color: white;
     font-size:small
   }
@@ -93,7 +93,7 @@ small {
     overflow-x: hidden;
   }
   #tbl.table, th, td {
-    border: 2px solid #044800;
+    border: 2px solid #575b71;
     padding: 8px;
     /* border-collapse: collapse; */
     /* border: 1px solid black; */

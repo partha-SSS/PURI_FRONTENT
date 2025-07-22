@@ -21,15 +21,6 @@
 
   <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
 
-    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
-      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
-       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
-        <strong>{{showMsg.Message}}</strong>
-        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    </div>
 
     <h1></h1>
     <h4 class="customHeader">Personal Information</h4>
@@ -97,7 +88,7 @@
           <div class="input-group-append">
         <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" style="font-size:x-small" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
         </div>
-        <div class="suggestions2 border p-2" *ngIf="suggestedCustomer">
+        <div class="suggestions border p-2" *ngIf="suggestedCustomer">
           <!-- <strong> [ Customer Cd / Phone ] Name </strong> -->
           <!-- <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
             (click)="setCustDtls(cust.cust_cd)">
@@ -153,7 +144,7 @@
           [disabled]="disableAll == 'Y' " id="bond_no" 
           style="height:25px; text-align: right;" [(ngModel)]="tm_loan_all.loan_acc_no" type="text" placeholder="Bond No">
       </div> -->
-      <div class="form-group col-1">
+      <!-- <div class="form-group col-1">
         <small>Fund Type</small><span class="text-danger">*</span>
         <select 
           style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
@@ -164,13 +155,13 @@
           <option value="" [readonly]="true" selected>Select</option>
           <option *ngFor="let l of fundTypeList" [value]="l.value">{{l.name}}</option>
         </select>
-      </div>
+      </div> -->
 
-      <div class="form-group col-2">
+      <div class="form-group col-3">
         <small for=due_date>Inst. Start Dt / Due Dt </small><span class="text-danger">*</span>
         <div class="input-group">
           <input class="form-control form-control-sm text-capitalize" id="due_date" 
-            [disabled]=" disableAll == 'Y' ||appvSanction || duedateSetting"
+            [disabled]=" disableAll == 'Y' ||appvSanction "
             style="height:25px; text-align: right;" bsDatepicker 
             [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
             [(ngModel)]="tm_loan_all.instl_start_dt" type="text" placeholder="DD/MM/YYYY" (ngModelChange)="rep_stDT()">
@@ -202,7 +193,7 @@
       <div class="form-group col-2">
         <small>Instalment No</small><span class="text-danger">*</span>
         <input class="form-control form-control-sm text-capitalize"
-          [disabled]="appvSanction || duedateSetting" id="instl_no"
+          [disabled]="appvSanction " id="instl_no"
           style="height:25px; text-align: right;" type="number" min="0" step='any' [(ngModel)]="tm_loan_all.instl_no"
           placeholder="Instalment No">
       </div>
@@ -211,7 +202,7 @@
         <small>Installment Type</small><span class="text-danger">*</span>
         <select
           style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
-          [disabled]=" disableAll == 'Y'||appvSanction || duedateSetting"
+          [disabled]=" disableAll == 'Y'||appvSanction "
           (change)="setInstalPeriod($event.target.value)" [(ngModel)]="tm_loan_all.piriodicity" id="loan_type"
           class="form-control form-control-sm">
           <option [value]="tm_loan_all.piriodicity" [readonly]="true" selected>
@@ -256,9 +247,387 @@
   <!-- <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3" *ngIf="tm_loan_all.loan_id != undefined"> -->
   <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
     <div class="row">
-      <div class="col-8 border-right">
+      <div class="col-12 ">
+         <h4 class="customHeader">Security Details</h4>
+          <form [formGroup]="securityForm" >
+            <div formArrayName="securities">
+              <div *ngFor="let group of securities.controls; let i = index" [formGroupName]="i" class="border p-3 my-3">
 
-        <h1></h1>
+                <!-- === Common Fields (ALL) === -->
+                <div class="row">
+                   <!-- Security Type Dropdown -->
+                  <div class="col-md-6">
+                     <label>Security Type</label>
+                    <select formControlName="sec_type" class="form-control" >
+                      <option *ngFor="let type of securityTypes" [value]="type.sec_type">
+                        {{ type.sec_desc }}
+                      </option>
+                    </select>
+
+                    <!-- <label>Security Type</label>
+                    <select (change)="onTypeChange($event, i)" class="form-control">
+                      <option *ngFor="let type of securityTypes" [value]="type.sec_type">
+                        {{ type.sec_desc }}
+                      </option>
+                    </select> -->
+                  </div>
+                  <div class="col-md-3">
+                    <label>Loan ID</label>
+                    <input type="text" formControlName="loan_id" readonly class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Account Code</label>
+                    <input type="text" formControlName="acc_cd" readonly class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>SL No</label>
+                    <input type="number" formControlName="sl_no" readonly class="form-control" />
+                  </div>
+                </div>
+
+                <hr>
+
+                <!-- === Gold Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'G'" class="row">
+                  <div class="col-md-1">
+                    <label>Quantity</label>
+                    <input type="number" formControlName="gold_qty" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Gross Wet.</label>
+                    <input type="number" formControlName="gold_gross_wt" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Net Wet.</label>
+                    <input type="number" formControlName="gold_net_wt" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Karat</label>
+                    <input type="number" formControlName="karat" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Description</label>
+                    <input type="text" formControlName="gold_desc" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Unit Rate</label>
+                    <input type="number" formControlName="unit_rate" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Gold Value</label>
+                    <input type="number" formControlName="gold_val" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Appraiser Id</label>
+                    <input type="text" formControlName="gold_appraiser_id" class="form-control" />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label>Appraiser Name</label>
+                    <input type="text" formControlName="gold_appraiser_name" class="form-control" />
+                  </div>
+                  
+
+                </div>
+
+                <!-- === Certificate Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'N'" class="row">
+                  <div class="col-md-2">
+                    <label>Certificate Name 1</label>
+                    <input type="text" formControlName="cert_name1" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Certificate Number</label>
+                    <input type="text" formControlName="cert_no" class="form-control" />
+                  </div>
+                  <div class="col-md-3">
+                    <label>Registration No</label>
+                    <input type="text" formControlName="regn_no" class="form-control" />
+                  </div>
+                </div>
+
+                <!-- === LIC Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'L'" class="row">
+                  <div class="col-md-3">
+                    <label>Policy Name 1</label>
+                    <input type="text" formControlName="pol_name1" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Policy Number</label>
+                    <input type="text" formControlName="pol_no" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Policy Type</label>
+                    <input type="text" formControlName="pol_type" class="form-control" />
+                  </div>
+                </div>
+                 <!-- === Deposit Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'D'" class="row">
+                <div class="col-md-3">
+                  <label>Account Type Code</label>
+                  <select style="height:25px; font-size: medium; align-content:center; padding-top: 0px; background-color: rgb(253, 253, 253);"
+                          formControlName="acc_type_cd" id="acc_type_cd"
+                          class="form-control form-control-sm">
+                          <option [readonly]="true" selected>Select Acc Type</option>
+                          <option *ngFor="let l of depositAccountTypeList" [value]="l.acc_type_cd">{{l.acc_type_cd}}-{{l.acc_type_desc}}</option>
+                  </select>
+                  <!-- <input type="number" formControlName="acc_type_cd" class="form-control" /> -->
+                </div>
+            <!-- <div class="form-group col-md-3">
+            <small for="acct_num">Search by Cust CD / Name</small>
+            <span class="badge badge-warning pull-right" *ngIf="this.CustomerName"> 
+                Cust Name:-{{this.CustomerName?.cust_name}}
+               </span>
+            <div class="input-group">
+              <input type="text"  class="form-control form-control-sm "
+                formControlName="acc_num" id="acc_num"
+                name="x-field-1" autocomplete="new-field-1" >
+                <div class="input-group-append">
+                <button class="btn btn-primary btn-sm"  (click)="suggestCustomer2()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="suggestions2" *ngIf="suggestedCustomer2 && suggestedCustomer2.length>0">
+              <table class="table table-hover table-bordered table-sm w-auto small" id="customers2">
+               <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer2" (click)="SelectCustomer(cust,i)">
+                    <td scope="row">{{cust.acc_num}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 150%; font-size: small;" *ngIf="shownoresult">
+              <strong class="text-danger">" {{group.get('acc_num')?.value}} " does not match with any Deposit A/C</strong>
+            </div>
+          </div> -->
+            <div class="form-group col-md-3 position-relative" style="margin-top: 5px;">
+      <small for="acct_num">Search Customer</small>
+      <span class="badge badge-warning pull-right" *ngIf="CustomerName"> 
+        Cust Name:-{{group.get('dh_name1')?.value}}
+      </span>
+
+      <div class="input-group">
+        <input type="text" class="form-control form-control-sm"
+          formControlName="acc_num" id="acc_num"
+          (focus)="selectedIndexForSuggestion = i"
+          name="x-field-1" autocomplete="new-field-1">
+        <div class="input-group-append">
+          <button class="btn btn-primary btn-sm" (click)="suggestCustomer2(i)">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="suggestions2"
+        *ngIf="suggestedCustomer2?.length > 0 && selectedIndexForSuggestion === i">
+        <table class="table table-hover table-bordered table-sm w-auto small" id="customers2">
+          <tr>
+            <th>Acc#</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Guardian Name</th>
+            <th>Address</th>
+          </tr>
+          <tr *ngFor="let cust of suggestedCustomer2" (click)="SelectCustomer(cust, i)">
+            <td>{{cust.acc_num}}</td>
+            <td>{{cust.cust_name}}</td>
+            <td>{{cust.phone || ''}}</td>
+            <td>{{cust.guardian_name}}</td>
+            <td>{{cust.present_address}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+        *ngIf="shownoresult && selectedIndexForSuggestion === i">
+        <strong class="text-danger">" {{group.get('acc_num')?.value}} " does not match with any Deposit A/C</strong>
+      </div>
+    </div>
+                <!-- <div class="col-md-3">
+                  <label>Account Number</label>
+                  <input type="text" formControlName="acc_num" class="form-control" />
+                </div> -->
+                <div class="col-md-2">
+                  <label>Opening Date</label>
+                  <input type="date" formControlName="opn_dt" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                  <label>Prn. Amount</label>
+                  <input type="number" formControlName="prn_amt" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                  <label>Maturity Date</label>
+                  <input type="date" formControlName="mat_dt" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                  <label>Maturity Value</label>
+                  <input type="number" formControlName="mat_val" class="form-control" />
+                </div>
+                </div>
+                 <!-- === Stock Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'S'" class="row">
+                  <div class="col-md-6">
+                    <label>Stock Type</label>
+                    <input type="text" formControlName="stock_type" class="form-control" />
+                  </div>
+                  <div class="col-md-6">
+                    <label>Stock Value</label>
+                    <input type="number" formControlName="stock_value" class="form-control" />
+                  </div>
+                </div>
+                 <!-- === housing Fields === -->
+
+                  <div *ngIf="group.get('sec_type')?.value === 'H'" class="row">
+                <!-- Owner Details -->
+                <div class="col-md-3" *ngFor="let i of [1,2,3,4,5]">
+                  <label>Owner Name {{i}}</label>
+                  <input type="text" [formControlName]="'dh_name' + i" class="form-control" />
+                </div>
+
+                <!-- Property Information -->
+                <div class="col-md-3">
+                  <label>Property Type</label>
+                  <input type="text" formControlName="prop_type" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                  <label>Property Address</label>
+                  <input type="text" formControlName="prop_addr" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Total Land Area</label>
+                  <input type="text" formControlName="to_lnd_area" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Total Covered Area</label>
+                  <input type="text" formControlName="tot_cv_area" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Deed Number</label>
+                  <input type="text" formControlName="deed_no" class="form-control" />
+                </div>
+
+                <!-- Location Details -->
+                <div class="col-md-3">
+                  <label>District</label>
+                  <input type="text" formControlName="distct" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Police Station</label>
+                  <input type="text" formControlName="ps" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Mouza</label>
+                  <input type="text" formControlName="mouza" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>JL Number</label>
+                  <input type="text" formControlName="jl_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>RS Khatian</label>
+                  <input type="text" formControlName="rs_kha" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>LR Khatian</label>
+                  <input type="text" formControlName="lr_kha" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>RS Dag</label>
+                  <input type="text" formControlName="rs_dag" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>LR Dag</label>
+                  <input type="text" formControlName="lr_dag" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Municipality</label>
+                  <input type="text" formControlName="deed_muni" class="form-control" />
+                </div>
+
+                <!-- House/Building Specific -->
+                <div class="col-md-3">
+                  <label>Ward No</label>
+                  <input type="text" formControlName="ward_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Holding No</label>
+                  <input type="text" formControlName="holding_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Boundry</label>
+                  <input type="text" formControlName="boundry" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Construction Year</label>
+                  <input type="text" formControlName="cnst_yr" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Floor Area</label>
+                  <input type="text" formControlName="floor_area" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Market Value</label>
+                  <input type="number" formControlName="mkt_val" class="form-control" />
+                </div>
+
+                <!-- Tax & Deed -->
+                <div class="col-md-3">
+                  <label>Tax Paid Up To</label>
+                  <input type="date" formControlName="tax_upto" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Block/RO Tax</label>
+                  <input type="text" formControlName="bl_ro_tax" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Mortgage Deed Registration No</label>
+                  <input type="text" formControlName="mort_deed_reg_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Mortgage Deed Date</label>
+                  <input type="date" formControlName="mort_deed_dt" class="form-control" />
+                </div>
+              </div>
+
+                <div class="text-right mb-3">
+                  
+        
+                  <button  type="button" style="max-height: 27px;" class="btn btn-danger btn-sm"
+                      (click)="removeSecurity(i)">
+                      <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                      </button>
+                </div>
+                  
+                <!-- <button type="button" class="btn btn-danger mt-3" (click)="removeSecurity(i)">Remove</button> -->
+              </div>
+            </div>
+            <div class="text-right mb-3" >
+              <button type="button" style=" max-height: 27px;" [disabled]="disableAll == 'Y'" class="btn btn-primary btn-sm mr-2"
+                    (click)="addSecurity()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+            <!-- <button type="button" class="btn btn-primary" (click)="addSecurity()">Add More Security</button> -->
+            <!-- <button type="submit" class="btn btn-success text-right" (click)="onSecuritySave()">Save Security</button> -->
+          </form>
+     </div>
+     </div>
+    <div class="row">
+      <div class="col-12 ">
+
+        <!-- <h1></h1>
         <h4 class="customHeader">Guaranter Details</h4>
 
         <div class="form-row">
@@ -275,8 +644,8 @@
               style="height:25px; text-align: left;" [disabled]="disableAll == 'Y' " type="text"
               placeholder="Guaranter Address" [(ngModel)]="tm_guaranter.gua_add">
           </div>
-        </div>
-
+        </div> -->
+<!-- 
         <div class="form-row">
           <div class="form-group col-4">
             <small>Father's Name</small>
@@ -308,7 +677,7 @@
             </div>
           </div>
 
-        </div>
+        </div> -->
 
 
         <div class="form-row ">
@@ -498,7 +867,7 @@
             <div class="form-group col-2">
               <small for=due_date>Validity Date</small><span class="text-danger">*</span>
               <div class="input-group">
-                <input class="form-control form-control-sm text-capitalize" id="validity_date" [disabled]="disableAll == 'Y' || ls.approval_status == 'A' || duedateSetting"
+                <input class="form-control form-control-sm text-capitalize" id="validity_date" [disabled]="disableAll == 'Y' || ls.approval_status == 'A' "
                   style="height:25px; text-align: right;" bsDatepicker
                   [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" type="text" 
                   [(ngModel)]="ls.due_dt" type="text" placeholder="DD/MM/YYYY">
@@ -522,9 +891,9 @@
         </section>
 
       </div>
+      
 
-
-      <div class="col-4 border-left">
+      <!-- <div class="col-4 border-left">
         <h1></h1>
         <h4 class="customHeader">Security Details</h4>
         <div class="scroll-style">
@@ -565,8 +934,7 @@
         </div>
 
         
-        <!-- <div class="text-right mb-3" *ngIf="tm_loan_all.acc_cd==23314 || tm_loan_all.acc_cd==23315 || tm_loan_all.acc_cd==20419 || tm_loan_all.acc_cd==20441|| tm_loan_all.acc_cd==20416"> -->
-          <div class="text-right mb-3" >
+        <div class="text-right mb-3" >
           <button  type="button" style="height:22px; padding-top: 0px;"  [disabled]="disableAll == 'Y' "
            class="btn btn-primary btn-sm" (click)="openModalC1(contentLoanStmt)">
             <i class="fa fa-plus-circle" aria-hidden="true"></i>
@@ -579,37 +947,12 @@
        </div>
         <h4 class="customHeader">Account Details</h4>
         <div class="scroll-style">
-          <!-- <section *ngFor="let set of td_loan_sanc_set_list; let i=index">-->
-
+          
             <div *ngIf="SecaccCD">
 
               <div class="form-row">
     
-                <!-- <div class="form-group col-4">
-                  <small for="trans_type">Constitution</small> <br>
-                  <select [disabled]='disableAll'
-                    style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
-                    id="trans_type" [(ngModel)]="newtm_deposit.constitution_cd" class="form-control form-control-sm"
-                    >
-                    <option [value]="newtm_deposit.constitution_cd" [readonly]="true" selected>
-                      {{newtm_deposit.constitution_cd}}-{{newtm_deposit.constitution_desc}}</option>
-                    <option *ngFor="let l of selectedConstitutionList" [value]="l.constitution_cd">
-                      {{l.constitution_cd}}-{{l.constitution_desc}}</option>
-                  </select>
-                </div> -->
-    
-                <!-- <div class="form-group col-3">
-                  <small for="dep_oprn_instr">Operational Instr</small> <br>
-                  <select
-                    style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
-                    id="acc_oprn_instr" [(ngModel)]="newtm_deposit.oprn_instr_cd" [disabled]='disableAll'
-                    class="form-control form-control-sm">
-                    <option [value]="newtm_deposit.oprn_instr_cd" selected>
-                      {{newtm_deposit.oprn_instr_cd}}-{{newtm_deposit.oprn_instr_desc}}</option>
-                    <option *ngFor="let l of operationalInstrList" [value]="l.oprn_cd">{{l.oprn_cd}}-{{l.oprn_desc}}
-                    </option>
-                  </select>
-                </div> -->
+               
                 <span class="badge badge-warning pull-right" *ngIf="!accName"> 
                   Customer Name:-{{CustomerName.cust_name}}
                  </span>
@@ -664,21 +1007,7 @@
                   <input [disabled]='disableAll' [(ngModel)]="newtm_deposit.cert_no" style="height:20px" type="text"
                     class="form-control form-control-sm text-capitalize" id="dep_cert_no">
                 </div>
-    
-                <!-- <div class="form-group col-2">
-                  
-                  <small for="stand_ins_after_matu">After Maturity Instr</small> <br>
-                  <select [disabled]='disableAll'
-                    style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
-                    id="stand_ins_after_matu" [(ngModel)]="newtm_deposit.standing_instr_flag"
-                    class="form-control form-control-sm">
-                   
-                    <option *ngFor="let l of standingInstrAfterMaturity"
-                      [selected]="newtm_deposit.standing_instr_flag==l.instr_code" [value]="l.instr_code">{{l.instr_dscr}}
-                
-                    </option>
-                  </select>
-                </div> -->
+
                 <div class="form-group col-3">
                   <small for="dep_cert_no">S/B Account No</small>
                   <input [disabled]='disableAll' [(ngModel)]="newtm_deposit.user_acc_num" style="height:20px" type="text"
@@ -687,7 +1016,6 @@
     
                 <div class="form-group col-3">
                   <br>
-                  <!-- <div class="container border"> -->
                   <label class="form-check-label">
                     <input
                       [disabled]='disableAll || newtm_deposit.intt_trf_type == undefined || newtm_deposit.intt_trf_type == null || newtm_deposit.intt_trf_type == "O"'
@@ -696,27 +1024,22 @@
                       Instr</small>
                   </label>
                 </div>
-                <!-- </div> -->
     
               </div>
             </div>
-          <!-- </section> -->
         </div>
 
-      </div>
+      </div> -->
     </div>
-
-    <div *ngIf="showMsg && showMsg.Show" class="col-12 mt-1">
-      <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
-       'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
-        <strong>{{showMsg.Message}}</strong>
-        <button type="button" class="close" data-dismiss="alert" (click)="closeAlertMsg()" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+     
+     
+     <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
     </div>
 
   </div>
+
 
 
   <!-- <div

@@ -803,9 +803,8 @@ debugger
       const result = MatchFinger(60, 10,this.bioData,tmpFormat); // quality: 60%, timeout: 10s
 
       if (result?.httpStaus) {
-        // If capture success and data exists
         if (result.data?.ErrorCode=='0') {
-          console.log("Captured Finger Data:", result.data.FingerData);
+          console.log("Captured Finger Data:", result?.data);
             if (result.data?.Status) {
               console.log('✅ Fingerprint matched!');
                 this.fingerprintStatus = 'success';

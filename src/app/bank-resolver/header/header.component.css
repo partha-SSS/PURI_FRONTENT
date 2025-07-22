@@ -4,13 +4,13 @@ a{
 a:hover{
   text-decoration: none !important;
 }
-.header_class{background-color: #e2d51b; border:none; padding:5px 0; border-radius: 0; color: #044800; width: 100%; border-bottom: #044800 solid 1px;}
+.header_class{background-color: #abb8e9; border:none; padding:5px 0; border-radius: 0; color: #575b71; width: 100%; border-bottom: #575b71 solid 1px;}
 ul.header_top{margin:0; padding:4px 15px; list-style-type: none;}
-ul.header_top li{display: inline-block;  margin-right: 15px; line-height:16px; color: #044800;}
+ul.header_top li{display: inline-block;  margin-right: 15px; line-height:16px; color: #575b71;}
 ul.header_top li.date{float: right; margin: 0;}
 .logo_sec_main{position: relative;}
 .logo_sec{padding:4px 15px 2px 15px;
-background: #044800;
+background: #575b71;
 /*border-radius: 0 0 50px 50px;*/
 display: inline-block;
 box-shadow: 0 5px 4px -2px #d0cece;
@@ -19,7 +19,7 @@ left: 15px;
 top: 0;}
 .logo_sec img{max-width: 60px; height: auto;}
 
-nav{font-family: 'Roboto', sans-serif; color: #fff!important;background-color: #044800 !important;
+nav{font-family: 'Roboto', sans-serif; color: #fff!important;background-color: #575b71 !important;
 font-size: small;
 }
 .navbarSectio{text-align: right; padding-top:3px;}
@@ -32,7 +32,7 @@ font-size: small;
 .navigation ul li{display: inline-block; padding:7px 7px;}
 .navigation ul li:first-child{padding-left: 0;}
 .navigation ul li:last-child{padding-right: 0;}
-.navigation ul li a{color: #044800; font-size: 13px;}
+.navigation ul li a{color: #575b71; font-size: 13px;}
 nav{font-family: 'Roboto', sans-serif;}
 .drpdwn-prnt{
   font-size: 13px;
@@ -62,14 +62,14 @@ mat-icon{
     height: 35px !important;
 }
 .mat-menu-item>mat-icon{
-  color: #044800!important;
+  color: #575b71!important;
 }
 .mat-menu-item:hover{
   background: #d9e446!important;
-  color: #044800;
+  color: #575b71;
 }
 span{
-  color: #044800;
+  color: #575b71;
 }
 .topBody{
   
@@ -100,17 +100,17 @@ button[disabled]{
   /* background-color: #aeeea6; */
 }
 span.mat-menu-item:hover:not([disabled]), .mat-menu-item.cdk-program-focused:not([disabled]), .mat-menu-item.cdk-keyboard-focused:not([disabled]), .mat-menu-item-highlighted:not([disabled]) {
-  background: #044800;
-  color: #044800;
+  background: #575b71;
+  color: #575b71;
 }
 /* span.mat-menu-item .mat-icon {
-  color: #044800;
+  color: #575b71;
 }
 span.mat-menu-item{
-  color: #044800;
+  color: #575b71;
 } */
 .myDivClass>span>mat-menu-item >mat-icon{
-  color: #044800;
+  color: #575b71;
   height: 51px;
   margin-left: 70px;
   margin-top: 10px;
@@ -121,7 +121,7 @@ span.mat-menu-item{
   height: 72px;
 }
 .menu_item_style {
-    color: #044800; /* Change 'red' to your desired color */
+    color: #575b71; /* Change 'red' to your desired color */
   }
   .mat-button{
     padding: 0 8px!important; 
@@ -134,6 +134,6 @@ span.mat-menu-item{
 
   .btn:hover {
     background:#adb447b6;
-    color: #044800;
+    color: #575b71;
   }
  

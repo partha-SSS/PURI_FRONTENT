@@ -8,6 +8,8 @@ import {trigger, style, animate, transition} from '@angular/animations';
 import { CommonServiceService } from '../common-service.service';
 import { Router } from '@angular/router';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+// import { ChartConfiguration, ChartOptions } from 'chart.js';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -21,6 +23,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
     ])
   ]
 })
+
 export class DashboardComponent implements OnInit{
 
   constructor(private router: Router, private modalService:BsModalService,private msg: InAppMessageService,private svc: RestService, private comsv:CommonServiceService) { }
@@ -29,7 +32,54 @@ export class DashboardComponent implements OnInit{
   isLoading = false;
   modalRef?:BsModalRef;
   currUser:any;
-  L2L:any=localStorage.getItem('L2L')
+  L2L:any=localStorage.getItem('L2L');
+  
+
+  // chartData: ChartConfiguration<'bar'>['data'] = {
+  //   labels: [
+  //     'Opening', 'Received', 'Paid', 'Closing',
+  //     'A/c Opened', 'Maturity', 'Loan Disbursed', 'Loan Recovered'
+  //   ],
+  //   datasets: [
+  //     {
+  //       label: '₹ Amount',
+  //       data: [
+  //         +this.dashboardItem.todaysOpening,
+  //         +this.dashboardItem.cashReceived,
+  //         +this.dashboardItem.cashPaid,
+  //         +this.dashboardItem.todayClosing,
+  //         +this.dashboardItem.accountopenedAmount,
+  //         +this.dashboardItem.todayMaturityAmount,
+  //         +this.dashboardItem.loanDisbursedAmount,
+  //         +this.dashboardItem.loanRecoveredAmount
+  //       ],
+  //       backgroundColor: [
+  //         '#6a11cb', '#f7971e', '#bdc3c7', '#11998e',
+  //         '#396afc', '#e52d27', '#00c9ff', '#667eea'
+  //       ],
+  //       borderRadius: 8
+  //     }
+  //   ]
+  // };
+
+  // chartOptions: ChartConfiguration<'bar'>['options'] = {
+  //   responsive: true,
+  //   plugins: {
+  //     legend: {
+  //       display: true,
+  //       position: 'top'
+  //     },
+  //     tooltip: {
+  //       enabled: true
+  //     }
+  //   },
+  //   scales: {
+  //     y: {
+  //       beginAtZero: true
+  //     }
+  //   }
+  // };
+
   @ViewChild('template', { static: true }) template: TemplateRef<any>;
 
   ngOnInit(): void {
@@ -47,6 +97,7 @@ export class DashboardComponent implements OnInit{
     // }
     // this.getCustomerList()
 }
+ 
     openModal(template: TemplateRef<any>) {
       this.currUser=localStorage.getItem('__userId');
       this.modalRef = this.modalService.show(template, {class: 'modal-sm modal-dialog-centered'});

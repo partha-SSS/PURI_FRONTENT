@@ -18,6 +18,7 @@ export class DenominationComponent implements OnInit {
     @ViewChild('retriveDeno', { static: true }) retriveDeno: TemplateRef<any>;
     @ViewChild('insertDeno', { static: true }) insertDeno: TemplateRef<any>;
     @Input() trans_code: any;
+    @Input() transaction_date: any;
     modalRef: BsModalRef;
     custTitle: string;
     isLoading=false;
@@ -33,14 +34,29 @@ export class DenominationComponent implements OnInit {
     trans_dt:any;
     trans_cd:number=0;
     transFromAnotherSceen:boolean=false;
+    // transFromAnotherSceenForUpdate:boolean=false;
   ngOnInit(): void {
-    if(this.trans_code>0){
+     this.getDenominationList();
+    this.trans_dt= this.sys.CurrentDate;
+    if(this.trans_code>0 && !this.transaction_date){
         this.transFromAnotherSceen=true;
+        this.updateMode=false;
         debugger
 
+    }else if(this.transaction_date && this.trans_code>0){
+      this.updateMode=true;
+      this.transFromAnotherSceen=true;
+      console.log(this.transaction_date);
+      this.trans_dt=this.transaction_date;
+      this.getDenomination(this.transaction_date,this.trans_code);
+      debugger
+    }else{
+    this.updateMode=false;
+    this.transFromAnotherSceen=false;
+   
+    debugger
     }
-    this.getDenominationList();
-    this.trans_dt= this.sys.CurrentDate;
+    
   }
   private getDenominationList(): void {
     let denoList: tt_denomination[] = [];
@@ -78,7 +94,7 @@ export class DenominationComponent implements OnInit {
             if (null !== res && Object.keys(res).length !== 0) {
               this.HandleMessage(true, MessageType.Sucess, 'Denomination Fetch Successfully');
               this.isLoading=false;
-               this.modalRef.hide();
+               this.modalRef?.hide();
               this.tm_denominationList = res;
               this.tm_denominationList.forEach(element => {
                 const denomination = this.denominationList.filter(e => e.value === element.rupees)[0];
@@ -89,12 +105,12 @@ export class DenominationComponent implements OnInit {
             }else{
               this.isLoading=false;
               this.HandleMessage(true, MessageType.Error, 'No Data Found');
-              this.modalRef.hide();
+              this.modalRef?.hide();
             }
           },
           err => { 
               this.isLoading=false;
-              this.modalRef.hide();
+              this.modalRef?.hide();
               this.HandleMessage(true, MessageType.Error, 'Error from server side');
           }
         );
@@ -137,9 +153,10 @@ export class DenominationComponent implements OnInit {
   onSaveClick(){
     if(this.transFromAnotherSceen){
       this.insertDenomination(this.trans_dt,this.trans_code)
-    }else{
+    }
+    else{
       this.trans_dt=this.sys.CurrentDate
-     this.modalRef = this.modalService.show(this.insertDeno);
+     this.modalRef = this.modalService?.show(this.insertDeno);
     }
    
        
@@ -149,8 +166,13 @@ export class DenominationComponent implements OnInit {
       console.log(JSON.stringify(this.tm_denominationList));
       this.tm_denominationList.forEach(element => {
         console.log(element.trans_cd);
-        if(!element.trans_cd){
+        if(!this.trans_code){
           element.trans_cd=this.tm_denominationList[0]?.trans_cd;
+          element.trans_dt=this.tm_denominationList[0]?.trans_dt;
+          element.created_dt=this.tm_denominationList[0]?.created_dt;
+          element.created_by=this.sys.UserId+'/'+localStorage.getItem('ipAddress');
+        }else{
+          element.trans_cd=this.trans_code;
           element.trans_dt=this.tm_denominationList[0]?.trans_dt;
           element.created_dt=this.tm_denominationList[0]?.created_dt;
           element.created_by=this.sys.UserId+'/'+localStorage.getItem('ipAddress');

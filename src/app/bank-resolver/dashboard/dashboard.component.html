@@ -3,18 +3,7 @@
   <div class="wrapper">
    
 <div class="wrapperWhite">
-  <!-- <img src="./assets/images/cfsgreen.png"  class="log4"> -->
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData">
-          <h2>Opening Cash Balance </h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_a.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.todaysOpening | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
+ 
       <div class="row" @fade style="margin-top:40px;">
       <div class="col-sm-3 float-left" >
       <mat-card class="example-card bgColor1">
@@ -23,23 +12,13 @@
           <div class="imgSec1"><img src="./assets/images/icon_a.png" alt="" /></div>
           <div class="amount">{{dashboardItem.todaysOpening | INRCurrency}}</div>
           <div class="space"></div>
-        <!-- <h2>Opening Cash Balance </h2> -->
+  
         <button mat-button class="repLink" matTooltip="Click here to see full report" (click)="openDayBook()">Opening Cash Balance</button>
         
       </mat-card>
       </div>
 
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData bgColor2">
-          <h2>Cash Received</h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_b.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.cashReceived | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
+    
       <div class="col-sm-3 float-left">
         <mat-card class="example-card bgColor2">
           <img src="./assets/images/logo11.png" alt=""  class="landing"/>
@@ -48,23 +27,11 @@
             <div class="amount">{{dashboardItem.cashReceived | INRCurrency}}</div>
             <div class="space"></div>
             <button mat-button class="repLink" matTooltip="Click here to see full report" (click)="openGlTrns()">Cash Received</button>
-         
-          <!-- <h2>Cash Received </h2> -->
-          
+   
         </mat-card>
       </div>
 
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData bgColor3">
-          <h2>Cash Paid</h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_c.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.cashPaid | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
+ 
       <div class="col-sm-3 float-left">
         <mat-card class="example-card bgColor3">
           <img src="./assets/images/logo11.png" alt=""  class="landing"/>
@@ -74,22 +41,12 @@
             <div class="space"></div>
             <button mat-button class="repLink" matTooltip="Click here to see full report" (click)="openGlTrns()">Cash Paid</button>
          
-          <!-- <h2>Cash Paid</h2> -->
+
           
         </mat-card>
       </div>
 
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData bgColor4">
-          <h2>Closing Cash Balance</h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_d.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.todayClosing | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
+    
       <div class="col-sm-3 float-left" >
         <mat-card class="example-card bgColor4">
           <img src="./assets/images/logo11.png" alt=""  class="landing"/>
@@ -99,23 +56,12 @@
             <div class="space"></div>
             <button mat-button class="repLink" matTooltip="Click here to see full report" (click)="openDayBook()">Closing Cash Balance</button>
          
-          <!-- <h2>Closing Cash Balance</h2> -->
-          
+
         </mat-card>
       </div>
     </div>
 
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData bgColor5">
-          <h2>Deposit Account Opened <span>[No: {{dashboardItem.accountopened}}]</span></h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_e.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.accountopenedAmount | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
+   
       <div class="row"  @fade style="margin-top: 60px;">
       <div class="col-sm-3 float-left">
         <mat-card class="example-card bgColor5">
@@ -126,22 +72,10 @@
             <div class="space"></div>
             <button mat-button class="repLink" matTooltip="Click here to see full report" (click)="accOpen()">Deposit Account Opened</button><span>[No: {{dashboardItem.accountopened}}]</span>
          
-          <!-- <h2>Deposit Account Opened <span>[No: {{dashboardItem.accountopened}}]</span></h2> -->
-          
+         
         </mat-card>
       </div>
 
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData bgColor6">
-          <h2>Today’s Maturity <span>[No: {{dashboardItem.todayMaturity}}]</span></h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_f.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.todayMaturityAmount | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
       <div class="col-sm-3 float-left">
         <mat-card class="example-card bgColor6">
           <img src="./assets/images/logo11.png" alt=""  class="landing"/>
@@ -155,17 +89,6 @@
         </mat-card>
       </div>
 
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData bgColor7">
-          <h2>Loan Disbursed <span>[No: {{dashboardItem.loanDisbursed}}]</span></h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_g.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.loanDisbursedAmount | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
       <div class="col-sm-3 float-left">
         <mat-card class="example-card bgColor7">
           <img src="./assets/images/logo11.png" alt=""  class="landing"/>
@@ -174,22 +97,9 @@
             <div class="amount">{{dashboardItem.loanDisbursedAmount | INRCurrency}}</div>
           <div class="space"></div>
           <button mat-button class="repLink" matTooltip="Click here to see full report" (click)="loanDis()">Total Loan Disbursed</button><span>[No: {{dashboardItem.loanDisbursed}}]</span>
-
-            <!-- <h2>Loan Disbursed <span >[No: {{dashboardItem.loanDisbursed}}]</span></h2> -->
-          
-        </mat-card>
+       </mat-card>
       </div>
-      <!-- <div class="col-sm-3 float-left">
-        <div class="boxData bgColor8">
-          <h2>Loan Recovered <span>[No: {{dashboardItem.loanRecovered}}]</span></h2>
-          <div class="bottomSec">
-            <div class="imgSec"><img src="./assets/images/icon_h.png" alt="" /></div>
-            <div class="amount">{{dashboardItem.loanRecoveredAmount | INRCurrency}}</div>
-          </div>
-          <br clear="all">
-
-        </div>
-      </div> -->
+    
       <div class="col-sm-3 float-left">
         <mat-card class="example-card bgColor8">
           <img src="./assets/images/logo11.png" alt=""  class="landing"/>
@@ -198,9 +108,7 @@
             <div class="space"></div>
             <button mat-button class="repLink" matTooltip="Click here to see full report" (click)="loanRec()">Total Loan Recovered</button><span>[No: {{dashboardItem.loanRecovered}}]</span>
          
-          <!-- <h2>Loan Recovered <span>[No: {{dashboardItem.loanRecovered}}]</span></h2> -->
-          
-        </mat-card>
+         </mat-card>
       </div>
     </div>
 

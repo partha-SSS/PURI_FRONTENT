@@ -42,7 +42,7 @@ export class LandingComponent implements OnInit {
   @ViewChild('template', { static: true }) template: TemplateRef<any>;
 
   ngOnInit(): void {
-    this.ardbName=localStorage.getItem('ardb_name');
+    this.ardbName=localStorage.getItem('societyName');
     this.brnName=localStorage.getItem('__brnName');
     this.marqueeText = `${this.ardbName} (${this.brnName})`;
     this.comsv.accOpen=false

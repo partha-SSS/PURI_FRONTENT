@@ -2,17 +2,28 @@ small {
   font-size: 70%;
   font-weight: 500;
 }
+.suggestions{
+  position: absolute;
+  background-color: rgb(255, 255, 255);
+  z-index: 1;
+  width: 280px;
+  height: auto;
+  max-height: 300px;
+  overflow: auto;
+  font-size: x-small;
+  margin-top:15%;
+}
 
 .suggestions2{
   position: absolute;
   background-color: rgb(255, 255, 255);
   z-index: 1;
-  width: 250px;
+  width: 600px;
   height: auto;
   max-height: 300px;
   overflow: auto;
   font-size: x-small;
-  margin-top:20%;
+  margin-top:0%;
 }
 #customers2 {
   
