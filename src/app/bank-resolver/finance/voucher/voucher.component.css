@@ -38,7 +38,7 @@ small{
 
 .customers tr:nth-child(even){background-color: #f2f2f2;}
 
-.customers tr:hover {background-color: #aeeea6;  ;}
+.customers tr:hover {background-color: #a7d1d1;  ;}
 
 .customers th {
   padding-top: 12px;

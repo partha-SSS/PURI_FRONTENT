@@ -397,17 +397,17 @@ table{
   
   #close {
     top: 280px;
-    background-color: #34723A;
+    background-color: #286e6e;
   }
   
   #print {
     top: 360px;
-    background-color: #34723A;
+    background-color: #286e6e;
   }
   
   #retrieve {
     top: 440px;
-    background-color: #34723A;
+    background-color: #286e6e;
   }
   .sidenav>button>mat-icon{
     margin-left:28px

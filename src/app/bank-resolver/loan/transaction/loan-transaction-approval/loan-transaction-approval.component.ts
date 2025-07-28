@@ -750,6 +750,9 @@ export class LoanTransactionApprovalComponent implements OnInit {
       res => {
         debugger
         if (res === 0) {
+          if(this.selectedVm.td_def_trans_trf.trf_type=='C'){
+          this.approveDenomination(trnParam.ad_trans_cd,trnParam.adt_trans_dt,trnParam.flag);
+          }
           this.selectedVm.td_def_trans_trf.approval_status = 'A';
           this.HandleMessage(true, MessageType.Sucess,
             `Transaction with Transacation Cd ${this.selectedVm.td_def_trans_trf.trans_cd} is approved.`);
@@ -771,6 +774,18 @@ export class LoanTransactionApprovalComponent implements OnInit {
       
       }
     );
+  }
+   public approveDenomination(tc,date,flag): void {
+        const dt={
+            "brn_cd": this.sys.BranchCode,
+            "adt_trans_dt": date,
+            "ad_trans_cd": tc,
+            "flag": flag
+        }
+      this.svc.addUpdDel<any>('Common/ApproveDenomination', dt).subscribe(
+            res => {
+             
+            })
   }
   public onChangeAcctType(acctTypeCd: number): void {
     acctTypeCd = +acctTypeCd;

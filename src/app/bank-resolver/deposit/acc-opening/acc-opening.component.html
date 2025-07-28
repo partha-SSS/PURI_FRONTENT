@@ -30,9 +30,12 @@
     </button>
   </div> -->
    
-<div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
-      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
-      <span class="alert-text">{{ showMsg.Message }}</span>
+    <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+          <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+          <span class="alert-text">{{ showMsg.Message }}</span>
+          <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+          </button>
     </div>
     <div class="row">
       <div class="col-12 col-sm-6 col-md-7 border-right">
@@ -277,7 +280,6 @@
 
           </div>
         </section>
-
         <div class="text-right mb-3">
           <button type="button" style=" padding-top: 0px;" class="btn btn-primary btn-sm mr-2"
             (click)="addJointHolder()">
@@ -286,6 +288,51 @@
 
           <button  type="button" style=" padding-top: 0px;" class="btn btn-primary btn-sm"
             (click)="removeJointHolder()">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+          </button>
+        </div>
+        <hr style="margin-top: 0ch;">
+        <h4 class="customHeader">Introducer Details</h4>
+        <section *ngFor="let t1 of td_introducerlist; let i=index">
+          <div class="form-row">
+            <div class="form-group col-3">
+              <small for="intr_acc_type">Account Type</small>
+              <select [disabled]='disableAll'
+                style="height:25px; font-size: small; padding-top: 0px; background-color: whitesmoke;"
+                id="intr_acc_type" class="form-control form-control-sm" [(ngModel)]="t1.introducer_acc_type"
+                (focusout)="setIntroducerAccountType($event.target.value, i)">
+                <option [value]="t1.introducer_acc_type" [readonly]="true" selected>
+                  {{t1.introducer_acc_type}}-{{t1.introducer_acc_type_desc}}</option>
+                <option *ngFor="let l of introducerAccTypeList" [value]="l.introducer_acc_type_cd">
+                  {{l.introducer_acc_type_cd}}-{{l.introducer_acc_type_desc}}</option>
+              </select>
+            </div>
+
+            <div class="form-group col-3">
+              <small for="intr_acc_no">Account Number</small>
+              <input [disabled]='disableAll' [(ngModel)]='t1.introducer_acc_num' type="text" style="height:25px"
+                class="form-control form-control-sm text-capitalize" id="intr_acc_no" (change)="setIntroducerName(i)"
+                placeholder="Introducer Account Number">
+            </div>
+
+            <div class="form-group col-6">
+              <small for="intr_name">Introducer Name</small>
+              <input type="text" [(ngModel)]='t1.introducer_name' style="height:25px" [readonly]="true"
+                class="form-control form-control-sm text-capitalize" id="intr_name" placeholder="Introducer Name">
+            </div>
+          </div>
+        </section>
+        
+        
+
+        <div class="text-right mb-3">
+          <button mat-raised-button type="button" style="padding-top: 0px;" class="btn btn-primary btn-sm mr-2"
+            (click)="addIntroducer()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+          </button>
+
+          <button mat-raised-button type="button" style="padding-top: 0px;" class="btn btn-primary btn-sm"
+            (click)="removeIntroducer()">
             <i class="fa fa-minus-circle" aria-hidden="true"></i>
           </button>
         </div>
@@ -1248,7 +1295,7 @@
               class="form-control form-control-sm" [(ngModel)]="td_deftrans.trf_type"
               (change)="setTransType($event.target.value)">
               <!-- <option [value]="td_deftrans.trf_type" selected>{{td_deftrans.trf_type_desc}}</option> -->
-              <option [value]="l.trf_type" [selected]="masterModel.tddeftrans.trf_type==l.trf_type"
+              <option [value]="l.trf_type" [selected]="masterModel?.tddeftrans?.trf_type==l.trf_type"
                 *ngFor="let l of transferTypeListTemp">{{l.trf_type_desc}}</option>
             </select>
           </div>
@@ -1259,11 +1306,7 @@
               class="form-control form-control-sm text-capitalize" id="trans_code" placeholder="Trans Code">
           </div>
         </div>
-        <br>
-        <div *ngIf="td_deftrans.trf_type=='C'">
-            <h4 class="customHeader">Denomination Details</h4>
-            <app-test></app-test>
-        </div>
+        
       
 
       </div>
@@ -1574,5 +1617,15 @@
     <button mat-raised-button type="button" class="btn btn-light" (click)="this.modalRef.hide()" >No</button>&nbsp;
     <button mat-raised-button type="button" class=" btn btn-primary" (click)="deleteData()" >Yes</button>
     
+  </div>
+</ng-template>
+<ng-template #denomination > 
+  <div class="modal-header">
+     <h4 class="modal-title pull-left customHeader"> Denomination for Trans Code: <b style="color: rgb(207 255 65);font-size: x-large;">{{trans_code}}</b> and Trans Amount: <b style="color: rgb(207 255 65);font-size: x-large;">₹{{transactionAmount}} </b>  &nbsp;&nbsp;&nbsp;  </h4><button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-denomination [trans_code]="trans_code" [transaction_date]="transaction_date"></app-denomination>
   </div>
 </ng-template>

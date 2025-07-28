@@ -840,6 +840,7 @@ debugger
            if (this.cashMode) {
             this.transactionAmount=this.totalDebit
             this.trans_code=(+100000)+(+res);
+            this.trans_date=null;
             // this.trans_date=this._voucherDt;
             setTimeout(() => {
             this.modalRef = this.modalService.show(this.denomination,{ class: 'modal-xl' , keyboard: false, backdrop: true, ignoreBackdropClick: true });
@@ -934,14 +935,17 @@ debugger
           }
         }
       }
-      
+      for(let i=0; i<tvdSaveAll.length; i++){
+        this.totalDebit += tvdSaveAll[i].debit_credit_flag=='D'?tvdSaveAll[i].dr_amount:0;
+        this.totalCredit += tvdSaveAll[i].debit_credit_flag=='C'?tvdSaveAll[i].cr_amount:0;
+      }
       debugger;
       console.log(tvdSaveAll)
       this.svc.addUpdDel<any>('Voucher/DeleteInsertVoucherDtls', tvdSaveAll).subscribe(
         res => {
           if(this._voucherTyp == "CR" ||this._voucherTyp == "CP"){
             //  this.onDelDenomination(this._voucherDt,this._voucherId);
-            this.transactionAmount=this.totalDebit//tobechange
+            this.transactionAmount=this.totalDebit?this.totalDebit:this.totalCredit//tobechange
             // this.trans_code=this._voucherId;
             this.trans_code=(+100000)+(+this._voucherId);
             this.trans_date=this._voucherDt;

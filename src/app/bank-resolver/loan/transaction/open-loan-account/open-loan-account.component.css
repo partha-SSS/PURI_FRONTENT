@@ -39,13 +39,13 @@ small {
 }
 #customers2 tr:nth-child(even){background-color: #f2f2f2;}
 
-#customers2 tr:hover {background-color: #aeeea6; cursor: pointer;}
+#customers2 tr:hover {background-color: #a7d1d1; cursor: pointer;}
 
 #customers2 th {
   padding-top: 2px;
   padding-bottom: 2px;
   text-align: left;
-  background-color: #34723A;
+  background-color: #286e6e;
   color: white;
   font-size:small
 }
@@ -53,12 +53,24 @@ small {
   position: absolute;
   background-color: rgb(255, 255, 255);
   z-index: 1;
-  width: 400px;
+  width: 300px;
   height: auto;
   max-height: 300px;
   overflow: auto;
   font-size: x-small;
   margin-top:15%;
+}
+.DDsuggestions{
+  position: absolute;
+  background-color: rgb(255, 255, 255);
+  z-index: 999;
+  width: 98%;
+  height: auto;
+  max-height: 300px;
+  overflow: auto;
+  /* margin-left: 1%; */
+  font-size: medium;
+
 }
 #customers1 {
   
@@ -76,13 +88,13 @@ small {
 
 #customers1 tr:nth-child(even){background-color: #f2f2f2;}
 
-#customers1 tr:hover {background-color: #aeeea6; cursor: pointer;}
+#customers1 tr:hover {background-color: #a7d1d1; cursor: pointer;}
 
 #customers1 th {
   padding-top: 2px;
   padding-bottom: 2px;
   text-align: left;
-  background-color: #34723A;
+  background-color: #286e6e;
   color: white;
   font-size:small
 }

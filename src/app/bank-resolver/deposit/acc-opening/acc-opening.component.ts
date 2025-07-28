@@ -45,6 +45,11 @@ export class AccOpeningComponent implements OnInit {
 
   static accTypes: mm_acc_type[] = [];
   @ViewChild('kycContent', { static: true }) kycContent: TemplateRef<any>;
+  @ViewChild('denomination', { static: true }) denomination: TemplateRef<any>;
+  trans_code:any
+  cashMode:boolean=false;
+  transaction_date:any;
+  transactionAmount:number=0;
   // selectedTransType = '';
   disablejoinholder:boolean=true;
   selectedAccNature:string=''
@@ -609,6 +614,7 @@ export class AccOpeningComponent implements OnInit {
 
 
   clearData() {
+    this.transactionAmount=0
     this.operationalInstrList=[];
     this.operationType = '';
     this.disabledOnNull=true;
@@ -622,7 +628,7 @@ export class AccOpeningComponent implements OnInit {
   }
 
   retrieveData() {
-
+    this.transactionAmount=0
     this.clearData();
 
     this.operationType = '';
@@ -711,6 +717,15 @@ export class AccOpeningComponent implements OnInit {
   }
 
   saveData() {
+    if(this.td_deftrans.trf_type=='C'){
+      this.cashMode=true;
+      if(this.selectedAccNature=='RD'){
+        this.transactionAmount=this.tm_deposit.instl_amt;
+      }else{
+        this.transactionAmount=this.tm_deposit.prn_amt;
+      }
+      debugger
+    }
     if(this.tm_deposit.prn_amt){
         console.log(this.tm_deposit);
         if((this.tm_deposit.acc_type_cd == 2 || 
@@ -769,7 +784,9 @@ export class AccOpeningComponent implements OnInit {
   }
 
   validateData() {
-
+    this.transaction_date=null
+    this.trans_code=0;
+    // this.transactionAmount=0;
     let nomPercent = 0;
 
     if (this.tm_deposit.year === null || this.tm_deposit.year === undefined) { this.tm_deposit.year = 0; }
@@ -1091,22 +1108,12 @@ export class AccOpeningComponent implements OnInit {
 
   getNewAccountNoAndSaveData() {
     const param={
-      "ls_cons_cd":(this.sys.ardbCD=="4" && this.masterModel.tmdeposit.acc_type_cd==9)?this.ddsAgent:this.masterModel.tmdeposit.constitution_cd,
+      "ls_cons_cd":this.masterModel.tmdeposit.constitution_cd,
       "brn_cd":this.branchCode,
       "gs_acc_type_cd":this.masterModel.tmdeposit.acc_type_cd,
       "ls_catg_cd":this.masterModel.tmdeposit.category_cd,
       "ardb_cd":this.sys.ardbCD
     }
-    // if(this.sys.ardbCD=="4" && this.masterModel.tmdeposit.acc_type_cd==9){
-    //   this.p_gen_param.ls_cons_cd = this.ddsAgent; // Integer
-    // }
-    // else{
-    //   this.p_gen_param.ls_cons_cd = this.masterModel.tmdeposit.constitution_cd; // Integer
-    // }
-    // this.p_gen_param.brn_cd = this.branchCode; // String
-    // this.p_gen_param.gs_acc_type_cd = this.masterModel.tmdeposit.acc_type_cd; // Integer
-    // this.p_gen_param.ls_catg_cd = this.masterModel.tmdeposit.category_cd; // Integer
-    // this.p_gen_param.ardb_cd=this.sys.ardbCD;
 
     this.isLoading = true;
     debugger
@@ -1172,13 +1179,17 @@ export class AccOpeningComponent implements OnInit {
     {
       this.svc.addUpdDel<any>('Deposit/InsertAccountOpeningData', this.masterModel).subscribe(
         res => {
-        
-          this.td_deftrans.trans_cd = Number(res);
+        this.trans_code=(+res);
+        // this.transaction_date=this.sys.CurrentDate;
+        this.td_deftrans.trans_cd = Number(res);
           this.isLoading = false;
           this.disableCustomerName = true;
           this.operationType = '';
-          // this.showAlertMsg('INFORMATION', 'Account Record Created Successfully [Account Number:' +
-          //   this.masterModel.tmdeposit.acc_num + '] [Trans Code: ' + this.td_deftrans.trans_cd + ']');
+          if (this.cashMode) {
+                        setTimeout(() => {
+                        this.modalRef = this.modalService.show(this.denomination,{ class: 'modal-xl' , keyboard: false, backdrop: true, ignoreBackdropClick: true });
+                        }, 2000); // auto-close after 4 sec
+                      }
           this.HandleMessage(true, MessageType.Sucess, 'Account Record Created Successfully [Account Number:' +
             this.masterModel.tmdeposit.acc_num + '] [Trans Code: ' + this.td_deftrans.trans_cd + ']');
         },
@@ -1196,7 +1207,8 @@ export class AccOpeningComponent implements OnInit {
     }
     else // Modify the Account opening Data
     {
-
+      this.trans_code=(+this.td_deftrans.trans_cd);
+      this.transaction_date=this.sys.CurrentDate;
       this.svc.addUpdDel<any>('Deposit/UpdateAccountOpeningData', this.masterModel).subscribe(
         res => {
 
@@ -1204,6 +1216,11 @@ export class AccOpeningComponent implements OnInit {
           this.isLoading = false;
 
           if (ret === 0) {
+            if (this.cashMode) {
+                        setTimeout(() => {
+                        this.modalRef = this.modalService.show(this.denomination,{ class: 'modal-xl' , keyboard: false, backdrop: true, ignoreBackdropClick: true });
+                        }, 2000); // auto-close after 4 sec
+                      }
             // this.showAlertMsg('INFORMATION', 'Record Set Updated Successfully');
             this.HandleMessage(true, MessageType.Sucess, 'Record Set Updated Successfully');
             this.disableCustomerName = true;
@@ -1426,11 +1443,13 @@ export class AccOpeningComponent implements OnInit {
 
 
   setRelationship(relation: string, idx: number) {
-
+    if(this.td_accholderList[0]?.cust_cd!=0){
     this.td_accholderList[idx].cust_cd = Number(this.td_accholderList[idx].cust_cd);
     this.td_accholderList[idx].relation = relation;
     this.td_accholderList[idx].relationId = this.relationship.filter(x => x.val?.toString() === relation)[0].id;
 
+    }
+  
   }
 
   setIntTfrType(tfr_type: string) {
@@ -2839,11 +2858,11 @@ private HandleMessage(show: boolean, type: MessageType = null, message: string =
   this.showMsg.Type = type;
   this.showMsg.Message = message;
 
-  if (show) {
-    setTimeout(() => {
-      this.showMsg.Show = false;
-    }, 5000); // auto-close after 4 sec
-  }
+  // if (show) {
+  //   setTimeout(() => {
+  //     this.showMsg.Show = false;
+  //   }, 5000); // auto-close after 4 sec
+  // }
 }
 
 getAlertIcon(type: MessageType): string {

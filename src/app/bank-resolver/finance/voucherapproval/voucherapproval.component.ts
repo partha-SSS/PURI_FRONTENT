@@ -529,7 +529,7 @@ export class VoucherapprovalComponent implements OnInit {
     this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
   private UpdateVoucher(): void {
-    try {
+    // try {
       this.isLoading=true;
       let tvdSaveAll: T_VOUCHER_DTLS[] = [];
       for (let x = 0; x < this.VoucherF.length; x++) {
@@ -545,10 +545,16 @@ export class VoucherapprovalComponent implements OnInit {
         tvdSave.narrationdtl = this._voucherNarration;
         tvdSaveAll.push(tvdSave);
       }
-      ;
+      debugger
       this.svc.addUpdDel<any>('Voucher/UpdateTVoucherDtls', tvdSaveAll).subscribe(
         res => {
-          ;
+          if(this.tvdRet[0].transaction_type == "C"){
+          const v_id=tvdSaveAll[0]?.voucher_id?tvdSaveAll[0]?.voucher_id:0;
+          const flag=this._voucherTyp=="Cash Payment"?"W":"D"
+          this.approveDenomination(100000+(+v_id),this.tvd.voucher_dt,flag);
+          debugger
+        }
+        debugger
           let x = res;
           //this._voucherDt = this._voucherDt
           //this._voucherTyp = "C";
@@ -567,7 +573,7 @@ export class VoucherapprovalComponent implements OnInit {
           this.isLoading=false;
           this.showAlert = true;
           if(res!=-1)
-         { this.alertMsg = "INFORMATION : Voucher Approved Successfully.";
+         { this.alertMsg = "Voucher Approved Successfully.";
         this.HandleMessage(true, MessageType.Sucess, this.alertMsg);
          }
          else{
@@ -583,8 +589,20 @@ export class VoucherapprovalComponent implements OnInit {
           this.HandleMessage(true,MessageType.Error,this.alertMsg)
         }
       );
-    }
-    catch (exception) { let x = 0; }
+    // }
+    // catch (exception) { let x = 0; }
+  }
+  public approveDenomination(tc,date,flag): void {
+        const dt={
+            "brn_cd": this.sys.BranchCode,
+            "adt_trans_dt": date,
+            "ad_trans_cd": tc,
+            "flag": flag
+        }
+      this.svc.addUpdDel<any>('Common/ApproveDenomination', dt).subscribe(
+            res => {
+             
+            })
   }
   public getTotalCr() {
     let total = 0;

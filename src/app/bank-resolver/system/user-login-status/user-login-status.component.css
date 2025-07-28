@@ -27,7 +27,7 @@
    }
    input[type=checkbox]:checked:after {
       content:'✔';
-      color: #575b71;
+      color:  #286e6e;
       font-weight: 700;
    }
    input[type=checkbox]::after {
@@ -70,13 +70,13 @@
 
 #customers1 tr:nth-child(even){background-color: #f2f2f2;}
 
-#customers1 tr:hover {background-color: #aeeea6;}
+#customers1 tr:hover {background-color: #a7d1d1;}
 
 #customers1 th {
   padding-top: 2px;
   padding-bottom: 2px;
   text-align: left;
-  background-color: #575b71;
+  background-color:  #286e6e;
   color: white;
   font-size:small
 }

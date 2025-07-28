@@ -36,16 +36,15 @@
   </div>
 </ng-template>
 
-<div class="row d-flex justify-content-center align-items-center"
+<!-- <div class="row d-flex justify-content-center align-items-center"
   style="background-color: #78c2ad21; text-align: center;">
   <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
     <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button>
     <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add New Safe</button>
 
-    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
     <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
   </div>
-</div>
+</div> -->
 <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
   <strong>Error! </strong> {{alertMsg}}
   <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
@@ -55,50 +54,43 @@
 
 <div class="row d-flex justify-content-center align-items-center"
   style="background-color: #78c2ad21; min-height: 90vh;">
-  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
-    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
-     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
-      <strong>{{showMsg.Message}}</strong>
-      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  </div>
+  
   <div class="col-xs-12 col-sm-12 col-md-11 col-lg-6 shadow mb-2 bg-white p-3">
     <div class="row">
       <div class="col-12">
         <div class="row">
           <div class="col-12 ">
-            <h4 class="customHeader">Gold Safe Details</h4>
+            <h4 class="customHeader">Gold Carat Details</h4>
             
-            <div class="table-responsive" class="scroll-when-long">
-              
-                  <div class="form-row">
-                     <div class="form-group col-4">
-                     Safe Id
-                     </div>
-                     <div class="form-group col-4">
-                      Safe Name
-                     </div>
-                     <div class="form-group col-4">
-                      Branch
-                     </div>
+            <form [formGroup]="form" (ngSubmit)="submit()">
+            <div formArrayName="rates">
+              <div *ngFor="let group of rateControls.controls; let i = index" [formGroupName]="i" class="rate-row">
+               
+                <div class="form-row">
+                  <div class="form-group col-4">
+                        <small for="acc_type">Carat<span class="text-danger">*</span></small>
+                        <select formControlName="karat"  class="form-control form-control-sm custom-scrollbar"  >
+                          <option *ngFor="let k of karatOptions" [ngValue]="k">{{ k }} Carat</option>
+                        </select>
                   </div>
-                    <div class="form-row" *ngFor="let locker of reportData;let i = index">
-                    <div class="form-group col-4">
-                        <input type="text" readonly style="border-radius: 1.25rem!important;"  value="{{locker.goldSafeId}}" class="form-control form-control-sm custom-scrollbar"  tabindex="1"  >
-                      </div>
-                      <div class="form-group col-4">
-                        <input type="text" style="border-radius: 1.25rem!important;" value="{{locker.goldSafeName}}" class="form-control form-control-sm custom-scrollbar" tabindex="1" (change)="nameChange(locker.goldSafeId,locker.branch, $event)" >
-                      </div>
-                      <div class="form-group col-4">
-                        <input type="text" style="border-radius: 1.25rem!important;"  value="{{locker.branch}}" class="form-control form-control-sm custom-scrollbar" (change)="branchChange(locker.goldSafeId,locker.goldSafeName, $event)" tabindex="1"  >
 
-                      </div>
+                    <div class="form-group col-4">
+                      <small for="acc_type">Rate<span class="text-danger">*</span></small>
+                      <input type="number" formControlName="rate" placeholder="Enter rate"  class="form-control form-control-sm custom-scrollbar"/>
                     </div>
-                 
-              <hr>
+                    <div class="form-group col-4">
+                         <button type="button" (click)="updateRow()" class="btn btn-primary btn-sm ml-1 mr-1" style="margin-top: 9%;">Update</button>
+                         <button type="button" (click)="removeRate(i)" class="btn btn-primary btn-sm ml-1 mr-1" style="margin-top: 9%;">Remove</button>
+                  </div>
+                  </div>
+               
+              </div>
             </div>
+            <button type="button" (click)="addRate()" class="btn btn-primary btn-sm ml-1 mr-2">Add Row</button>
+            <button type="submit" class="btn btn-primary btn-sm ml-2 mr-1">Insert Rates</button>
+            <button type="button" class="btn btn-primary btn-sm ml-2 mr-1" (click)="onBackClick()">Back</button>
+
+          </form>
           </div>
          
         </div>
@@ -114,13 +106,19 @@
   </button>
 </div>
 
-<div class="row d-flex justify-content-center align-items-center"
+<!-- <div class="row d-flex justify-content-center align-items-center"
   style="background-color: #78c2ad21; text-align: center;">
   <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
     <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button>
     <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add New Safe</button>
 
-    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onUpdateClick()">Update</button> -->
     <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
   </div>
-</div>
+</div> -->
+<div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
+      <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+      </button>
+    </div>

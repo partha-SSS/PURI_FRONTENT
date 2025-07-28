@@ -29,7 +29,9 @@ import { MessageType, mm_customer, ShowMessage } from 'src/app/bank-resolver/Mod
 import { CommonServiceService } from 'src/app/bank-resolver/common-service.service';
 import { sm_parameter } from 'src/app/bank-resolver/Models/sm_parameter';
 import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
+import { LoanDetailsForSI } from 'src/app/bank-resolver/Models/loan/LoanDetailsForSI';
+import { LoanAgentDetailsForSI } from 'src/app/bank-resolver/Models/loan/loanAgentDetails';
 // import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 // import { error } from 'console';
 interface SecurityType {
@@ -37,8 +39,10 @@ interface SecurityType {
   sec_desc: string;
 }
 
-
-  
+interface GoldRate {
+  karat: number;
+  rate: number;
+}
 @Component({
   selector: 'app-open-loan-account',
   templateUrl: './open-loan-account.component.html',
@@ -57,8 +61,9 @@ export class OpenLoanAccountComponent implements OnInit {
   @ViewChild('contentLoanStmt', { static: true }) contentLoanStmt: TemplateRef<any>;
   @ViewChild('MakerChecker', { static: true }) MakerChecker: TemplateRef<any>;
   @ViewChild('kycContent', { static: true }) kycContent: TemplateRef<any>;
-
-   securityForm!: FormGroup;
+  karatOptions = [16, 18, 20, 22, 24];
+  AllgoldCatat:GoldRate[]=[]
+  securityForm!: FormGroup;
   securityTypes: SecurityType[] = [
     { sec_type: 'G', sec_desc: 'Gold' },
     { sec_type: 'N', sec_desc: 'Govt.Certificates(NSC/KVP/LIC)' },
@@ -69,15 +74,20 @@ export class OpenLoanAccountComponent implements OnInit {
     { sec_type: 'S', sec_desc: 'Stock' }
   ];
   selectedIndexForSuggestion: number | null = null;
-   depositDTLS : any
+  depositDTLS : any
   newtm_deposit:any;
-   SecaccNum:any;
+  SecaccNum:any;
   SecaccCD:any;
   shownoresult:Boolean
   // selectedType = 'G'; 
- acc_data:any[]=[];
+  acc_data:any[]=[];
   actDesc:any;
-  
+  shownoresult3=false;
+  LoanDetailsForSI = new LoanDetailsForSI();
+  LoanAgentDetailsForSI = new LoanAgentDetailsForSI();
+  suggestedDDCustomer:any
+  suggestedAgent:any;
+  allAgent:any;
   // duedateSetting:boolean=false;
   branchCode = '0';
   createUser = '';
@@ -176,6 +186,7 @@ export class OpenLoanAccountComponent implements OnInit {
   createUser1:any;
   logUser:any;
   ngOnInit(): void {
+    this.getAgentList();
     this.securityForm = this.fb.group({
       securities: this.fb.array([
         this.initSecurityFormGroup(1)
@@ -193,7 +204,7 @@ export class OpenLoanAccountComponent implements OnInit {
       // this.getCustomerList();
       this.getAccountTypeList();
       this.getInstalmentTypeList();
-
+      this.populaterGoldRate();
       this.getSectorList();
       this.getActivityList();
       this.getCorpList();
@@ -203,13 +214,69 @@ export class OpenLoanAccountComponent implements OnInit {
 
     this.initializeModels();
     this.newAccount();
-    
+    this.LoanDetailsForSI.dr_acc_type=11;
+    this.LoanDetailsForSI.min_bal=100;
 
   }
   get securities(): FormArray {
     return this.securityForm.get('securities') as FormArray;
   }
+  
 
+   populaterGoldRate() {
+  this.AllgoldCatat = [];
+  this.isLoading = true;
+
+  this.svc.addUpdDel<any>('Loan/GetGoldRates', null).subscribe(
+    res => {
+      if (res.length > 0) {
+        this.AllgoldCatat = res; // <-- direct assignment
+      } else {
+        this.AllgoldCatat = [];
+        this.HandleMessage(true, MessageType.Error, 'No Gold Rate Found, Please Insert New Rates');
+      }
+      console.log(res);
+      this.isLoading = false;
+    },
+    err => {
+      this.isLoading = false;
+      this.HandleMessage(true, MessageType.Error, 'Error While Getting Rates');
+    }
+  );
+}
+  getGoldRate(karat,index2){
+    console.log(karat,index2);
+    this.securities.controls.forEach((group, index) => {
+        const netWeight:number = group.get('gold_net_wt')?.value;
+        const grossWeight:number = group.get('gold_gross_wt')?.value;
+        const caratRate:number = (+this.AllgoldCatat.filter(e=>e.karat==karat)[0]?.rate)
+      debugger
+      if(index==index2){
+        if(grossWeight<netWeight){
+          this.HandleMessage(true, MessageType.Warning,"Net weight should be less than or equal to Gross weight." );
+          group.get('gold_net_wt')?.setValue(0);
+        }else{
+          group.get('unit_rate')?.setValue(caratRate);
+          group.get('gold_val')?.setValue(netWeight*caratRate);
+        }
+      } 
+    });
+  }
+  changeNetWt(nt_wt,ind){
+    this.securities.controls.forEach((group, index) => {
+        const goldRate:number = group.get('unit_rate')?.value?group.get('unit_rate')?.value:0;
+        const grossWeight:number = group.get('gold_gross_wt')?.value;
+      if(grossWeight<(+nt_wt)){
+          this.HandleMessage(true, MessageType.Warning,"Net weight should be less than or equal to Gross weight." );
+          group.get('gold_net_wt')?.setValue(0);
+        }else{
+           if(index==ind && (+goldRate)>0){
+        group.get('gold_val')?.setValue(goldRate*nt_wt);
+      } 
+    }
+     
+    })
+  }
   initSecurityFormGroup(slNo: number): FormGroup {
     return this.fb.group({
       // ALL Fields
@@ -472,6 +539,7 @@ convertToInputDateFormat(dateStr: string): string | null {
   return `${year}-${month}-${day}`; // "2018-03-14"
 }
   insertSecurity(): void {
+   
     console.log(this.securityForm.value?.securities);
     this.svc.addUpdDel<any>('Loan/InsertLoanSecurityList', this.securityForm.value?.securities).subscribe(
       res => {
@@ -616,10 +684,13 @@ convertToInputDateFormat(dateStr: string): string | null {
 
 
   assignModelsFromMasterData() {
-
+    this.LoanDetailsForSI.dr_acc_type=11;
+    this.LoanDetailsForSI.min_bal=100;
+    
     const loan = new tm_loan_all();
     this.tm_loan_all = loan;
     this.tm_loan_all = this.masterModel.tmloanall;
+    this.getSIAgentData(this.masterModel.tmloanall.loan_id)
     this.setLoanAccountType(this.tm_loan_all.acc_cd);
     this.setInstalPeriod(this.tm_loan_all.piriodicity);
     this.setRepaymentFormula(this.tm_loan_all.emi_formula_no);
@@ -1305,6 +1376,8 @@ getHousingOrNot(i:any): boolean {
   }
 
   clearData() {
+    this.LoanAgentDetailsForSI=new LoanAgentDetailsForSI()
+    this.LoanDetailsForSI=new LoanDetailsForSI()
     this.securities.clear();
     this.securityForm = this.fb.group({
       securities: this.fb.array([
@@ -1510,13 +1583,13 @@ getHousingOrNot(i:any): boolean {
     this.isLoading = true;
     this.svc.addUpdDel<any>('Loan/InsertLoanAccountOpeningData', this.masterModel).subscribe(
       res => {
-        // debugger;
+        this.insertLoanSIData();
+        this.insertLoanAgentData();
         this.isLoading = false;
-        // this.disablePersonal = 'Y';
         this.operationType = 'U';
         this.associateChildRecordsWithHeader();
-        // this.showAlertMsg('INFORMATION', 'Loan Account Created Successfully. LoanId: ' + this.tm_loan_all.loan_id);
         this.HandleMessage(true, MessageType.Sucess, 'Loan Account Created Successfully. LoanId: ' + this.tm_loan_all.loan_id);
+        
       },
       err => {
         // debugger;
@@ -1529,7 +1602,102 @@ getHousingOrNot(i:any): boolean {
     );
   }
 
+  insertLoanSIData(){
+    this.LoanDetailsForSI.loan_id=(+this.tm_loan_all.loan_id);
+    this.LoanDetailsForSI.acc_cd=(+this.tm_loan_all.acc_cd);
+    this.LoanDetailsForSI.party_cd=(+this.tm_loan_all.party_cd);
+    this.LoanDetailsForSI.trf_flag="Y";
+    this.LoanDetailsForSI.trf_dt=this.tm_loan_all.created_dt.toISOString();
+    this.LoanDetailsForSI.created_by=this.tm_loan_all.created_by;
+    this.LoanDetailsForSI.created_dt=this.tm_loan_all.created_dt.toISOString();
+    console.log(this.LoanDetailsForSI);
+    
+    this.isLoading = true;
+    this.svc.addUpdDel<any>('Loan/InsertLoanStandingInstruction',this.LoanDetailsForSI).subscribe(
+      res => {
+        // debugger;
+        this.isLoading = false;
+       
+      },
+      err => {
+        // debugger;
+        this.isLoading = false;
+        console.error('Error on save SI Details' + JSON.stringify(err));
+        // this.showAlertMsg('ERROR', 'Record Not Saved !!!');
+        this.HandleMessage(true, MessageType.Warning, 'SI Not Saved !!!' );
 
+      }
+    );
+  }
+
+  updateLoanSIData(){
+    this.LoanDetailsForSI.loan_id=(+this.tm_loan_all.loan_id);
+    this.LoanDetailsForSI.acc_cd=(+this.tm_loan_all.acc_cd);
+    this.LoanDetailsForSI.party_cd=(+this.tm_loan_all.party_cd);
+    this.LoanDetailsForSI.trf_flag="Y";
+    this.LoanDetailsForSI.trf_dt=this.tm_loan_all.created_dt.toISOString();
+    this.LoanDetailsForSI.created_by=this.tm_loan_all.created_by;
+    this.LoanDetailsForSI.created_dt=this.tm_loan_all.created_dt.toISOString();
+    console.log(this.LoanDetailsForSI);
+    
+    this.isLoading = true;
+    this.svc.addUpdDel<any>('Loan/UpdateLoanStandingInstruction',this.LoanDetailsForSI).subscribe(
+      res => {
+        // debugger;
+        this.isLoading = false;
+       
+      },
+      err => {
+        // debugger;
+        this.isLoading = false;
+        console.error('Error on save SI Details' + JSON.stringify(err));
+        // this.showAlertMsg('ERROR', 'Record Not Saved !!!');
+        this.HandleMessage(true, MessageType.Warning, 'SI Not Update !!!' );
+
+      }
+    );
+  }
+
+  insertLoanAgentData(){
+    console.log(this.LoanAgentDetailsForSI);
+    this.LoanAgentDetailsForSI.loan_id=(+this.tm_loan_all.loan_id);
+      this.isLoading = true;
+    this.svc.addUpdDel<any>('Loan/InsertLoanAgent', this.LoanAgentDetailsForSI).subscribe(
+      res => {
+        // debugger;
+        this.isLoading = false;
+        
+      },
+      err => {
+        // debugger;
+        this.isLoading = false;
+        console.error('Error on Save AgentData' + JSON.stringify(err));
+        // this.showAlertMsg('ERROR', 'Record Not Saved !!!');
+        this.HandleMessage(true, MessageType.Warning, 'Agent Not Saved !!!' );
+
+      }
+    );
+  }
+  UpdateLoanAgentData(){
+    console.log(this.LoanAgentDetailsForSI);
+    this.LoanAgentDetailsForSI.loan_id=(+this.tm_loan_all.loan_id);
+      this.isLoading = true;
+    this.svc.addUpdDel<any>('Loan/UpdateLoanAgent', this.LoanAgentDetailsForSI).subscribe(
+      res => {
+        // debugger;
+        this.isLoading = false;
+        
+      },
+      err => {
+        // debugger;
+        this.isLoading = false;
+        console.error('Error on Save AgentData' + JSON.stringify(err));
+        // this.showAlertMsg('ERROR', 'Record Not Saved !!!');
+        this.HandleMessage(true, MessageType.Warning, 'Agent Not Update !!!' );
+
+      }
+    );
+  }
   UpdateLoanAccountOpeningData(saveType: string) {
     this.ValidateLoanUpdateData();
     this.updateSecurity();
@@ -1537,7 +1705,8 @@ getHousingOrNot(i:any): boolean {
     this.isLoading = true;
     this.svc.addUpdDel<any>('Loan/InsertLoanAccountOpeningData', this.masterModel).subscribe(
       res => {
-        // debugger;
+        this.UpdateLoanAgentData();
+        this.updateLoanSIData();
         this.isLoading = false;
         this.operationType = 'U';
 
@@ -2031,8 +2200,161 @@ getHousingOrNot(i:any): boolean {
   }
 
 //for new security
+  getAgentList() {
+    var dt = {
+      "ardb_cd": this.sys.ardbCD,
+      "brn_cd": this.sys.BranchCode
+    }
+    this.svc.addUpdDel('Deposit/GetAgentData', dt).subscribe(res => {
+      this.allAgent=res
+    })
+  }
+  suggestAgent(){
+    this.suggestedAgent=[]
+    this.suggestedAgent = this.allAgent.filter(agent =>
+      agent.agent_name.toLowerCase().includes(this.LoanAgentDetailsForSI.agent_name.toLowerCase())
+    );
+    if(this.suggestedAgent){
+      this.shownoresult3=true
+    }
+
+  }
+  SelectAgent(agent){
+    this.LoanAgentDetailsForSI.agent_cd=agent.agent_cd;
+    this.LoanAgentDetailsForSI.agent_name= agent.agent_name;
+    this.suggestedAgent=[];
+    this.shownoresult3=false;
+  }
+ public suggestCustomer3(): Observable<mm_customer> {
+    this.isLoading = true;
+    console.log("here")
+    // console.log(this.f.acct_num.value.length)
+    //  console.log(this.accDtlsFrm.get('home_brn_cd').value)
+    if (this.LoanDetailsForSI.dr_acc_num.length>0) {
+      const prm = new p_gen_param();
+      prm.ad_acc_type_cd = this.LoanDetailsForSI.dr_acc_type;
+      prm.as_cust_name = this.LoanDetailsForSI.dr_acc_num;
+      console.log(prm);
+
+      this.svc.addUpdDel<any>('Deposit/GetAccDtls', prm).subscribe(
+        res => {
+          console.log(res)
+          this.isLoading = false;
+          if (undefined !== res && null !== res && res.length > 0 && res != '') {
+            this.suggestedDDCustomer = [];
+            // this.suggestedCustomer = res.slice(0, 10);
+            this.suggestedDDCustomer = res
+            console.log(res.length + " " + this.suggestedDDCustomer.length)
+            return this.suggestedDDCustomer;
+          } else {
+            this.shownoresult = true;
+            console.log(res.length)
+            this.suggestedDDCustomer = [];
+            return this.suggestedDDCustomer;
+          }
+        },
+        err => {
+          this.shownoresult = true;
+          this.isLoading = false;
+        }
+      );
 
 
+    } else {
+      // debugger;
+      this.isLoading = false;
+      this.suggestedDDCustomer = null;
+      return null;
+    }
+    // console.log(this.suggestedCustomer)
+  }
+  public SelectCustomer3(cust: any): void {
+    this.LoanDetailsForSI.modified_by=null;
+    this.shownoresult = false;
+    // this.selectedCust = cust.acc_num
+    console.log(cust)
+    this.LoanDetailsForSI.dr_acc_num=cust.acc_num;
+    this.LoanDetailsForSI.modified_by= cust.cust_name;
+    // this.f.acct_num.setValue(cust.acc_num);
+    // this.onAccountNumTabOff();
+    // this.f.acct_num.value.length=0;
+    this.suggestedDDCustomer = [];
+    this.validateSbAccount();
+   
+
+  }
+  validateSbAccount() {
+    //debugger;
+    
+    if (this.LoanDetailsForSI.dr_acc_num === undefined
+      || this.LoanDetailsForSI.dr_acc_num === null
+      || this.LoanDetailsForSI.dr_acc_num === "") {
+      return;
+    }
+
+    let temp_deposit_list: tm_deposit[] = [];
+    const temp_deposit = new tm_deposit();
+    temp_deposit.brn_cd = this.branchCode;
+    temp_deposit.acc_num = this.LoanDetailsForSI.dr_acc_num;
+    temp_deposit.acc_type_cd = this.LoanDetailsForSI.dr_acc_type;
+    temp_deposit.ardb_cd=this.sys.ardbCD;
+    this.isLoading = true;
+    this.svc.addUpdDel<any>('Deposit/GetDeposit', temp_deposit).subscribe(
+      res => {
+        //debugger;
+        temp_deposit_list = res;
+        this.isLoading = false;
+
+        if (temp_deposit_list.length > 0) {
+          temp_deposit_list = temp_deposit_list.filter(x => x.acc_status.toUpperCase() !== 'C')
+        }
+
+        if (temp_deposit_list.length === 0) {
+          this.HandleMessage(true, MessageType.Warning, 'Invalid Account Number for Standing Instruction');
+          this.LoanDetailsForSI.dr_acc_num = null;
+          exit(0);
+        }
+
+      },
+      err => {
+        this.isLoading = false;
+      }
+    );
+  }
+  clearSuggestedCust3() {
+    this.suggestedDDCustomer = null;
+    this.shownoresult = false;
+    if (this.LoanDetailsForSI.dr_acc_num.length > 0) {
+      this.disabledOnNull = false;
+    }
+    else {
+      this.disabledOnNull = true;
+    }
+
+
+  }
+  getSIAgentData(loan_id){
+
+       this.svc.addUpdDel<any>(`Loan/GetLoanStandingInstruction?loan_id=${loan_id}`, null).subscribe(
+        res => {
+          if(res){
+            this.LoanDetailsForSI=res;
+            console.log(this.LoanDetailsForSI);
+            
+          }
+        })
+        this.svc.addUpdDel<any>(`Loan/GetLoanAgent?loan_id=${loan_id}`, null).subscribe(
+        res => {
+          if(res){
+            this.LoanAgentDetailsForSI=res;
+            console.log(this.LoanAgentDetailsForSI);
+
+          }
+        })
+
+
+    
+  }
 
 
 }

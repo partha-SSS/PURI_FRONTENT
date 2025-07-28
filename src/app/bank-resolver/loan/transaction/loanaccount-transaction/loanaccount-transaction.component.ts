@@ -161,7 +161,7 @@ export class LoanaccountTransactionComponent implements OnInit {
   glHead:any;
   memberCD:any;
   fnd_typ:string='';
-  displayedColumns: string[] = ['trans_dt', 'disb_amt', 'curr_intt_cal', 'ovd_intt_cal','penal_intt_cal','last_intt_calc_dt','prn_trf','intt_trf','curr_intt_recov','ovd_intt_recov','penal_intt_recov','adv_prn_recov','curr_prn_recov','ovd_prn_recov','totalRecov','curr_prn','ovd_prn','curr_intt','ovd_intt','penal_intt'];
+  displayedColumns: string[] = ['trans_dt', 'disb_amt', 'curr_intt_cal', 'ovd_intt_cal','last_intt_calc_dt','prn_trf','intt_trf','curr_intt_recov','ovd_intt_recov','curr_prn_recov','ovd_prn_recov','totalRecov','curr_prn','ovd_prn','curr_intt','ovd_intt'];
   dataSource = new MatTableDataSource()
   opcrSum = 0;
   drSum = 0;
@@ -2045,19 +2045,19 @@ export class LoanaccountTransactionComponent implements OnInit {
         console.log(dt);
         // var dt = this.dtpipe.transform(lstfDT, 'dd/MM/yyyy hh:mm:ss')
         console.log(this.dayDiff(dt1, dt))
-        if(this.dayDiff(dt1 ,dt)>0){
-          debugger
-          this.HandleMessage(true, MessageType.Error, 'Interest can not be calculated after ' + fyearlstfDT);
-        this.tdDefTransFrm.patchValue({
-          intt_recov_dt:Utils.convertStringToDt(fyearlstfDT),
-          no_of_day: 0,
-          curr_prn_recov: '',
-          curr_intt_recov: '',
-          ovd_prn_recov: '',
-          ovd_intt_recov: ''
-        });
-        return
-        }
+        // if(this.dayDiff(dt1 ,dt)>0){
+        //   debugger
+        //   this.HandleMessage(true, MessageType.Error, 'Interest can not be calculated after ' + fyearlstfDT);
+        // this.tdDefTransFrm.patchValue({
+        //   intt_recov_dt:Utils.convertStringToDt(fyearlstfDT),
+        //   no_of_day: 0,
+        //   curr_prn_recov: '',
+        //   curr_intt_recov: '',
+        //   ovd_prn_recov: '',
+        //   ovd_intt_recov: ''
+        // });
+        // return
+        // }
         console.log(dt1 + " " + dt2)
         this.PopulateRecoveryDetails(3);
         if (this.td.amount.value > 0){
@@ -3863,11 +3863,11 @@ this.out_ovd_intt=0;
         this.showMsg.Type = type;
         this.showMsg.Message = message;
 
-        if (show) {
-          setTimeout(() => {
-            this.showMsg.Show = false;
-          }, 5000); // auto-close after 4 sec
-        }
+        // if (show) {
+        //   setTimeout(() => {
+        //     this.showMsg.Show = false;
+        //   }, 5000); // auto-close after 4 sec
+        // }
       }
 
       getAlertIcon(type: MessageType): string {
@@ -4153,7 +4153,7 @@ this.out_ovd_intt=0;
               }
               else{
                 const str = this.acc2.tddeftrans?.created_by;
-                const part = str.split("/")[0];
+                const part = str?.split("/")[0];
                 this.created_user=part
                 this.l_case_no=this.acc2.tdloansancsetlist[0]?.tdloansancset.filter(e=>e.param_cd=='500')[0]?.param_value
                 debugger

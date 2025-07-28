@@ -23,6 +23,7 @@ export class DenominationComponent implements OnInit {
     custTitle: string;
     isLoading=false;
     updateMode=true
+    exchange_mode=false;
     isOpenTransDt = false;
     showMsg: ShowMessage;
     cust: mm_customer;
@@ -117,6 +118,7 @@ export class DenominationComponent implements OnInit {
     
   }
  insertDenomination(trans_dt,trans_cd){
+  this.exchange_mode=this.denominationGrandTotal>0?false:true;
   this.modalRef?.hide();
     this.isLoading=true;
     // const inputDate = trans_dt;
@@ -125,7 +127,7 @@ export class DenominationComponent implements OnInit {
     console.log(trans_dt,trans_cd);
      console.log(this.tm_denominationList);
         this.tm_denominationList.forEach(element => {
-                element.trans_cd = trans_cd;
+                element.trans_cd = this.denominationGrandTotal>0? trans_cd:300000+(+trans_cd);
                 element.trans_dt = trans_dt;
                 element.brn_cd = this.sys.BranchCode;
                 element.created_dt = this.sys.CurrentDate;
@@ -135,9 +137,13 @@ export class DenominationComponent implements OnInit {
         this.svc.addUpdDel<any>('Common/InsertDenominationDtls', this.tm_denominationList).subscribe(
         res => {console.log(res);
             this.onClearClick();
-
+            // this.approveDenomination();
             if (null !== res || res==0 ) {
-              this.HandleMessage(true, MessageType.Sucess, 'Denomination Save Successfully');
+              if( this.exchange_mode){
+                  this.HandleMessage(true, MessageType.Sucess, 'Denomination Save Successfully'+`TC: ${300000+(+trans_cd)}`)
+              }else{
+                 this.HandleMessage(true, MessageType.Sucess, 'Denomination Save Successfully');
+              }
               this.isLoading=false;
             }else{
               this.isLoading=false;
@@ -155,12 +161,35 @@ export class DenominationComponent implements OnInit {
       this.insertDenomination(this.trans_dt,this.trans_code)
     }
     else{
-      this.trans_dt=this.sys.CurrentDate
-     this.modalRef = this.modalService?.show(this.insertDeno);
+       if(this.denominationGrandTotal>0)
+        {
+            this.trans_dt=this.sys.CurrentDate
+            this.modalRef = this.modalService?.show(this.insertDeno);
+        }else{
+          this.getExchangeTC();     
+          
+        }
+   
     }
    
        
   }
+   public getExchangeTC(){
+       var dt= {
+                "brn_cd": this.sys.BranchCode,
+                "trans_dt": this.sys.CurrentDate,
+              }
+        this.svc.addUpdDel<any>('Common/GetMaxCoinExchangeCode', dt).subscribe(
+        res => {console.log(res);
+          // return res;
+            this.insertDenomination(this.sys.CurrentDate,res)
+          },
+          err => { 
+              this.HandleMessage(true, MessageType.Error, err);
+               return null;
+          }
+        );
+    }
     onUpdateClick(){
        console.log(this.tm_denominationList);
       console.log(JSON.stringify(this.tm_denominationList));
@@ -197,6 +226,19 @@ export class DenominationComponent implements OnInit {
           }
         );
     }
+    public approveDenomination(tc,date,flag): void {
+        const dt={
+            "brn_cd": this.sys.BranchCode,
+            "adt_trans_dt": date,
+            "ad_trans_cd": tc,
+            "flag": flag
+        }
+      this.svc.addUpdDel<any>('Common/ApproveDenomination', dt).subscribe(
+            res => {
+             console.log(res);
+             
+            })
+  }
     onDelClick(){
       var dt= {
                 "brn_cd": this.tm_denominationList[0]?.brn_cd,
@@ -280,20 +322,7 @@ export class DenominationComponent implements OnInit {
     }
   }
   
-  getAlertClass(type: MessageType): string {
-    switch (type) {
-      case MessageType.Sucess:
-        return 'alert-success';
-      case MessageType.Warning:
-        return 'alert-warning';
-      case MessageType.Info:
-        return 'alert-info';
-      case MessageType.Error:
-        return 'alert-danger';
-      default:
-        return 'alert-info';
-    }
-  }
+
  
   onBackClick(){
     this.router.navigate([this.sys.BankName + '/la']);
@@ -315,7 +344,7 @@ export class DenominationComponent implements OnInit {
     if (show) {
       setTimeout(() => {
         this.showMsg.Show = false;
-      }, 5000); // auto-close after 4 sec
+      }, 6000); // auto-close after 4 sec
     }
   }
   
@@ -331,6 +360,20 @@ export class DenominationComponent implements OnInit {
         return '❌';
       default:
         return '🔔';
+    }
+  }
+    getAlertClass(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return 'alert-success';
+      case MessageType.Warning:
+        return 'alert-warning';
+      case MessageType.Info:
+        return 'alert-info';
+      case MessageType.Error:
+        return 'alert-danger';
+      default:
+        return 'alert-info';
     }
   }
 }

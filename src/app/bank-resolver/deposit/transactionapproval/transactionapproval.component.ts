@@ -1017,6 +1017,9 @@ getAlertIcon(type: MessageType): string {
     this.svc.addUpdDel<any>('Deposit/ApproveAccountTranaction', param).subscribe(
       res => {
         if (res === 0) {
+          if(this.selectedVm1.td_def_trans_trf.trf_type=='C'){
+          this.approveDenomination(param.ad_trans_cd,param.adt_trans_dt,param.flag);
+          }
           this.selectedVm1.td_def_trans_trf.approval_status = 'A';
           this.HandleMessage(true, MessageType.Sucess, this.selectedVm1.tm_deposit.acc_num
             + '\'s Transaction with Transancation Cd ' + this.selectedVm1.td_def_trans_trf.trans_cd
@@ -1048,6 +1051,18 @@ getAlertIcon(type: MessageType): string {
     );
   }
 }
+public approveDenomination(tc,date,flag): void {
+        const dt={
+            "brn_cd": this.sys.BranchCode,
+            "adt_trans_dt": date,
+            "ad_trans_cd": tc,
+            "flag": flag
+        }
+      this.svc.addUpdDel<any>('Common/ApproveDenomination', dt).subscribe(
+            res => {
+             
+            })
+  }
 
 containsSubstring(msg:any): boolean {
   return msg.includes("Transaction already Approved...");

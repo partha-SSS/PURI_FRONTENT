@@ -7051,11 +7051,11 @@ private HandleMessage(show: boolean, type: MessageType = null, message: string =
   this.showMsg.Type = type;
   this.showMsg.Message = message;
 
-  if (show) {
-    setTimeout(() => {
-      this.showMsg.Show = false;
-    }, 5000); // auto-close after 4 sec
-  }
+  // if (show) {
+  //   setTimeout(() => {
+  //     this.showMsg.Show = false;
+  //   }, 5000); // auto-close after 4 sec
+  // }
 }
 
 getAlertIcon(type: MessageType): string {

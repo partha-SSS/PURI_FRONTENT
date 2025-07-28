@@ -92,22 +92,22 @@ padding: 80px 20px 80px 20px;
 
 
  
-  .bgColor1{background-color: #5c084a;max-width: 300px;
+  .bgColor1{background-color: #926789;max-width: 300px;
     border-radius: 24px;}
-  .bgColor2{background-color: #4b4601;max-width: 300px;
+  .bgColor2{background-color: #6d6a42;max-width: 300px;
     border-radius: 24px;}
-  .bgColor6{background-color: #490809;max-width: 300px;
+  .bgColor6{background-color: #774a4a;max-width: 300px;
     border-radius: 24px;}
-  .bgColor4{background-color: #03523a;max-width: 300px;
+  .bgColor4{background-color: #46695f;max-width: 300px;
     border-radius: 24px;}
 
-  .bgColor5{background-color: #3f0263;;max-width: 300px;
+  .bgColor5{background-color: #527e5c;;max-width: 300px;
     border-radius: 24px;}
-  .bgColor3{background-color: #02485a;max-width: 300px;
+  .bgColor3{background-color: #38565e;max-width: 300px;
     border-radius: 24px;}
-  .bgColor7{background-color: #195202;max-width: 300px;
+  .bgColor7{background-color: #415738;max-width: 300px;
     border-radius: 24px;}
-  .bgColor8{background-color: #170f5f;max-width: 300px;
+  .bgColor8{background-color: #3c395a;max-width: 300px;
     border-radius: 24px;}
 
 h2{font-size: 18px; color: #ffffff; font-weight: 400;}
@@ -151,7 +151,7 @@ img{
 .imgSec{
   max-width: 300px;
   border-radius: 24px;
-  border-color: #575b71;
+  border-color:  #286e6e;
   background-color: rgb(206, 211, 206);
   
 }
@@ -160,7 +160,7 @@ img{
   padding:15px;
   top: -30px;
   border-radius: 15px;
-  background-color: #abb8e9;
+  background-color: #c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 
@@ -175,7 +175,7 @@ img{
   top: -30px;
   border-radius: 15px;
   /* background-color: #b99cca; */
-  background-color:#abb8e9;
+  background-color:#c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 
@@ -188,7 +188,7 @@ img{
   padding:15px;
   top: -30px;
   border-radius: 15px;
-  background-color:#abb8e9;
+  background-color:#c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 
@@ -200,7 +200,7 @@ img{
   padding:15px;
   top: -30px;
   border-radius: 15px;
-  background-color: #abb8e9;
+  background-color: #c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 
@@ -214,7 +214,7 @@ img{
   top: -30px;
   border-radius: 15px;
   /* background-color:#dd9fb0; */
-  background-color:#abb8e9;
+  background-color:#c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 
@@ -228,7 +228,7 @@ img{
   top: -30px;
   border-radius: 15px;
   /* background-color:#e1c47b; */
-  background-color:#abb8e9;
+  background-color:#c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 
@@ -241,7 +241,7 @@ img{
   top: -30px;
   border-radius: 15px;
   /* background-color: #6ecba7; */
-  background-color: #abb8e9;
+  background-color: #c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 
@@ -254,7 +254,7 @@ img{
   top: -30px;
   border-radius: 15px;
   /* background-color: #8688d5; */
-  background-color: #abb8e9;
+  background-color: #c9c77e;
   float: left;
   -moz-border-radius: 15px; 
   -webkit-border-radius: 15px; 

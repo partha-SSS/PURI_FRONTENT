@@ -174,9 +174,9 @@
   .imgSec{
     max-width: 300px;
     border-radius: 24px;
-    border-color: #575b71;
+    border-color:  #286e6e;
     background-color: rgb(206, 211, 206);
-    /* background-image: linear-gradient(to right, #575b71, rgb(6, 148, 53)); */
+    /* background-image: linear-gradient(to right,  #286e6e, rgb(6, 148, 53)); */
     
   }
   .imgSec1{
@@ -620,7 +620,7 @@
     font-weight: 900;
     background-image: -webkit-linear-gradient(60deg, #fa1818, #a70000, #8a0606, #a31f1f, #a70202, hsl(0deg 71.64% 35.17%));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: #575b71;
+    -webkit-text-fill-color:  #286e6e;
     -webkit-animation: hue 5s infinite linear;
 }
 

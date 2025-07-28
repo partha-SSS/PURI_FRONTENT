@@ -776,7 +776,7 @@
 
 /* body{border-top: red solid 5px !important;} */
 
-nav.navbar a{color: #fff; text-decoration: none;}
+nav.navbar a{color: #fff; text-decoration: none;font-size: medium;}
 nav.navbar .dropdown-menu a{color: #000; text-decoration: none;}
 /* ul.navbar li a{color: #fff; text-decoration: none;} */
 
@@ -806,43 +806,43 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #575b71;
+  background-color:  #286e6e;
   border-radius: 20px;
   border: 6px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #575b71;
+  background-color:  #286e6e;
 }
 
 .mat-mdc-raised-button:enabled{
-  background-color: #575b71 !important;
+  background-color:  #286e6e !important;
   color:white!important;
   border-color: #418b48 !important;
 }
 .btn-primary{
-  background-color: #575b71 !important;
+  background-color:  #286e6e !important;
   color:white!important;
   border-color: #418b48 !important;
 }
 .btn-light{
   background-color: #ffff !important;
-  color:#575b71!important;
+  color: #286e6e!important;
   border-color: #ffffff !important;
 }
 .btn-light:hover{
-  background-color: #575b71 !important;
+  background-color:  #286e6e !important;
   color:#ffff!important;
-  border-color: #575b71 !important;
+  border-color:  #286e6e !important;
 }
 .btn-primary:hover{
   background-color:white !important;
-  color:#575b71!important;
-  border-color: #575b71 !important;
+  color: #286e6e!important;
+  border-color:  #286e6e !important;
 }
 .customHeader{
-  background-color:#575b71; 
+  background-color: #286e6e; 
   border-radius: 10px;
   padding-left: 11px;
   color:white
@@ -850,7 +850,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .btn-link{
-  color:#575b71 !important
+  color: #286e6e !important
 }
 input{
   /* border-radius: 15px !important; */
@@ -858,7 +858,7 @@ input{
 
 }
 input:checked{
-  background-color: #575b71 !important;
+  background-color:  #286e6e !important;
 }
 select{
   /* border-radius: 15px !important; */
@@ -892,17 +892,17 @@ select{
 
 #close {
   top: 280px;
-  background-color: #575b71;
+  background-color:  #286e6e;
 }
 
 #print {
   top: 360px;
-  background-color: #575b71;
+  background-color:  #286e6e;
 }
 
 #retrieve {
   top: 440px;
-  background-color: #575b71;
+  background-color:  #286e6e;
 }
 .sidenav>button>mat-icon{
   margin-left:30px
@@ -999,4 +999,9 @@ select{
 
 .alert-danger {
   background: linear-gradient(135deg, #cc0805, #bd2424);
+}
+.nav-link {
+    display: block;
+    padding: 5px 10px!important;
+    font-size: medium!important;
 }

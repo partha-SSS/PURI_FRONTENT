@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { CommonServiceService } from 'src/app/bank-resolver/common-service.service';
@@ -30,6 +30,7 @@ export class GoldSafeMasterComponent {
   closeResult = '';
   showReport = false;
   showAlert = false;
+  updateMode:boolean=false;
   isLoading = false;
   UrlString = '';
   alertMsg = '';
@@ -44,7 +45,7 @@ export class GoldSafeMasterComponent {
   itemsPerPage = 50;
   currentPage = 1;
   pagedItems = [];
-  reportData:any=[]
+  reportData:any;
   ardbName=localStorage.getItem('ardb_name')
   branchName=this.sys.BranchName
 
@@ -71,11 +72,16 @@ export class GoldSafeMasterComponent {
     {type:"Vacant",id:"V"},
     {type:"Allocated",id:"A"},
   ]
-
+  form: FormGroup;
+  karatOptions = [16, 18, 20, 22, 24];
   
-  constructor(private svc: RestService, private elementRef: ElementRef,private formBuilder: FormBuilder,
+  constructor(private svc: RestService, private elementRef: ElementRef,private fb: FormBuilder,
     private msg: InAppMessageService, private modalService: BsModalService,
-    private router: Router, private comser:CommonServiceService) { }
+    private router: Router, private comser:CommonServiceService) { 
+      this.form = this.fb.group({
+      rates: this.fb.array([this.createRateGroup()])
+    });
+    }
     accountTypeList: mm_acc_type[]= [];
     param :any[]=[];
     isTrade: boolean = false;
@@ -83,18 +89,18 @@ export class GoldSafeMasterComponent {
     asOnDate : any;
 
   ngOnInit(): void {
-    this.SubmitReport();
+    this.getGoldRate();
 
     console.log(window.location.hostname)
     // this.getAccountTypeList();
     this.asOnDate =this.sys.CurrentDate;
     
-    this.locker = this.formBuilder.group({
-      goldSafeId: [null, Validators.required],
-      goldSafeName: [null, Validators.required],
-      branch: [null, Validators.required]
+    // this.locker = this.fb.group({
+    //   goldSafeId: [null, Validators.required],
+    //   goldSafeName: [null, Validators.required],
+    //   branch: [null, Validators.required]
       
-    });
+    // });
     var date = new Date();
     // get the date as a string
        var n = date.toDateString();
@@ -102,6 +108,140 @@ export class GoldSafeMasterComponent {
        var time = date.toLocaleTimeString();
        this.today= n + " "+ time
   }
+
+ get rateControls(): FormArray {
+  return this.form.get('rates') as FormArray;
+}
+
+ createRateGroup(data?: { karat: number; rate: number }): FormGroup {
+  return this.fb.group({
+    karat: [data?.karat ?? null, Validators.required],
+    rate: [data?.rate ?? null, [Validators.required, Validators.min(0)]]
+  });
+}
+
+  addRate() {
+    this.rateControls.push(this.createRateGroup());
+  }
+ removeRate(index: number) {
+    this.rateControls.removeAt(index);
+  }
+  updateRow() {
+   
+      if (this.form.valid) {
+          const payload = this.form.value.rates;
+          console.log('Submitting payload:', payload);
+          this.svc.addUpdDel('Loan/UpdateGoldRateList',payload).subscribe(data=>{
+            console.log(data);
+            debugger
+            this.reportData=data
+            if(this.reportData==0){
+              this.HandleMessage(true, MessageType.Sucess, 'Gold Rate Update Successfull');
+              // this.getGoldRate();
+
+            } 
+            this.isLoading=false;
+          },
+          err => {
+            this.isLoading=false ;
+            this.HandleMessage(true, MessageType.Error, ' Updation Failed');
+                })
+        } else {
+          console.warn('Form invalid');
+          this.isLoading=false;
+            this.HandleMessage(true, MessageType.Sucess, 'Fill the data');
+        }
+    
+  }
+
+  submit() {
+    this.isLoading=true;
+    if(this.updateMode){
+      if (this.form.valid) {
+          const payload = this.form.value.rates;
+          console.log('Submitting payload:', payload);
+          this.svc.addUpdDel('Loan/UpdateGoldRateList',payload).subscribe(data=>{
+            console.log(data);
+            debugger
+            this.reportData=data
+            if(this.reportData==0){
+                   this.HandleMessage(true, MessageType.Sucess, 'Gold Rate Update Successfull');
+            } 
+            this.isLoading=false;
+          },
+          err => {
+            this.isLoading=false ;
+            this.HandleMessage(true, MessageType.Error, ' Updation Failed');
+                })
+        } else {
+          console.warn('Form invalid');
+          this.isLoading=false;
+            this.HandleMessage(true, MessageType.Sucess, 'Fill the data');
+        }
+    }
+    else{
+    if (this.form.valid) {
+          const payload = this.form.value.rates;
+          console.log('Submitting payload:', payload);
+          this.svc.addUpdDel('Loan/InsertGoldRates',payload).subscribe(data=>{
+            console.log(data);
+            debugger
+            this.reportData=data
+            if(this.reportData==0){
+              this.HandleMessage(true, MessageType.Sucess, 'Gold Rate Insert Successfull');
+              // this.getGoldRate();
+            } 
+            this.isLoading=false;
+          },
+          err => {
+            this.isLoading=false ;
+            this.HandleMessage(true, MessageType.Error, ' Insertion Failed');
+                })
+        } else {
+          console.warn('Form invalid');
+          this.isLoading=false;
+            this.HandleMessage(true, MessageType.Sucess, 'Fill the data');
+        }
+    }
+    
+    
+  }
+
+
+ getGoldRate()
+  {
+    this.isLoading=true;
+    this.form.reset();
+    debugger
+      const ratesArray = this.form.get('rates') as FormArray;
+      ratesArray.clear();
+      this.svc.addUpdDel<any>('Loan/GetGoldRates', null).subscribe(
+        res => {
+          if(res.length>0){
+            this.updateMode=true;
+              res.forEach(rateItem => {
+              ratesArray.push(this.createRateGroup(rateItem));
+            });
+          this.HandleMessage(true, MessageType.Sucess, 'Gold Rate Successfull Fatch');
+          }
+          else{
+            this.updateMode=false;
+            this.HandleMessage(true, MessageType.Error, 'No Gold Rate Found, Please Insert New Rates');
+          }
+          console.log(res);
+          debugger
+          this.isLoading=false;
+        },
+        err => {
+          ;
+          this.isLoading=false;
+          this.HandleMessage(true, MessageType.Error, 'Error While Geting Rates');
+        }
+      );
+
+   }
+
+
   onLoadScreen(content) {
     this.maxSafeId=0;
     this.modalRef = this.modalService.show(content, this.config);
@@ -297,10 +437,45 @@ debugger
       );
    }
   /** Below method handles message show/hide */
-  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-    this.showMsg = new ShowMessage();
-    this.showMsg.Show = show;
-    this.showMsg.Type = type;
-    this.showMsg.Message = message;
-  }
+     getAlertClass(type: MessageType): string {
+        switch (type) {
+          case MessageType.Sucess:
+            return 'alert-success';
+          case MessageType.Warning:
+            return 'alert-warning';
+          case MessageType.Info:
+            return 'alert-info';
+          case MessageType.Error:
+            return 'alert-danger';
+          default:
+            return 'alert-info';
+        }
+      }
+      private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+        this.showMsg = new ShowMessage();
+        this.showMsg.Show = show;
+        this.showMsg.Type = type;
+        this.showMsg.Message = message;
+
+        if (show) {
+          setTimeout(() => {
+            this.showMsg.Show = false;
+          }, 3000); // auto-close after 4 sec
+        }
+      }
+
+      getAlertIcon(type: MessageType): string {
+        switch (type) {
+          case MessageType.Sucess:
+            return '✅';
+          case MessageType.Warning:
+            return '⚠️';
+          case MessageType.Info:
+            return 'ℹ️';
+          case MessageType.Error:
+            return '❌';
+          default:
+            return '🔔';
+        }
+      }
 }

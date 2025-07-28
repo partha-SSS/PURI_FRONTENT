@@ -141,13 +141,13 @@
   
   #customers1 tr:nth-child(even){background-color: #f2f2f2;}
   
-  #customers1 tr:hover {background-color: #aeeea6; cursor: pointer;}
+  #customers1 tr:hover {background-color: #a7d1d1; cursor: pointer;}
   
   #customers1 th {
     padding-top: 2px;
     padding-bottom: 2px;
     text-align: left;
-    background-color: #34723A;
+    background-color: #286e6e;
     color: white;
     font-size:small
   }

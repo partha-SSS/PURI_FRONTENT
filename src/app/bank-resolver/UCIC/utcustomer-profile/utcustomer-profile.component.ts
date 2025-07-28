@@ -46,7 +46,7 @@ export class UTCustomerProfileComponent implements OnInit {
   retrieveClicked = false;
   selectedCustomer: mm_customer;
   enableModifyAndDel = false;
-  showMsgs: ShowMessage[] = [];
+  showMsg: ShowMessage;
   // showMsg: ShowMessage;
   disabledOnNull=true;
   isLoading = false;
@@ -158,6 +158,7 @@ export class UTCustomerProfileComponent implements OnInit {
       last_name: [null, Validators.required],
       cust_name: ['', { disabled: true }],
       guardian_name: [null],
+      guardian_relation: [null],
       father_name: [null, Validators.required],
       cust_dt: [null],
       old_cust_cd: [null],
@@ -476,7 +477,7 @@ getImage(_custCD: number) {
     }
   getGuardian(){
     this.custMstrFrm.controls.guardian_name.setValue(this.custMstrFrm.controls.father_name.value);
-    this.custMstrFrm.controls.lbr.setValue('Father');
+    this.custMstrFrm.controls.guardian_relation.setValue('Father');
   }
   private getServiceAreaMaster(): void {
     var dt = {
@@ -642,10 +643,7 @@ getImage(_custCD: number) {
     this.custMstrFrm.controls.permanent_address.setValue(add.target.value);
   }
   public SelectCustomer(cust: mm_customer): void {
-    // this.f.status.disable();
-    // ;
-    // var dt_Death = Utils.convertDtToString(cust.date_of_death);
-    // console.log(dt_Death)
+    
     const dob = (null !== cust.dt_of_birth && '01/01/0001 00:00' === cust.dt_of_birth.toString()) ? null
       : cust.dt_of_birth;
     this.selectedCustomer = cust;
@@ -665,11 +663,15 @@ getImage(_custCD: number) {
     this.svc.addUpdDel('UCIC/GetLoanDtls',dt).subscribe(data=>{console.log(data)
       this.reportData2=data
       this.svc.addUpdDel('UCIC/GetDepositDtls',dt).subscribe(data=>{console.log(data)
-        this.reportData3=data
+        this.reportData3=data;
+        for(let i=0;i<this.reportData3.length;i++){
+            this.reportData3[i].acc_type_desc= this.accountTypeList.filter(c => c.acc_type_cd == this.reportData3[i]?.acc_type_cd)[0]?.acc_type_desc;
+          }
         this.isLoading=false
       })
     })
   }
+ 
   debugger
     // this.custName.unsubscribe()
     this.enableModifyAndDel = true;
@@ -678,6 +680,7 @@ getImage(_custCD: number) {
     this.selectedBlock = this.blocks.filter(e => e.block_cd === cust.block_cd)[0];
     this.selectedPO = this.Allpo.filter(e => (e.po_id === cust.po_id ))[0];
     this.custMstrFrm.patchValue({
+      guardian_relation:this.lbr_status.filter(e=>e.val?.toLowerCase()==cust.guardian_relation?.toLowerCase())[0]?.val,
       brn_cd: cust.brn_cd,
       cust_cd: cust.cust_cd,
       cust_type: cust.cust_type,
@@ -831,8 +834,7 @@ getImage(_custCD: number) {
 
 
   validateControls(): boolean {
-    debugger
-    this.showMsgs = [];
+    this.showMsg = null;
     let trReturn = true;
     if(this.organizationMode){
       if(this.retrieveClicked==true && this.f.cust_name.value==null){
@@ -849,9 +851,7 @@ getImage(_custCD: number) {
         trReturn = false;
       }
       for (const name in this.custMstrFrm.controls) {
-        debugger
         if (this.custMstrFrm.controls[name].invalid) {
-          debugger
           switch (name) {
             
             case 'cust_type':
@@ -940,11 +940,8 @@ getImage(_custCD: number) {
         this.HandleMessage(true, MessageType.Error, 'Phone number is mandatory');
         trReturn = false;
       }
-  debugger
       for (const name in this.custMstrFrm.controls) {
-        debugger
         if (this.custMstrFrm.controls[name].invalid) {
-          debugger
           switch (name) {
             case 'dt_of_birth':
               this.HandleMessage(true, MessageType.Error, 'Date of Birth is Mandatory');
@@ -995,23 +992,57 @@ getImage(_custCD: number) {
         trReturn = true;
       }
       
-      if (this.showMsgs.length > 0) {
+      if (this.showMsg) {
         trReturn = false;
       }
     }
    console.log(trReturn)
     return trReturn;
   }
-  private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
-    const showMsg = new ShowMessage();
-    showMsg.Show = show;
-    showMsg.Type = type;
-    showMsg.Message = message;
-    this.showMsgs.push(showMsg);
+   private HandleMessage(show: boolean, type: MessageType = null, message: string = null) {
+    this.showMsg = new ShowMessage();
+    this.showMsg.Show = show;
+    this.showMsg.Type = type;
+    this.showMsg.Message = message;
+  
+    if (show) {
+      setTimeout(() => {
+        this.showMsg.Show = false;
+      }, 6000); // auto-close after 4 sec
+    }
+  }
+  
+  getAlertIcon(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return '✅';
+      case MessageType.Warning:
+        return '⚠️';
+      case MessageType.Info:
+        return 'ℹ️';
+      case MessageType.Error:
+        return '❌';
+      default:
+        return '🔔';
+    }
+  }
+    getAlertClass(type: MessageType): string {
+    switch (type) {
+      case MessageType.Sucess:
+        return 'alert-success';
+      case MessageType.Warning:
+        return 'alert-warning';
+      case MessageType.Info:
+        return 'alert-info';
+      case MessageType.Error:
+        return 'alert-danger';
+      default:
+        return 'alert-info';
+    }
   }
   public RemoveMessage(rmMsg: ShowMessage) {
     rmMsg.Show = false;
-    this.showMsgs.splice(this.showMsgs.indexOf(rmMsg), 1);
+    this.showMsg=null
   }
 
   public onDelClick(): void {
@@ -1042,7 +1073,7 @@ getImage(_custCD: number) {
    this.disabledOnNull=true;
    this.retrieveClicked=false
     this.custMstrFrm.reset();
-    this.showMsgs = [];
+    this.showMsg = null;
     this.showNoResult=false;
     this.enableModifyAndDel = false;
    
@@ -1080,6 +1111,7 @@ getImage(_custCD: number) {
       cust.last_name = this.f.last_name.value?.toUpperCase();
       cust.cust_name = this.f.cust_name.value?.toUpperCase();
       cust.guardian_name = this.f.guardian_name.value?.toUpperCase();
+      cust.guardian_relation = this.f.guardian_relation.value?.toUpperCase();
       // cust.cust_dt = ('' === this.f.cust_dt.value
       //   || '0001-01-01T00:00:00' === this.f.cust_dt.value) ? null : this.f.cust_dt.value;
       cust.cust_dt = this.sys.CurrentDate;
@@ -1362,14 +1394,14 @@ getImage(_custCD: number) {
                 console.log(res);
                 this.isLoading = false;
                 if(res > 0){
-                      this.showMsgs.length = 0;
+                      this.showMsg = null;
                     //  _mode == 'PIN' ? this.kycPhotoNo.nativeElement.focus() : this.kycAddressNo.nativeElement.focus()
                      this.HandleMessage(true, MessageType.Error, _type == 'P' ? `This pan card number is already exist for another customer, UCIC is ${res}}` 
                      :`This Aadhar number is already exist for another customerUCIC is ${res}`);  
                      this._isDisabled= true;              
                 }      
                 else{
-                  this.showMsgs.length = 0;
+                  this.showMsg = null;
                   this._isDisabled= false;              
                 }  
       } 
@@ -1402,7 +1434,7 @@ getImage(_custCD: number) {
                 console.log(res);
                 this.isLoading = false;
                 if(res > 0){
-                      this.showMsgs.length = 0;
+                       this.showMsg = null;
                       // _FLAG == 'PAN' ? this.pan.nativeElement.focus() : this.aadhar.nativeElement.focus()
                      this.HandleMessage(true, MessageType.Error, _FLAG == 'PAN' ? `This pan card number is already exist for another customer, UCIC is ${res}`
                      :`This Aadhar number is already exist for another customer, UCIC is ${res}`);  
@@ -1423,7 +1455,7 @@ getImage(_custCD: number) {
                     this.f.kyc_address_type.setValue('G');
                     this.f.kyc_address_no.setValue(this.f.aadhar.value);
                   }
-                  this.showMsgs.length = 0;
+                   this.showMsg = null;
                   this._isDisabled= false;              
                 }  
       } 

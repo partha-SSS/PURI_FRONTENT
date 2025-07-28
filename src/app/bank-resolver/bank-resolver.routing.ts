@@ -520,7 +520,7 @@ const routes: Routes = [
       { path: 'LR_FortNightNewConso', component: CtFortnightNewConsoComponent, canActivate: [AuthGuard] },
       { path: 'LR_letterMst', component: GoldRateMasterComponent, canActivate: [AuthGuard] },
       { path: 'LR_goldItem', component: GoldItemMasterComponent, canActivate: [AuthGuard] },
-      { path: 'LR_goldSafe', component: GoldSafeMasterComponent, canActivate: [AuthGuard] },
+      { path: 'LR_goldCarat', component: GoldSafeMasterComponent, canActivate: [AuthGuard] },
       { path: 'LR_goldLoanMst', component: GoldLoanMasterComponent, canActivate: [AuthGuard] },
       { path: 'LR_goldSlab', component: GoldLoanSlabMasterComponent, canActivate: [AuthGuard] },
       // { path: 'FT_PrintTrans', component: TransactionPrintComponent, canActivate: [AuthGuard] },
