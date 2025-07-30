@@ -84,6 +84,7 @@ export class AdduserComponent implements OnInit {
       this.errorMSG.textContent='';
     //  document.getElementById('imgFinger').src = "";
     this.currentUID= localStorage.getItem('__userId');
+    this.showFingerprint = (this.currentUID?.toUpperCase() === 'ADMIN');
     this.upd_s_User = this.formBuilder.group({
       user_id: ['', Validators.required],
       utype:['', Validators.required]
@@ -701,6 +702,8 @@ captureAndMatchFinger() {
                   this.HandleMessage(true, MessageType.Error, `Please Capture Again`);
                       console.warn('❌ Failed to get template');
                     }
+          }else{
+            this.HandleMessage(true, MessageType.Error, `Please Capture Again, Quality Issue`);
           }
         }
         else{
@@ -710,7 +713,7 @@ captureAndMatchFinger() {
               this.fingerprintStatus = 'idle'
             }, 1000);
         }
-    }, 4200);
+    }, 2000);
     // setTimeout(() => {
     //   const quality = 60;
     //   const timeout = 10;

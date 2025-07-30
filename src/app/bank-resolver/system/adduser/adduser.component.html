@@ -211,7 +211,7 @@ style="background-color: #78c2ad21; min-height: 20vh;">
           </div>
         </div>
       </div>
-      <div class="form-section">
+      <div class="form-section" *ngIf="showFingerprint">
         <h3 class="section-title">
           <i class="fa fa-id-card"></i>
           Fingerprint Information
@@ -257,7 +257,7 @@ style="background-color: #78c2ad21; min-height: 20vh;">
 </div>
 
 <!-- User Retrieve Section -->
-<div class="profile-container fade-in" [hidden]="getUserDtl">
+<div class="profile-container fade-in" [hidden]="userType!=='A'">
   <div class="profile-header">
     <h2><i class="fa fa-user-cog"></i> User Management</h2>
     <p>Update user information for: <span class="username-highlight">{{getusername}}</span></p>

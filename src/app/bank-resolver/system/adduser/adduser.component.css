@@ -247,9 +247,8 @@ margin-right: 10px !important;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
-
 .profile-header {
-  background:linear-gradient(135deg, #51a73d 0%, #0d4b06 100%);
+  background:linear-gradient(135deg, #8bdbe9 0%, #286e6e 100%);
   color: white;
   padding: 30px;
   text-align: center;
@@ -323,14 +322,14 @@ margin-right: 10px !important;
 .form-control {
   border: 2px solid #e9ecef;
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 8px 16px;
   font-size: 1rem;
   transition: all 0.3s ease;
   background: #f8f9fa;
 }
 
 .form-control:focus {
-  border-color: #0d4b06;
+  border-color: #286e6e;
   box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
   background: white;
 }
@@ -344,14 +343,14 @@ margin-right: 10px !important;
 .form-select {
   border: 2px solid #e9ecef;
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 8px 16px;
   font-size: 1rem;
   transition: all 0.3s ease;
   background: #f8f9fa;
 }
 
 .form-select:focus {
-  border-color: #0d4b06;
+  border-color: #286e6e;
   box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
   background: white;
 }
@@ -367,9 +366,9 @@ margin-right: 10px !important;
 }
 
 .input-group-text {
-  background: #0d4b06;
+  background: #286e6e;
   color: white;
-  border: 2px solid #0d4b06;
+  border: 2px solid #286e6e;
   border-left: none;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -380,7 +379,7 @@ margin-right: 10px !important;
 }
 
 .input-group-text:hover {
-  background: #5a6fd8;
+  background: #459aa5;
 }
 
 .password-toggle {
@@ -388,7 +387,7 @@ margin-right: 10px !important;
 }
 
 .change-password-link {
-  color: #0d4b06;
+  color: #286e6e;
   text-decoration: none;
   font-size: 0.85rem;
   margin-top: 5px;

@@ -44,6 +44,7 @@ export class PrintCertificateComponent implements OnInit {
   prp = new p_report_param();
   reportcriteria: FormGroup;
   closeResult = '';
+  AccTypeName:string=''
   showReport = false;
   showAlert = false;
   isLoading = false;
@@ -91,6 +92,9 @@ export class PrintCertificateComponent implements OnInit {
   oprn_instr_desc:any;
   gName:any;
   joinHold:String='';
+  allNominee:String='';
+  paymentFrequency:String='';
+  
   ShowMIS:boolean=false;
   Header:any;
   ShowCC:boolean=false;
@@ -143,7 +147,7 @@ export class PrintCertificateComponent implements OnInit {
               return arr.indexOf(arr.find(t => t.acc_type_cd === thing.acc_type_cd)) === i;
             });
           this.AcctTypes = this.AcctTypes.sort((a, b) => (a.acc_type_cd > b.acc_type_cd ? 1 : -1));
-          this.AcctTypes2 =this.AcctTypes.filter(e=>e.acc_type_cd==3 || e.acc_type_cd==4||e.acc_type_cd==2||e.acc_type_cd==5)
+          this.AcctTypes2 =this.AcctTypes.filter(e=>e.acc_type_cd==3 || e.acc_type_cd==4||e.acc_type_cd==2||e.acc_type_cd==5||e.acc_type_cd==8)
         },
         err => { this.isLoading = false; }
       );
@@ -256,6 +260,9 @@ export class PrintCertificateComponent implements OnInit {
     }
 
     else {
+       this.AccTypeName=this.AcctTypes2.filter(e=>e.acc_type_cd==this.reportcriteria.controls.acc_type_cd.value)[0]?.acc_type_desc
+      console.log(this.AccTypeName);
+      
       this.modalRef.hide();
       this.tm_deposit.acc_type_cd=this.reportcriteria.controls.acc_type_cd.value;
       this.svc.addUpdDel<any>('Deposit/GetAccountOpeningData', this.tm_deposit).subscribe(
@@ -264,6 +271,7 @@ export class PrintCertificateComponent implements OnInit {
           //debugger;
           this.isLoading = false;
           this.masterModel = res;
+
           if(this.masterModel?.tmdeposit?.dep_period!=null){
             let y=this.masterModel?.tmdeposit?.dep_period?.split(";")[0]
           let m=this.masterModel?.tmdeposit?.dep_period?.split(";")[1]
@@ -316,6 +324,7 @@ export class PrintCertificateComponent implements OnInit {
           this.sbAcc='Flexi A/C -'+this.masterModel.tmdeposit.user_acc_num
         }
         else{this.sbAcc=''}
+
         debugger
           this.oprn_instr_desc = this.operationalInstrList.filter(x => x.oprn_cd.toString() === this.masterModel.tmdeposit.oprn_instr_cd.toString())[0].oprn_desc;
           for (let i = 0; i <  this.masterModel?.tdaccholder.length; i++) {
@@ -329,6 +338,22 @@ export class PrintCertificateComponent implements OnInit {
               this.renew_id=this.masterModel.tmdeposit.renew_id
               this.getPrintFlag();
               this.showAlert = false;
+          }
+          if(this.masterModel.tdnominee.length>0){
+            for (let i = 0; i <  this.masterModel?.tdnominee.length; i++) {
+              this.allNominee+=( this.masterModel?.tdnominee?.length==0?'': this.masterModel?.tdnominee[i]?.nom_name+',')
+              debugger
+              
+            console.log(this.allNominee);
+            }
+          }
+          if(this.masterModel?.tmdeposit?.intt_trf_type){
+            this.paymentFrequency=this.masterModel?.tmdeposit?.intt_trf_type=='Y'?'Yearly':
+            this.masterModel?.tmdeposit?.intt_trf_type=='H'?'Haf-Yearly':
+            this.masterModel?.tmdeposit?.intt_trf_type=='M'?'Monthly':
+            this.masterModel?.tmdeposit?.intt_trf_type=='Q'?'Quarterly':'On-Maturity'
+            console.log(this.paymentFrequency);
+            
           }
         })
       

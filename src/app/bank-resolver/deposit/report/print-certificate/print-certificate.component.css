@@ -9,13 +9,15 @@
   .text-danger {
     font-size: larger!important;
   }
-  /* table, th, td {
+  table, th, td {
+     padding-top: 5px;
       border: 1px solid;
-      
+  
     }
-  table{
+  
+  /* table{
       margin-left: 17%;
-  }*/
+  } */
   .mkScroll{
     height:auto;
     max-height:450px;
@@ -114,11 +116,11 @@
   
   
   .mkSmall{
-    font-size: large;
-    width: 97%;
-    margin-top:3%;
+    font-size: 19px;
+    width: 95%;
+    margin-top:1%;
     margin-left:1%;
-    margin-bottom:3%;
+    /* margin-bottom:1%; */
   }
   
   
@@ -132,5 +134,5 @@
     mso-footer: footer;
   }*/
   @media print {
-   html,table{font-size: large;font-family:Arial, Helvetica, ui-sans-serif} 
+   /* html,table{font-size: large;font-family:Arial, Helvetica, ui-sans-serif}  */
   }

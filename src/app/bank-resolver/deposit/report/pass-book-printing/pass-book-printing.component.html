@@ -195,20 +195,20 @@
         
        </tfoot>
     </table>
-    <div id="hiddenTabRD" hidden>
+    <div id="hiddenTabRD">
       <br><br>
-      <table style="width: 60%;font-size: large;" class="mkSmallRD">
+      <table style="width: 85%;font-size: medium;margin-top: 75px;" class="mkSmallRD">
         <!-- to be change for alipur -->
         <tbody *ngFor="let i of printData; let itr=index;">
           <tr *ngIf="i.balance==null">
-            <td style="margin-top: 30px;">&nbsp;</td>
+            <td style="margin-top: 24px;">&nbsp;</td>
            </tr>
           <tr>
-            <td style="width: 15%; padding-left: 5%;">{{i.instrument_num}}</td>
-            <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
+            <td style="width:19%;text-align: center;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
             <td  style="width:35%; padding-left: 5%;"> {{i.ardb_cd}}</td>
+            <!-- <td style="width: 15%; padding-left: 5%;">{{i.instrument_num}}</td> -->
             <td style="text-align: right;">{{i.amount| number : '1.2-2'}}</td>
-            <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
+            <td style="text-align: right; ">{{i.balance | number : '1.2-2'}}</td>
 
 
             <!-- <td style="text-align:right">{{i.balance | number : '1.2-2'}}</td> -->
@@ -230,125 +230,27 @@
 
       </table>
       <!-- <br><br><br><br>
-<small>This report is generated through CFS-2022</small> -->
+<small>This report is generated through Synergic Banking</small> -->
     </div>
     <div id="hiddenTab" hidden>
       <br><br>
-      <table  class="mkSmall" *ngIf="sys.ardbCD!='22' && sys.ardbCD!='21' ">
-        <tbody *ngFor="let i of printData; let itr=index;">
-          <tr *ngIf="i.trans_type==null">
-           <td style="margin-top: 24px;">&nbsp;</td>
-          </tr>
-          <tr *ngIf="i.trans_type!==null">
-            <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
-            <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
-            
-            <td  style="width: 12%; text-align: right; padding-right:3%;">
-              {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
-             </td>
-             <td style="text-align: right;">
-             {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
-             </td>
-           <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
-            </tr>
-          
-
-        </tbody>
-        
-
-      </table>
-      <table  class="mkSmallBK" *ngIf="sys.ardbCD=='22'" >
-        <tbody *ngFor="let i of printData; let itr=index;">
-          <tr *ngIf="i.trans_type==null">
-           <td style="margin-top: 24px;">&nbsp;</td>
-          </tr>
-          <tr *ngIf="i.trans_type!==null">
-            <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
-            <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
-            
-            <td  style="width: 6%; text-align: right; padding-right:3%;">
-              {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
-             </td>
-             <td style="text-align: right;">
-             {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
-             </td>
-           <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
-            </tr>
-          
-
-        </tbody>
-        
-
-      </table>
-      <table  class="mkSmallRAM" *ngIf="sys.ardbCD=='21'" >
-        <tbody *ngFor="let i of printData; let itr=index;">
-          <tr *ngIf="i.trans_type==null">
-           <td style="margin-top: 18px;">&nbsp;</td>
-          </tr>
-          <tr *ngIf="i.trans_type!==null">
-            <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
-            <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
-            
-            <td  style="width: 6%; text-align: right; padding-right:3%;">
-              {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
-             </td>
-             <td style="text-align: right;">
-             {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
-             </td>
-           <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
-            </tr>
-          
-
-        </tbody>
-        
-
-      </table>
-     </div>
-     <div id="hiddenTabNP" hidden>
-      <br><br> <br>
       <table  class="mkSmall" >
-        <tbody *ngFor="let i of printData; let itr=index;" style="margin-left: 15px;margin-right: 15px;">
+        <tbody *ngFor="let i of printData; let itr=index;">
           <tr *ngIf="i.trans_type==null">
            <td style="margin-top: 24px;">&nbsp;</td>
-          </tr>
-          <tr *ngIf="i.trans_type!==null">
-            <td style="width:23%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
-            <td style="max-width: 210px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
-            
-            <td  style="width: 18%; text-align: right; padding-right:3%;">
-              {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
-             </td>
-             <td style="text-align: right;">
-             {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
-             </td>
-           <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
-            </tr>
-          
-
-        </tbody>
-        
-
-      </table>
-      
-     </div>
-    <div id="hiddenTabGhatal" hidden>
-      <br><br>
-      <table  class="mkSmall">
-        <tbody *ngFor="let i of printDataGhatal; let itr=index;">
-          <tr *ngIf="i.trans_type==null">
-           <td style="margin-top: 26px;">&nbsp;</td>
           </tr>
           <tr *ngIf="i.trans_type!==null">
             <td style="width:16%;">{{i.trans_dt==null?'':i.trans_dt.substr(0,10)}}</td>
             <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{i.particulars}}</td>
             
-            <td  style="width: 12%; text-align: right; padding-right:3%;">
+            <td  style="width: 130px; text-align: right;">
               {{(i.trans_type=='W'?i.amount:i.trans_type==null?'':'') | number : '1.2-2'}}
              </td>
-             <td style="text-align: right;">
+             <td style="width:130px;text-align: right;">
              {{(i.trans_type=='D'?i.amount:i.trans_type==null?'':'')| number : '1.2-2'}}
              </td>
-           <td style="text-align: right; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
+           <td style="text-align: right;width: 130px; padding-right: 2%;">{{i.balance | number : '1.2-2'}}</td>
+           <td style="width:120px;"></td>
             </tr>
           
 
@@ -356,23 +258,22 @@
         
 
       </table>
-      </div>
-    <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
-  </div>
   
-
-
-  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
-    <div>
-      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Back</button>
-      <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
-      printSectionId="{{printID}}" ngxPrint (click)="printCall()">Print</button>
- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
- <button mat-raised-button type="button" (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_PassBookFastPage']" >Print Fast Page</button>
- <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" 
- printSectionId="contai_head" ngxPrint > Print Header</button>
-    </div>
   </div>
+  </div>
+
+
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Back</button>
+        <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="{{printID}}" ngxPrint (click)="printCall()">Print</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        <button mat-raised-button type="button" (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_PassBookFastPage']" >Print Fast Page</button>
+        <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" 
+        printSectionId="contai_head" ngxPrint > Print Header</button>
+        </div>
+    </div>
 </div>
 <ng-template #nextpage let-modal data-keyboard="false" data-backdrop="false">
  
